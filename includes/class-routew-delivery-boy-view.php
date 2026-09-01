@@ -306,6 +306,15 @@ public function login_redirect_woocommerce($redirect, $user)
 public function mark_picked_up()
     {
         $order = $this->verify_delivery_action();
+        // State-guard: only allow the "picked up" transition from the
+        // pre-pickup states. mark_delivered() guards its transition; this
+        // one didn't, so a stale form submission or a duplicate form
+        // could roll back an already-completed order to routew-picked-up.
+        // (AUDIT-FIXES M4)
+        $valid_from = array('routew-assigned', 'routew-in-kitchen');
+        if (!in_array($order->get_status(), $valid_from, true)) {
+            wp_die(esc_html__('Order cannot be marked picked up from its current status.', 'routemile-for-woocommerce'));
+        }
         $order->update_status('routew-picked-up', __('Order picked up by delivery agent.', 'routemile-for-woocommerce'));
 
         wp_safe_redirect(home_url('/delivery-dashboard/?updated=1'));

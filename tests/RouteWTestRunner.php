@@ -440,6 +440,37 @@ class ROUTEWTestRunner
             }
         }
 
+        // M4 (state guard): picked-up transition must guard on from-status.
+        $dbv_file = $this->plugin_dir . '/includes/class-routew-delivery-boy-view.php';
+        $dbv = file_exists($dbv_file) ? file_get_contents($dbv_file) : '';
+        if (false !== strpos($dbv, "in_array(\$order->get_status(), \$valid_from, true)")) {
+            $this->pass('M4 status guard present in mark_picked_up()');
+        } else {
+            $this->fail('M4 status guard missing from mark_picked_up()');
+        }
+
+        // M10 (state-changing actions on POST): admin_post handlers registered
+        // and the legacy admin_init GET handler removed.
+        $oa_file = $this->plugin_dir . '/includes/class-routew-order-admin.php';
+        $oa = file_exists($oa_file) ? file_get_contents($oa_file) : '';
+        foreach (array(
+            "admin_post_routew_reject",
+            "admin_post_routew_reassign",
+            "function handle_reject(",
+            "function handle_reassign(",
+        ) as $needle) {
+            if (false !== strpos($oa, $needle)) {
+                $this->pass('M10 wired: ' . $needle);
+            } else {
+                $this->fail('M10 missing: ' . $needle);
+            }
+        }
+        if (false === strpos($oa, "add_action('admin_init', array(\$this, 'handle_order_actions'))")) {
+            $this->pass('M10 legacy admin_init GET handler removed');
+        } else {
+            $this->fail('M10 legacy admin_init GET handler still registered');
+        }
+
         // Check order statuses registration
         $statuses_file = $this->plugin_dir . '/includes/class-routew-order-statuses.php';
         $content = file_get_contents($statuses_file);

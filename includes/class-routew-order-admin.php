@@ -22,56 +22,69 @@ class ROUTEW_Order_Admin
 		add_action('add_meta_boxes', array($this, 'add_delivery_meta_box'));
 		add_action('woocommerce_process_shop_order_meta', array($this, 'save_delivery_meta_box_data'));
 		add_action('template_redirect', array($this, 'print_receipt_template'));
-		add_action('admin_init', array($this, 'handle_order_actions'));
+		// State-changing order actions move from admin_init + GET to
+		// dedicated admin_post_* POST handlers (reject, reassign). This
+		// shrinks the CSRF surface and matches WP's documented pattern
+		// for admin mutations. (AUDIT-FIXES M10)
+		add_action('admin_post_routew_reject', array($this, 'handle_reject'));
+		add_action('admin_post_routew_reassign', array($this, 'handle_reassign'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
 	}
 
 	/**
-	 * Handle order actions.
+	 * POST handler for the "Reject Order" action.
 	 *
-	 * @since    1.0.0
+	 * @since 1.5.0
 	 */
-	public function handle_order_actions()
+	public function handle_reject()
 	{
-		if (isset($_GET['routew_action']) && isset($_GET['order_id']) && isset($_GET['_wpnonce'])) {
-			if (!current_user_can('edit_shop_orders')) {
-				wp_die(esc_html__('Unauthorized.', 'routemile-for-woocommerce'));
-			}
-
-			$nonce = sanitize_text_field(wp_unslash($_GET['_wpnonce']));
-			if (!wp_verify_nonce($nonce, 'routew_order_action')) {
-				wp_die(esc_html__('Invalid nonce.', 'routemile-for-woocommerce'));
-			}
-
-			$order_id = absint($_GET['order_id']);
-			$order = wc_get_order($order_id);
-
-			if (!$order) {
-				wp_die(esc_html__('Invalid order.', 'routemile-for-woocommerce'));
-			}
-
-			switch (sanitize_text_field(wp_unslash($_GET['routew_action']))) {
-				case 'reject':
-					$order->update_status('cancelled', __('Order rejected by admin.', 'routemile-for-woocommerce'));
-					break;
-case 'reassign':
-						// Reassign also drops the rider meta AND reverts
-						// the order status so it doesn't sit in routew-assigned
-						// with no rider (1.2.16).
-						$order->delete_meta_data('_routew_delivery_boy_id');
-						$revert_to = get_post_status_object('wc-routew-in-kitchen') ? 'routew-in-kitchen' : 'processing';
-						$order->update_status($revert_to, __('Delivery boy has been unassigned — order returned to kitchen.', 'routemile-for-woocommerce'));
-						$order->save();
-						// Wipe the now-stale location PII. (AUDIT-FIXES M2)
-						if (class_exists('ROUTEW_Order_Lifecycle')) {
-							ROUTEW_Order_Lifecycle::clear_delivery_location_meta($order_id);
-						}
-						break;
-			}
-
-			wp_safe_redirect(remove_query_arg(array('routew_action', '_wpnonce')));
-			exit;
+		if (!current_user_can('edit_shop_orders')) {
+			wp_die(esc_html__('Unauthorized.', 'routemile-for-woocommerce'));
 		}
+		$nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+		if (!wp_verify_nonce($nonce, 'routew_order_action')) {
+			wp_die(esc_html__('Invalid nonce.', 'routemile-for-woocommerce'));
+		}
+		$order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
+		$order = wc_get_order($order_id);
+		if (!$order) {
+			wp_die(esc_html__('Invalid order.', 'routemile-for-woocommerce'));
+		}
+		$order->update_status('cancelled', __('Order rejected by admin.', 'routemile-for-woocommerce'));
+		wp_safe_redirect(remove_query_arg(array('routew_action', '_wpnonce')));
+		exit;
+	}
+
+	/**
+	 * POST handler for the "Re-assign" action.
+	 *
+	 * @since 1.5.0
+	 */
+	public function handle_reassign()
+	{
+		if (!current_user_can('edit_shop_orders')) {
+			wp_die(esc_html__('Unauthorized.', 'routemile-for-woocommerce'));
+		}
+		$nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+		if (!wp_verify_nonce($nonce, 'routew_order_action')) {
+			wp_die(esc_html__('Invalid nonce.', 'routemile-for-woocommerce'));
+		}
+		$order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
+		$order = wc_get_order($order_id);
+		if (!$order) {
+			wp_die(esc_html__('Invalid order.', 'routemile-for-woocommerce'));
+		}
+		// Drops rider meta AND reverts the order so it doesn't sit in
+		// routew-assigned with no rider (1.2.16).
+		$order->delete_meta_data('_routew_delivery_boy_id');
+		$revert_to = get_post_status_object('wc-routew-in-kitchen') ? 'routew-in-kitchen' : 'processing';
+		$order->update_status($revert_to, __('Delivery boy has been unassigned — order returned to kitchen.', 'routemile-for-woocommerce'));
+		$order->save();
+		if (class_exists('ROUTEW_Order_Lifecycle')) {
+			ROUTEW_Order_Lifecycle::clear_delivery_location_meta($order_id);
+		}
+		wp_safe_redirect(remove_query_arg(array('routew_action', '_wpnonce')));
+		exit;
 	}
 
 	/**
@@ -271,10 +284,18 @@ case 'reassign':
 			$edit_link = admin_url('admin.php?page=wc-orders&action=edit&id=' . absint($order_id));
 		}
 			?>
-			<a href="<?php echo esc_url(wp_nonce_url(add_query_arg('routew_action', 'reject', $edit_link), 'routew_order_action')); ?>"
-				class="button button-danger"><?php esc_html_e('Reject Order', 'routemile-for-woocommerce'); ?></a>
-			<a href="<?php echo esc_url(wp_nonce_url(add_query_arg('routew_action', 'reassign', $edit_link), 'routew_order_action')); ?>"
-				class="button"><?php esc_html_e('Re-assign', 'routemile-for-woocommerce'); ?></a>
+			<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline-block;">
+				<?php wp_nonce_field('routew_order_action'); ?>
+				<input type="hidden" name="action" value="routew_reject" />
+				<input type="hidden" name="order_id" value="<?php echo esc_attr($order_id); ?>" />
+				<button type="submit" class="button button-danger"><?php esc_html_e('Reject Order', 'routemile-for-woocommerce'); ?></button>
+			</form>
+			<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline-block;">
+				<?php wp_nonce_field('routew_order_action'); ?>
+				<input type="hidden" name="action" value="routew_reassign" />
+				<input type="hidden" name="order_id" value="<?php echo esc_attr($order_id); ?>" />
+				<button type="submit" class="button"><?php esc_html_e('Re-assign', 'routemile-for-woocommerce'); ?></button>
+			</form>
 		</p>
 		<?php
 	}
