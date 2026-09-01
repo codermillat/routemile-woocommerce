@@ -366,3 +366,463 @@
 	background: var(--bs-primary);
 	border-radius: 2px;
 }
+
+/* ============================================================================
+   7. Orders list (/my-account/orders/)
+   Wrap the WC orders table in card styling and restyle action buttons.
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table,
+.woocommerce-account.routew-my-account-styled table.shop_table {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	box-shadow: var(--routew-account-shadow);
+	border-collapse: separate;
+	border-spacing: 0;
+	overflow: hidden;
+	font-size: 0.92em;
+	margin: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table thead th,
+.woocommerce-account.routew-my-account-styled table.shop_table thead th {
+	background: #FAF8F5;
+	color: var(--bs-body-color);
+	font-weight: 700;
+	font-size: 0.78em;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	padding: 12px 14px;
+	border: none;
+	border-bottom: 1px solid var(--bs-border-color);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tbody td,
+.woocommerce-account.routew-my-account-styled table.shop_table tbody td {
+	padding: 14px;
+	border: none;
+	border-top: 1px solid #F0EEEA;
+	vertical-align: middle;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tbody tr:first-child td,
+.woocommerce-account.routew-my-account-styled table.shop_table tbody tr:first-child td {
+	border-top: none;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tbody tr {
+	transition: background 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tbody tr:hover {
+	background: rgba(232, 93, 4, 0.03);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-number a,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .woocommerce-orders-table__cell-order-number a {
+	color: var(--bs-primary);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	text-decoration: none;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-number a:hover,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .woocommerce-orders-table__cell-order-number a:hover {
+	text-decoration: underline;
+}
+
+/* Order status pills in the table */
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-status,
+.woocommerce-account.routew-my-account-styled table.shop_table .order-status {
+	display: inline-block;
+	font-size: 0.78em;
+	font-weight: 600;
+	padding: 4px 10px;
+	border-radius: 999px;
+	letter-spacing: 0.02em;
+	line-height: 1.4;
+	background: #F0EEEA;
+	color: #5A5A5A;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-status.status-completed,
+.woocommerce-account.routew-my-account-styled table.shop_table .order-status.status-completed {
+	background: rgba(31, 138, 76, 0.12);
+	color: #1F8A4C;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-status.status-processing,
+.woocommerce-account.routew-my-account-styled table.shop_table .order-status.status-processing {
+	background: rgba(30, 111, 184, 0.12);
+	color: #1E6FB8;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-status.status-on-hold,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-status.status-pending,
+.woocommerce-account.routew-my-account-styled table.shop_table .order-status.status-on-hold,
+.woocommerce-account.routew-my-account-styled table.shop_table .order-status.status-pending {
+	background: rgba(245, 158, 11, 0.12);
+	color: #B45309;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-status.status-cancelled,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-status.status-refunded,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-status.status-failed,
+.woocommerce-account.routew-my-account-styled table.shop_table .order-status.status-cancelled,
+.woocommerce-account.routew-my-account-styled table.shop_table .order-status.status-refunded,
+.woocommerce-account.routew-my-account-styled table.shop_table .order-status.status-failed {
+	background: rgba(192, 50, 43, 0.12);
+	color: #C0322B;
+}
+
+/* Action buttons inside the orders table */
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .woocommerce-button,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px 12px;
+	min-height: 32px;
+	font-size: 0.82em;
+	font-weight: 600;
+	border-radius: var(--bs-border-radius-sm);
+	background: var(--bs-primary);
+	border: 1px solid var(--bs-primary);
+	color: #fff !important;
+	text-decoration: none !important;
+	cursor: pointer;
+	transition: background 0.15s ease, transform 0.15s ease;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .woocommerce-button:hover,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .button:hover {
+	background: #D44D00;
+	border-color: #D44D00;
+	transform: translateY(-1px);
+}
+
+/* No orders message */
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .woocommerce-Message {
+	background: #fff;
+	border: 1px dashed var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	padding: 32px 24px;
+	text-align: center;
+	color: var(--bs-body-color);
+	margin-bottom: 1em;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .woocommerce-Message .button {
+	background: var(--bs-primary);
+	color: #fff;
+	border: none;
+	margin-top: 16px;
+	padding: 10px 20px;
+	border-radius: var(--bs-border-radius-sm);
+}
+
+/* ============================================================================
+   8. View Order page (/my-account/view-order/{id}/)
+   Wrap order details + tracking block in cards, restyle meta rows.
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-order {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	box-shadow: var(--routew-account-shadow);
+	padding: 24px;
+	margin-bottom: 18px;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-order .woocommerce-MyAccount-content > h2 {
+	margin-top: 0;
+}
+
+/* Order header — order number + status + date */
+.woocommerce-account.routew-my-account-styled .woocommerce-order-overview {
+	display: flex !important;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding: 16px 0 !important;
+	margin: 0 0 18px !important;
+	border-top: 1px solid var(--bs-border-color);
+	border-bottom: 1px solid var(--bs-border-color);
+	background: transparent !important;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-order-overview li {
+	flex: 1 1 140px;
+	min-width: 0;
+	padding: 0 !important;
+	border: none !important;
+	text-transform: none !important;
+	color: var(--bs-body-color);
+	font-size: 0.9em;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-order-overview li strong {
+	display: block;
+	font-size: 0.74em;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #6B6B6B;
+	margin-bottom: 4px;
+}
+
+/* Product line-items table */
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	border-collapse: separate;
+	border-spacing: 0;
+	overflow: hidden;
+	margin: 18px 0;
+	font-size: 0.92em;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details thead th {
+	background: #FAF8F5;
+	color: var(--bs-body-color);
+	font-weight: 700;
+	font-size: 0.78em;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	padding: 12px 14px;
+	border: none;
+	border-bottom: 1px solid var(--bs-border-color);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tbody td {
+	padding: 12px 14px;
+	border: none;
+	border-top: 1px solid #F0EEEA;
+	vertical-align: middle;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tfoot th,
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tfoot td {
+	padding: 10px 14px;
+	border: none;
+	border-top: 1px solid var(--bs-border-color);
+	font-size: 0.95em;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tfoot tr:last-child th,
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tfoot tr:last-child td {
+	font-weight: 700;
+	font-size: 1.05em;
+	color: var(--bs-body-color);
+}
+
+/* Order detail product link */
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details a {
+	color: var(--bs-body-color);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details a:hover {
+	color: var(--bs-primary);
+}
+
+/* Order-again button + Re-order button (rendered by routew-shortcodes) */
+.woocommerce-account.routew-my-account-styled .order-again,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .button.re-order {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 12px 24px;
+	min-height: 44px;
+	background-color: var(--bs-primary);
+	border: 1px solid var(--bs-primary);
+	color: #fff !important;
+	font-weight: 700;
+	font-size: 0.95em;
+	border-radius: var(--bs-border-radius);
+	text-decoration: none !important;
+	box-shadow: 0 4px 12px rgba(232, 93, 4, 0.18);
+	transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .order-again:hover,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .button.re-order:hover {
+	background-color: #D44D00;
+	border-color: #D44D00;
+	transform: translateY(-1px);
+	box-shadow: 0 6px 20px rgba(232, 93, 4, 0.24);
+}
+
+/* Customer + billing address blocks in view-order */
+.woocommerce-account.routew-my-account-styled .woocommerce-customer-details,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .addresses {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 16px;
+	margin-top: 18px;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-customer-details .woocommerce-column__title,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .addresses h2,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .addresses h3 {
+	grid-column: 1 / -1;
+	margin: 0;
+	font-size: 1.1em;
+	font-weight: 700;
+	color: var(--bs-body-color);
+}
+
+/* ============================================================================
+   9. Edit Address (/my-account/edit-address/)
+   Convert the Billing/Shipping address cards into Bootstrap-styled cards.
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-Addresses {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	gap: 16px;
+	margin: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	box-shadow: var(--routew-account-shadow);
+	padding: 20px 22px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address:hover {
+	box-shadow: var(--routew-dash-shadow-md, 0 4px 16px rgba(20, 14, 8, 0.06));
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin: 0;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--bs-border-color);
+	font-size: 1.05em;
+	font-weight: 700;
+	color: var(--bs-body-color);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h3 {
+	margin: 0;
+	font-size: inherit;
+	font-weight: inherit;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title .edit {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 10px;
+	min-height: 28px;
+	background: transparent;
+	color: var(--bs-primary);
+	border: 1px solid var(--bs-primary);
+	font-size: 0.78em;
+	font-weight: 600;
+	border-radius: var(--bs-border-radius-sm);
+	text-decoration: none;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title .edit:hover {
+	background: var(--bs-primary);
+	color: #fff;
+}
+
+.woocommerce-account.routew-my-account-styled address {
+	font-style: normal;
+	color: var(--bs-body-color);
+	line-height: 1.55;
+}
+
+/* ============================================================================
+   10. Edit Account (/my-account/edit-account/)
+   Group fields into Bootstrap form cards.
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	box-shadow: var(--routew-account-shadow);
+	padding: 20px 22px;
+	margin: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset legend {
+	display: inline-block;
+	padding: 4px 10px;
+	font-size: 0.78em;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+	background: #FFF4ED;
+	border-radius: var(--bs-border-radius-sm);
+	margin-bottom: 12px;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .form-row {
+	margin-bottom: 1em;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .form-row label {
+	font-weight: 600;
+	font-size: 0.85em;
+	color: var(--bs-body-color);
+	margin-bottom: 4px;
+	display: block;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .button,
+.woocommerce-account.routew-my-account-styled button.button[type="submit"] {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 12px 28px;
+	min-height: 44px;
+	background-color: var(--bs-primary);
+	border: 1px solid var(--bs-primary);
+	color: #fff !important;
+	font-weight: 600;
+	font-size: 0.95em;
+	border-radius: var(--bs-border-radius);
+	text-decoration: none !important;
+	cursor: pointer;
+	transition: background 0.15s ease, transform 0.15s ease;
+	box-shadow: 0 2px 8px rgba(232, 93, 4, 0.18);
+	margin-top: 8px;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .button:hover,
+.woocommerce-account.routew-my-account-styled button.button[type="submit"]:hover {
+	background-color: #D44D00;
+	border-color: #D44D00;
+	transform: translateY(-1px);
+}
+
+/* Password change legend — separate fieldset gets a different accent */
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset:nth-of-type(2) legend {
+	color: #1E6FB8;
+	background: #E7F1FB;
+}

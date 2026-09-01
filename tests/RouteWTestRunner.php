@@ -891,6 +891,51 @@ class ROUTEWTestRunner
             $this->fail('UI3 mobile bottom-tab does not respect safe-area-inset-bottom');
         }
 
+        // UI4 — Sub-page polish (Batch 4).
+        // Verifies the WC sub-pages (Orders list, View Order, Edit Address,
+        // Edit Account) now have Bootstrap-styled CSS that targets their
+        // stock WC classes — no template changes, just CSS-only composition.
+        $my_account_css = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
+
+        // Orders list table — wc_orders-table + shop_table.
+        if (false !== strpos($my_account_css, '.woocommerce-orders-table') && false !== strpos($my_account_css, 'table.shop_table')) {
+            $this->pass('UI4 orders list table styled (.woocommerce-orders-table + table.shop_table)');
+        } else {
+            $this->fail('UI4 orders list table styling missing for .woocommerce-orders-table');
+        }
+
+        // View Order — order overview + order details table + re-order button.
+        $view_order_signals = array(
+            '.woocommerce-order-overview' => 'order overview grid',
+            '.woocommerce-table--order-details' => 'order details table',
+            'order-again' => 'order-again button',
+        );
+        $missing_signals = array();
+        foreach ($view_order_signals as $needle => $label) {
+            if (false === strpos($my_account_css, $needle)) {
+                $missing_signals[] = $label;
+            }
+        }
+        if (empty($missing_signals)) {
+            $this->pass('UI4 view order page styled (overview grid + details table + re-order button)');
+        } else {
+            $this->fail('UI4 view order page missing styles for: ' . implode(', ', $missing_signals));
+        }
+
+        // Edit Address — wc Addresses grid + edit link styling.
+        if (false !== strpos($my_account_css, '.woocommerce-Addresses') && false !== strpos($my_account_css, '.woocommerce-Address-title') && false !== strpos($my_account_css, 'grid-template-columns: repeat(auto-fit, minmax(320px')) {
+            $this->pass('UI4 edit address page styled (Addresses grid + title + edit link)');
+        } else {
+            $this->fail('UI4 edit address page missing styles for .woocommerce-Addresses grid');
+        }
+
+        // Edit Account — form fieldsets styled as Bootstrap cards.
+        if (false !== strpos($my_account_css, '.woocommerce-EditAccountForm fieldset') && false !== strpos($my_account_css, 'legend')) {
+            $this->pass('UI4 edit account page styled (fieldset cards + legend pills)');
+        } else {
+            $this->fail('UI4 edit account page missing styles for .woocommerce-EditAccountForm fieldset');
+        }
+
         echo "\n";
     }
 
