@@ -46,27 +46,79 @@ class ROUTEW_Session_Helper
     }
 
     /**
+     * Resolve the active WC session across the WC 3.6+ split between
+     * method-style (`WC()->session()`) and the older direct property
+     * (`WC()->session`). Returns null on any failure (uninitialised
+     * session handler, subclass without override, fatal during Blocks
+     * order-confirmation render, etc.) so the caller can no-op safely.
+     *
+     * @return \WC_Session|null
+     */
+    private static function safe_get_session()
+    {
+        if (!class_exists('WC_Session')) {
+            return null;
+        }
+        if (!function_exists('WC')) {
+            return null;
+        }
+        try {
+            $wc = WC();
+        } catch (\Throwable $e) {
+            return null;
+        }
+        if (!$wc) {
+            return null;
+        }
+        // Modern WC (3.6+).
+        if (method_exists($wc, 'session')) {
+            try {
+                $session = $wc->session();
+                return $session ? $session : null;
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+        // Legacy direct property access (WC < 3.6 fallback).
+        if (isset($wc->session) && is_object($wc->session)) {
+            return $wc->session;
+        }
+        return null;
+    }
+
+    /**
      * Remove all RouteMile-owned session keys.
      *
      * Safe to call when `WC()->session` is unavailable (CLI, REST
-     * pre-init, etc.) — we just no-op.
+     * pre-init, Blocks order-confirmation render before the session
+     * handler is bootstrapped, etc.) — we just no-op.
      *
      * @return void
      */
     public static function clear_customer_session_data()
     {
-        if (!class_exists('WC_Session') || null === WC()->session()) {
+        $session = self::safe_get_session();
+        if (!$session) {
             return;
         }
         // WC_Session exposes an array-like interface, but each subclass
         // (WC_Session_Handler / WC_Session_Tracker) handles direct
         // property access differently. set() with null drops the key.
-        $session = WC()->session();
+        // Wrap individual set() calls — a throwing subclass should not
+        // block cleanup of the remaining keys.
         foreach (self::owned_keys() as $key) {
-            $session->set($key, null);
+            try {
+                $session->set($key, null);
+            } catch (\Throwable $e) {
+                // Skip this key — defensive against subclass quirks.
+            }
         }
         if (function_exists('wc_get_logger')) {
-            wc_get_logger()->debug('RouteMile session data cleared on lifecycle event.', array('source' => 'routemile-for-woocommerce'));
+            try {
+                wc_get_logger()->debug('RouteMile session data cleared on lifecycle event.', array('source' => 'routemile-for-woocommerce'));
+            } catch (\Throwable $e) {
+                // Logger failures must never break checkout render.
+            }
         }
     }
 

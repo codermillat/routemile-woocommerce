@@ -657,6 +657,55 @@ class ROUTEWTestRunner
             }
         }
 
+        // R4 — WC session access in the session helper must be defensively
+        // guarded. The Blocks order-confirmation page fires
+        // `woocommerce_thankyou` while the WC session handler is still
+        // bootstrapping; a bare `WC()->session()` call there throws
+        // "Call to undefined method WooCommerce::session()" and 500s the
+        // thank-you page. (REGRESSION-FIX R4)
+        $session_helper = $this->plugin_dir . '/includes/services/class-routew-session-helper.php';
+        if (file_exists($session_helper)) {
+            $sh = file_get_contents($session_helper);
+            // The class must NOT contain a bare `WC()->session()` parens call
+            // outside of method_exists() / class_exists() guards. Strip
+            // line comments and block comments first so docstring references
+            // don't trigger the assertion.
+            $sh_code = preg_replace('!//.*!', '', $sh);
+            $sh_code = preg_replace('!/\*.*?\*/!s', '', $sh_code);
+            $unsafe = preg_match(
+                '/(?<!method_)\b(?:WC\(\))->session\s*\(\s*\)/',
+                $sh_code
+            );
+            if (0 === $unsafe) {
+                $this->pass('R4 no bare WC()->session() calls in session helper');
+            } else {
+                $this->fail('R4 bare WC()->session() call present — will fatal during Blocks order-confirmation render');
+            }
+            // And the helper must have a safe getter that prefers method_exists.
+            if (preg_match('/function\s+safe_get_session\s*\(/', $sh)
+                && preg_match('/method_exists\s*\(\s*\$wc\s*,\s*[\'"]session[\'"]/', $sh)
+            ) {
+                $this->pass('R4 safe_get_session() helper present with method_exists guard');
+            } else {
+                $this->fail('R4 safe_get_session() helper missing or unguarded');
+            }
+            // All hooks must still be present (regression-cover the audit H4 fix).
+            foreach (array(
+                'woocommerce_checkout_order_created' => 'H4 hook present: woocommerce_checkout_order_created',
+                'woocommerce_thankyou' => 'H4 hook present: woocommerce_thankyou',
+                'woocommerce_order_status_cancelled' => 'H4 hook present: woocommerce_order_status_cancelled',
+                'wp_logout' => 'H4 hook present: wp_logout',
+            ) as $hook => $label) {
+                if (false !== strpos($sh, "'" . $hook . "'") || false !== strpos($sh, '"' . $hook . '"')) {
+                    $this->pass($label);
+                } else {
+                    $this->fail($label);
+                }
+            }
+        } else {
+            $this->fail('R4 session helper file missing: ' . $session_helper);
+        }
+
         echo "\n";
     }
 
