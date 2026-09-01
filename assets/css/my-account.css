@@ -2123,3 +2123,351 @@
 		background: #ffffff !important;
 	}
 }
+
+/* ============================================================================
+   17. Edit Account — polish / very-bad → native-app.
+   The previous layout used `220px 1fr` for the .woocommerce-EditAccountForm
+   grid which left an EMPTY 220px-wide avatar column on desktop — the form
+   was stranded in the right column with too much breathing room around it.
+   This collapses that to a single full-width column with grouped field rows
+   (2-col internal grid), tighter fieldset cards, and an inline save footer.
+   ============================================================================ */
+
+/* 17.1. Edit-account form: single full-width column, no avatar island */
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm {
+	display: flex;
+	flex-direction: column;
+	gap: var(--routew-spacing-4);
+}
+
+@media (min-width: 768px) {
+	/* Replaces the 220px / 1fr split. Avatar is now inline at the top of the
+	   form rather than a side column. */
+	.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm::before {
+		display: block;
+		width: 80px;
+		height: 80px;
+		margin: 0 auto var(--routew-spacing-3);
+		border-radius: 50%;
+		background: linear-gradient(135deg, var(--bs-primary) 0%, #D44D00 100%);
+		box-shadow: 0 4px 16px rgba(232, 93, 4, 0.25);
+		content: "";
+	}
+}
+
+/* 17.2. Fieldset card: tighter padding, better hierarchy */
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	box-shadow: var(--routew-shadow-card);
+	padding: var(--routew-spacing-4) var(--routew-spacing-5);
+	margin: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset legend {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 12px;
+	font-size: 0.78em;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+	background: #FFF4ED;
+	border-radius: var(--routew-radius-sm);
+	margin-bottom: var(--routew-spacing-3);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset:nth-of-type(2) legend {
+	color: #1E6FB8;
+	background: #E7F1FB;
+}
+
+/* 17.3. Grouped field rows (First/Last name on one line, etc.) */
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset .form-row:not(.form-row-wide),
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset .form-row-first,
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset .form-row-last,
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset .form-row-first.form-row-last {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: var(--routew-spacing-3);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset label,
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset .form-row label {
+	font-weight: 600;
+	font-size: 0.85em;
+	color: var(--bs-body-color);
+	margin-bottom: 6px;
+	display: block;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset input[type="text"],
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset input[type="email"],
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset input[type="tel"],
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset input[type="password"],
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset input[type="url"],
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset select,
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset textarea {
+	width: 100%;
+	padding: 10px 12px;
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-sm);
+	font-size: 0.95em;
+	line-height: 1.4;
+	color: var(--bs-body-color);
+	box-sizing: border-box;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset input:focus-visible,
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset select:focus-visible,
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset textarea:focus-visible {
+	outline: none;
+	border-color: var(--bs-primary);
+	box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.18);
+}
+
+/* 17.4. Save button (legend pill → primary CTA) */
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .button,
+.woocommerce-account.routew-my-account-styled button.button[type="submit"] {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 12px 28px;
+	min-height: 44px;
+	background-color: var(--bs-primary);
+	border: 1px solid var(--bs-primary);
+	color: #fff !important;
+	font-weight: 600;
+	font-size: 0.95em;
+	border-radius: var(--bs-radius);
+	text-decoration: none !important;
+	cursor: pointer;
+	transition: background 0.15s ease, transform 0.15s ease;
+	box-shadow: 0 2px 8px rgba(232, 93, 4, 0.18);
+	margin-top: var(--routew-spacing-2);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .button:hover,
+.woocommerce-account.routew-my-account-styled button.button[type="submit"]:hover {
+	background-color: #D44D00;
+	border-color: #D44D00;
+	transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+	.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .button,
+	.woocommerce-account.routew-my-account-styled button.button[type="submit"] {
+		width: 100%;
+	}
+}
+
+/* ============================================================================
+   18. Edit Address — iOS card-pair, no empty columns, tighter form layout
+   ============================================================================ */
+
+/* 18.1. Stack the Billing / Shipping address cards on mobile (already auto-fit
+   on desktop; force single-column stack on narrow viewports) */
+@media (max-width: 600px) {
+	.woocommerce-account.routew-my-account-styled .woocommerce-Addresses {
+		grid-template-columns: 1fr !important;
+	}
+}
+
+/* 18.2. Address card preview — compact, breathing room */
+.woocommerce-account.routew-my-account-styled .woocommerce-Address {
+	display: flex;
+	flex-direction: column;
+	gap: var(--routew-spacing-3);
+	padding: var(--routew-spacing-4);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--routew-spacing-3);
+	margin: 0;
+	padding-bottom: var(--routew-spacing-3);
+	border-bottom: 1px solid var(--bs-border-color);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h3 {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	font-size: 1.05em;
+	font-weight: 700;
+	color: var(--bs-body-color);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title .edit {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 12px;
+	min-height: 32px;
+	background: transparent;
+	color: var(--bs-primary);
+	border: 1px solid var(--bs-primary);
+	border-radius: var(--routew-radius-sm);
+	font-size: 0.78em;
+	font-weight: 600;
+	text-decoration: none;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title .edit:hover {
+	background: var(--bs-primary);
+	color: #fff;
+}
+
+/* 18.3. Address card body — address block + actions in a single card */
+.woocommerce-account.routew-my-account-styled .woocommerce-Address address {
+	font-style: normal;
+	color: var(--bs-body-color);
+	line-height: 1.55;
+	background: #FAF8F5;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-sm);
+	padding: 14px 16px;
+	margin: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address .title {
+	display: block;
+	font-size: 0.72em;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+	margin-bottom: 4px;
+}
+
+/* ============================================================================
+   19. Orders list — filter chips + iOS-style empty state
+   ============================================================================ */
+
+/* 19.1. Filter chip row (chips are rendered by JS hook on the orders page;
+   we just style them as iOS-style pill buttons) */
+.woocommerce-account.routew-my-account-styled .routew-orders-filter {
+	display: flex;
+	gap: 8px;
+	margin-bottom: var(--routew-spacing-4);
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter::-webkit-scrollbar {
+	display: none;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip {
+	flex-shrink: 0;
+	padding: 8px 16px;
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 999px;
+	font-size: 0.85em;
+	font-weight: 600;
+	color: var(--bs-body-color);
+	text-decoration: none;
+	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip--active,
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip:hover {
+	background: var(--bs-primary);
+	border-color: var(--bs-primary);
+	color: #fff;
+}
+
+/* 19.2. iOS-style empty state (when no orders) */
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .woocommerce-Message {
+	background: #fff;
+	border: 1px dashed var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	padding: var(--routew-spacing-7) var(--routew-spacing-5);
+	text-align: center;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .woocommerce-Message .button {
+	background-color: var(--bs-primary);
+	color: #fff;
+	border: none;
+	padding: 10px 22px;
+	margin-top: var(--routew-spacing-4);
+	border-radius: var(--bs-radius);
+}
+
+/* ============================================================================
+   20. Tighten view-order sub-page elements (Header h1 size, Order again CTA prominence)
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-order > h1,
+.woocommerce-account.routew-my-account-styled .woocommerce-order > header h1 {
+	font-size: 1.75em;
+	font-weight: 800;
+	letter-spacing: -0.015em;
+}
+
+.woocommerce-account.routew-my-account-styled .order-again {
+	font-size: 1em;
+	min-height: 48px;
+	padding: 14px 32px;
+}
+
+@media (max-width: 600px) {
+	.woocommerce-account.routew-my-account-styled .order-again {
+		width: 100%;
+	}
+}
+
+/* ============================================================================
+   21. Compact view-order sub-page layout — Order-details card + customer/
+   billing address columns collapsed into a single row on narrow viewports
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-customer-details,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .addresses {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: var(--routew-spacing-3);
+	padding: 0;
+	border: 0;
+	box-shadow: none;
+	background: transparent;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-customer-details > section,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .addresses > section {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-md);
+	padding: var(--routew-spacing-4);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-customer-details > section h2,
+.woocommerce-account.routew-my-account-styled .woocommerce-customer-details > section h3,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .addresses > section h2 {
+	margin: 0 0 8px;
+	font-size: 0.78em;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-customer-details address,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .addresses address {
+	font-style: normal;
+	color: var(--bs-body-color);
+	line-height: 1.55;
+}

@@ -1099,6 +1099,31 @@ class ROUTEWTestRunner
             $this->fail('UI6 my-account.css missing CSS: ' . implode(', ', $missing_native_css));
         }
 
+        // UI7 — Sub-page polish: tighten edit-account, edit-address, orders
+        // list, view-order. Verifies the CSS targets the WC stock classes
+        // (woocommerce-EditAccountForm, woocommerce-Address, etc.) plus a
+        // few selector signals.
+        $ui7_css_signals = array(
+            '.woocommerce-EditAccountForm fieldset input' => 'fieldset input restyled',
+            '.woocommerce-Address-title .edit:hover' => 'address edit-link hover state',
+            '.woocommerce-Address-title h3' => 'address title typography',
+            '.routew-orders-filter__chip' => 'orders filter chip',
+            '.routew-orders-filter__chip--active' => 'orders filter active state',
+            '.order-again' => 'order-again CTA styling',
+            '.woocommerce-customer-details > section' => 'customer details column',
+        );
+        $missing_ui7 = array();
+        foreach ($ui7_css_signals as $needle => $label) {
+            if (false === strpos($my_account_css, $needle)) {
+                $missing_ui7[] = $label;
+            }
+        }
+        if (empty($missing_ui7)) {
+            $this->pass('UI7 my-account.css has all sub-page polish CSS signals');
+        } else {
+            $this->fail('UI7 my-account.css missing CSS: ' . implode(', ', $missing_ui7));
+        }
+
         echo "\n";
     }
 
