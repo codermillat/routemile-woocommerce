@@ -241,6 +241,27 @@ class ROUTEW_Checkout_Handler
             $order->set_shipping_address_2(sprintf('%s: %s', __('Landmark', 'routemile-for-woocommerce'), $landmark));
         }
 
+        // Snapshot the live session into a guest profile key so that a guest
+        // returning in the same browser on the next visit (same session
+        // cookie) gets their pin pre-loaded by load_saved_address(). Logged-in
+        // users get this via user meta (save_delivery_profile_for_user); the
+        // session snapshot is the guest analogue. (AUDIT-FIXES L4)
+        if (WC()->session && !is_user_logged_in()) {
+            $lat_val         = WC()->session->get('customer_lat');
+            $lng_val         = WC()->session->get('customer_lng');
+            $distance_data_v = WC()->session->get('routew_distance_data');
+            if ($lat_val && $lng_val && is_numeric($lat_val) && is_numeric($lng_val)) {
+                WC()->session->set('routew_delivery_profile', array(
+                    'lat'                  => $lat_val,
+                    'lng'                  => $lng_val,
+                    'address_details'      => $details,
+                    'landmark'             => $landmark,
+                    'delivery_instructions'=> $instructions,
+                    'distance_data'        => $distance_data_v,
+                ));
+            }
+        }
+
         // The checkout no longer renders WC address fields — default the
         // country to the store's base country so orders stay well-formed.
         $base_country = function_exists('wc_get_base_location') ? wc_get_base_location() : null;

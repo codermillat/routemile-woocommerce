@@ -138,6 +138,15 @@ if (!function_exists('routew_migrate_legacy_fxw_data')) {
             '_routew_address_details'      => '_fxw_address_details',
             '_routew_landmark'             => '_fxw_landmark',
             '_routew_delivery_profile'     => '_fxw_delivery_profile',
+            // Split-address legacy fields — privacy module declares these as
+            // personal data (class-routew-privacy.php) but the migration was
+            // missing entries. Without these, FXW→RouteMile upgrades lose
+            // the rows silently and the privacy export/erase misses them.
+            // (AUDIT-FIXES H5)
+            '_routew_house_flat_no'        => '_fxw_house_flat_no',
+            '_routew_floor_no'             => '_fxw_floor_no',
+            '_routew_society_building'     => '_fxw_society_building',
+            '_routew_block_tower_area'     => '_fxw_block_tower_area',
         );
         foreach ($meta_map as $new_key => $old_key) {
             // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching

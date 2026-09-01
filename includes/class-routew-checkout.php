@@ -344,8 +344,19 @@ class ROUTEW_Checkout
             }
         }
 
-        if (is_user_logged_in() && WC()->session) {
-            $profile = get_user_meta(get_current_user_id(), '_routew_delivery_profile', true);
+        if (WC()->session) {
+            // Logged-in users: pull from user meta.
+            if (is_user_logged_in()) {
+                $profile = get_user_meta(get_current_user_id(), '_routew_delivery_profile', true);
+            } else {
+                // Guests returning in the same browser fall back to a session-
+                // stored profile (class-routew-checkout-handler.php seeds it
+                // when an email comes back on the checkout-submit step). Without
+                // this branch the same-browser guest never sees their saved
+                // profile again and re-types the address each checkout.
+                // (AUDIT-FIXES L4)
+                $profile = WC()->session->get('routew_delivery_profile');
+            }
             if (!empty($profile) && !empty($profile['lat']) && !empty($profile['lng'])) {
                 WC()->session->set('customer_lat', $profile['lat']);
                 WC()->session->set('customer_lng', $profile['lng']);

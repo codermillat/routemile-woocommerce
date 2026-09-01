@@ -255,7 +255,7 @@ Run live on `foodxpress-for-woocommerce.local` after each fix batch.
 | H2 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | H3 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | H4 | [x] | 2026-09-01 | Round 2 batch B |
-| H5 | [ ] | | |
+| H5 | [x] | 2026-09-01 | Round 2 batch C |
 | M1 | [ ] | | |
 | M2+M3 | [ ] | | |
 | M4 | [ ] | | |
@@ -267,7 +267,7 @@ Run live on `foodxpress-for-woocommerce.local` after each fix batch.
 | L1 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | L2 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | L3 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
-| L4 | [ ] | | |
+| L4 | [x] | 2026-09-01 | Round 2 batch C |
 | L5 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | L6 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 
