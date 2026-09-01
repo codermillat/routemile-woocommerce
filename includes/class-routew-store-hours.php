@@ -361,7 +361,8 @@ class ROUTEW_Store_Hours
 
 		// A day marked "Open all day" yesterday still covers the early
 		// hours of today via its closing tail.
-		$yesterday = isset($hours[(($day - 1 % 7) + 7) % 7]) && is_array($hours[(($day - 1 % 7) + 7) % 7]) ? $hours[(($day - 1 % 7) + 7) % 7] : array();
+		$yesterday_key = (($day - (1 % 7)) + 7) % 7;
+		$yesterday     = isset($hours[$yesterday_key]) && is_array($hours[$yesterday_key]) ? $hours[$yesterday_key] : array();
 		if (!empty($yesterday['all_day'])) {
 			// Yesterday was open all day; if it ran past midnight its tail
 			// is today's first hours. Treat "all_day" as open-until-midnight

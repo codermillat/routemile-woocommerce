@@ -25,13 +25,14 @@ class ROUTEW_Email_Assigned extends WC_Email
         $this->title = __('Driver Assigned', 'routemile-for-woocommerce');
         $this->description = __('This email is sent when a delivery driver is assigned to the order.', 'routemile-for-woocommerce');
         $this->heading = __('A driver has been assigned!', 'routemile-for-woocommerce');
-        $this->subject = __('[{site_title}]: Driver assigned to your order #{order_number}', 'routemile-for-woocommerce');
+        $this->subject = __('{site_title}: Driver assigned to your order #{order_number}', 'routemile-for-woocommerce');
 
         $this->template_html = 'emails/routew-order-status.php';
         $this->template_plain = 'emails/plain/routew-order-status.php';
         $this->template_base = ROUTEW_PLUGIN_DIR . 'templates/';
 
         $this->placeholders = array(
+            '{site_title}' => '',
             '{order_date}' => '',
             '{order_number}' => '',
         );
@@ -49,7 +50,7 @@ class ROUTEW_Email_Assigned extends WC_Email
      */
     public function get_default_subject()
     {
-        return __('[{site_title}]: Driver assigned to your order #{order_number}', 'routemile-for-woocommerce');
+        return __('{site_title}: Driver assigned to your order #{order_number}', 'routemile-for-woocommerce');
     }
 
     /**

@@ -194,7 +194,7 @@ class ROUTEW_Dashboard_Render
 				</thead>
 				<tbody>
 					<?php if (!empty($unassigned_orders)): ?>
-						<?php $delivery_boys = get_users(array('role' => 'delivery_boy')); ?>
+						<?php $delivery_boys = get_users(array('role__in' => array('delivery_boy'))); ?>
 						<?php foreach ($unassigned_orders as $order): ?>
 							<tr>
 								<td><a
@@ -208,7 +208,6 @@ class ROUTEW_Dashboard_Render
 										<br><strong><?php echo wp_kses_post($order->get_formatted_order_total()); ?></strong>
 									<?php endif; ?>
 								</td>
-								<?php $this->kitchen_note_cell($order); ?>
 								<?php $this->kitchen_note_cell($order); ?>
 								<td>
 									<div class="routew-action-buttons">

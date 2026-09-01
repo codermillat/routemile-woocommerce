@@ -7,6 +7,11 @@
  * agent to find them. Pure (no instance state, no WordPress hooks) — call
  * as a static method.
  *
+ * The static helper class is retained for forward compatibility (multi-outlet
+ * editor planned for v1.6.0); the validator body was removed in 1.5.0 as
+ * no production caller remained. If you were calling this from a 3rd-party
+ * extension, switch to the shipping-method's per-checkout validation hook.
+ *
  * @since      1.2.0
  * @package    RouteMile
  * @author     MD MILLAT HOSEN <https://millat.is-a.dev/>
@@ -31,99 +36,22 @@ class ROUTEW_Address_Validator
     /**
      * Validate address completeness for delivery with detailed feedback.
      *
+     * @deprecated 1.5.0 No internal callers; safe to remove in v1.6.0.
      * @param string $address The delivery address to validate.
      * @return array Array with 'is_complete' boolean and 'message' string.
      * @since 1.0.0
      */
     public static function validate_address_completeness($address)
     {
-        if (empty($address)) {
-            return array(
-                'is_complete' => false,
-                'message' => __('address field is empty', 'routemile-for-woocommerce')
-            );
-        }
-
-        if (strlen($address) < 20) {
-            return array(
-                'is_complete' => false,
-                'message' => __('address is too short - please provide more details', 'routemile-for-woocommerce')
-            );
-        }
-
-        // Check for essential address components
-        $address_lower = strtolower($address);
-        $has_building_info = false;
-        $has_location_info = false;
-        $has_numbers = false;
-
-        // Enhanced building/location indicators
-        $building_keywords = array('flat', 'apartment', 'apt', 'floor', 'building', 'block', 'house', 'home', 'tower', 'complex', 'society', 'villa', 'bungalow', 'street', 'road', 'lane', 'avenue', 'plaza', 'square', 'mall', 'shop', 'office');
-        $location_keywords = array('near', 'opposite', 'behind', 'next to', 'beside', 'landmark', 'gate', 'entrance', 'main', 'sector', 'area', 'locality', 'colony', 'nagar', 'city', 'town', 'metro', 'station', 'market', 'hospital', 'school');
-
-        foreach ($building_keywords as $keyword) {
-            if (strpos($address_lower, $keyword) !== false) {
-                $has_building_info = true;
-                break;
-            }
-        }
-
-        foreach ($location_keywords as $keyword) {
-            if (strpos($address_lower, $keyword) !== false) {
-                $has_location_info = true;
-                break;
-            }
-        }
-
-        // Check for numbers (house/flat numbers, postal codes)
-        $has_numbers = preg_match('/\d+/', $address);
-
-        // Specific validation checks with helpful messages
-        if (!$has_numbers) {
-            return array(
-                'is_complete' => false,
-                'message' => __('please include building/house/flat number', 'routemile-for-woocommerce')
-            );
-        }
-
-        if (!$has_building_info && !$has_location_info) {
-            return array(
-                'is_complete' => false,
-                'message' => __('please add building name, street name, or nearby landmark', 'routemile-for-woocommerce')
-            );
-        }
-
-        // Check for delivery instructions or additional details
-        $has_delivery_hints = false;
-        $delivery_keywords = array('floor', 'gate', 'entrance', 'lift', 'stairs', 'parking', 'security', 'guard', 'bell', 'intercom', 'buzzer', 'call', 'ring', 'door', 'left', 'right', 'behind', 'front');
-
-        foreach ($delivery_keywords as $keyword) {
-            if (strpos($address_lower, $keyword) !== false) {
-                $has_delivery_hints = true;
-                break;
-            }
-        }
-
-        // All basic checks passed
-        if (strlen($address) > 30 && $has_building_info && $has_numbers) {
-            return array(
-                'is_complete' => true,
-                'message' => __('address looks complete', 'routemile-for-woocommerce')
-            );
-        }
-
-        // Moderate completeness - warn but allow
-        if ($has_building_info && $has_numbers) {
-            return array(
-                'is_complete' => true,
-                'message' => __('address is acceptable but could use more detail', 'routemile-for-woocommerce')
-            );
-        }
-
-        // Fallback - minimal requirements met
+        _doing_it_wrong(
+            __METHOD__,
+            esc_html__('ROUTEW_Address_Validator::validate_address_completeness() is deprecated and a no-op as of 1.5.0.', 'routemile-for-woocommerce'),
+            '1.5.0'
+        );
+        unset($address);
         return array(
-            'is_complete' => ($has_building_info || $has_location_info) && $has_numbers,
-            'message' => __('please add more specific delivery details like floor, gate number, or landmarks', 'routemile-for-woocommerce')
+            'is_complete' => true,
+            'message'     => '',
         );
     }
 }

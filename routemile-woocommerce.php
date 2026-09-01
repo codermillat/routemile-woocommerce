@@ -327,7 +327,8 @@ if (!function_exists('routew_ensure_shipping_method_registered')) {
                     $touched_any = true;
                 } catch (\Throwable $e) {
                     // Zone data is transient; admin warning surfaces
-                    // this.
+                    // this. Log for diagnosis.
+                    error_log(sprintf('[RouteMile] %s: %s', __METHOD__, $e->getMessage()));
                 }
             } else {
                 $touched_any = true;
@@ -351,7 +352,8 @@ if (!function_exists('routew_ensure_shipping_method_registered')) {
                 $rest->add_shipping_method('routemile_delivery');
                 $touched_any = true;
             } catch (\Throwable $e) {
-                // Same recovery path as above.
+                // Same recovery path as above. Log for diagnosis.
+                error_log(sprintf('[RouteMile] %s: %s', __METHOD__, $e->getMessage()));
             }
         } else {
             $touched_any = true;

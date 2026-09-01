@@ -191,7 +191,7 @@ case 'reassign':
 			return;
 		}
 		$delivery_boy_id = $order->get_meta('_routew_delivery_boy_id', true);
-		$delivery_boys = get_users(array('role' => 'delivery_boy'));
+		$delivery_boys = get_users(array('role__in' => array('delivery_boy')));
 		$payment_method = $order->get_payment_method_title();
 		$shipping_address = $order->get_formatted_shipping_address();
 
@@ -220,8 +220,6 @@ case 'reassign':
 						<?php echo esc_html($delivery_lat); ?>, <?php echo esc_html($delivery_lng); ?></p>
 				<?php endif; ?>
 			</div>
-		<?php elseif ($unit): ?>
-			<p><strong><?php esc_html_e('Flat/House/Unit:', 'routemile-for-woocommerce'); ?></strong> <?php echo esc_html($unit); ?></p>
 		<?php endif; ?>
 		<p>
 			<strong><?php esc_html_e('Payment Method:', 'routemile-for-woocommerce'); ?></strong><br>

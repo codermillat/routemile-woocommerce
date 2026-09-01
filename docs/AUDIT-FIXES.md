@@ -252,8 +252,8 @@ Run live on `foodxpress-for-woocommerce.local` after each fix batch.
 | Item | Status | Date | PR / commit |
 |---|---|---|---|
 | H1 | [ ] | | |
-| H2 | [ ] | | |
-| H3 | [ ] | | |
+| H2 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
+| H3 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | H4 | [ ] | | |
 | H5 | [ ] | | |
 | M1 | [ ] | | |
@@ -262,14 +262,14 @@ Run live on `foodxpress-for-woocommerce.local` after each fix batch.
 | M5+M6 | [ ] | | |
 | M7 | [ ] | | |
 | M8 | [ ] | | |
-| M9 | [ ] | | |
+| M9 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | M10 | [ ] | | |
-| L1 | [ ] | | |
-| L2 | [ ] | | |
-| L3 | [ ] | | |
+| L1 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
+| L2 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
+| L3 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | L4 | [ ] | | |
-| L5 | [ ] | | |
-| L6 | [ ] | | |
+| L5 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
+| L6 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 
 ---
 

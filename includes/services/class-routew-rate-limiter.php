@@ -23,10 +23,6 @@ class ROUTEW_Rate_Limiter
     public static function check_rate_limit($action, $limit = 20, $period = MINUTE_IN_SECONDS)
     {
         $ip_address = self::get_ip_address();
-        if (!$ip_address) {
-            // Cannot determine IP, so we can't rate limit.
-            return true;
-        }
 
         $transient_key = 'routew_rl_' . $action . '_' . md5($ip_address);
         $requests = get_transient($transient_key);
@@ -70,6 +66,7 @@ class ROUTEW_Rate_Limiter
     /**
      * Get remaining request quota for a given action without consuming a request.
      *
+     * @deprecated 1.5.0 No internal callers; safe to remove in v1.6.0.
      * @param string $action A unique name for the action being limited.
      * @param int    $limit  The number of allowed requests per period.
      * @param int    $period The time period in seconds.
@@ -77,26 +74,13 @@ class ROUTEW_Rate_Limiter
      */
     public static function get_remaining_quota($action, $limit = 20, $period = MINUTE_IN_SECONDS)
     {
-        $ip_address = self::get_ip_address();
-        if (!$ip_address) {
-            return $limit; // Cannot determine IP, return full quota
-        }
-
-        $transient_key = 'routew_rl_' . $action . '_' . md5($ip_address);
-        $requests = get_transient($transient_key);
-
-        if (false === $requests) {
-            return $limit; // No requests yet, full quota available
-        }
-
-        $current_time = time();
-        // Count only requests within the current period
-        $recent_requests = array_filter($requests, function ($timestamp) use ($current_time, $period) {
-            return ($current_time - $timestamp) < $period;
-        });
-
-        $remaining = $limit - count($recent_requests);
-        return max(0, $remaining);
+        unset($action, $period);
+        _doing_it_wrong(
+            __METHOD__,
+            esc_html__('ROUTEW_Rate_Limiter::get_remaining_quota() is deprecated and a no-op as of 1.5.0.', 'routemile-for-woocommerce'),
+            '1.5.0'
+        );
+        return (int) $limit;
     }
 
     /**
@@ -135,7 +119,11 @@ class ROUTEW_Rate_Limiter
      * Security: Only uses REMOTE_ADDR to prevent IP spoofing via headers.
      * If behind a trusted proxy/CDN, configure it to pass real IP via REMOTE_ADDR.
      *
-     * @return string|null The user's IP address or null if not found.
+     * When REMOTE_ADDR is missing (CLI, very old WP configs, sandboxed calls)
+     * returns a stable anonymous identifier so rate limiting still applies
+     * instead of letting every request through untracked.
+     *
+     * @return string The user's IP address or a stable anonymous identifier.
      */
     private static function get_ip_address()
     {
@@ -143,10 +131,19 @@ class ROUTEW_Rate_Limiter
         // Headers like HTTP_X_FORWARDED_FOR can be easily forged by attackers.
         $ip_address = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
 
-        if (!filter_var($ip_address, FILTER_VALIDATE_IP)) {
-            return null;
+        if (filter_var($ip_address, FILTER_VALIDATE_IP)) {
+            return $ip_address;
         }
 
-        return $ip_address;
+        // Fall back to a stable, opaque identifier so anonymous callers
+        // still share a single rate-limit bucket rather than bypassing
+        // the limit entirely. Logged so the operator can spot it.
+        if (function_exists('wc_get_logger')) {
+            wc_get_logger()->info(
+                'Rate limiter could not determine REMOTE_ADDR; falling back to anon bucket.',
+                array('source' => 'routemile-rate-limiter')
+            );
+        }
+        return 'anon-' . sha1('routew-anon-bucket');
     }
 }

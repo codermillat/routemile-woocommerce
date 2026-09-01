@@ -25,13 +25,14 @@ class ROUTEW_Email_In_Kitchen extends WC_Email
         $this->title = __('Order In Kitchen', 'routemile-for-woocommerce');
         $this->description = __('This email is sent when an order is being prepared in the kitchen.', 'routemile-for-woocommerce');
         $this->heading = __('Your order is being prepared!', 'routemile-for-woocommerce');
-        $this->subject = __('[{site_title}]: Your order #{order_number} is in the kitchen', 'routemile-for-woocommerce');
+        $this->subject = __('{site_title}: Your order #{order_number} is in the kitchen', 'routemile-for-woocommerce');
 
         $this->template_html = 'emails/routew-order-status.php';
         $this->template_plain = 'emails/plain/routew-order-status.php';
         $this->template_base = ROUTEW_PLUGIN_DIR . 'templates/';
 
         $this->placeholders = array(
+            '{site_title}' => '',
             '{order_date}' => '',
             '{order_number}' => '',
         );
@@ -49,7 +50,7 @@ class ROUTEW_Email_In_Kitchen extends WC_Email
      */
     public function get_default_subject()
     {
-        return __('[{site_title}]: Your order #{order_number} is in the kitchen', 'routemile-for-woocommerce');
+        return __('{site_title}: Your order #{order_number} is in the kitchen', 'routemile-for-woocommerce');
     }
 
     /**

@@ -27,7 +27,7 @@ class ROUTEW_Dashboard_Agents
 	 */
 	public static function render()
 	{
-		$agents = get_users(array('role' => 'delivery_boy', 'orderby' => 'display_name'));
+		$agents = get_users(array('role__in' => array('delivery_boy'), 'orderby' => 'display_name'));
 		if (empty($agents)) {
 			return;
 		}

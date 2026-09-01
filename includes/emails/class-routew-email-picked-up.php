@@ -25,13 +25,14 @@ class ROUTEW_Email_Picked_Up extends WC_Email
         $this->title = __('Order Picked Up', 'routemile-for-woocommerce');
         $this->description = __('This email is sent when the order is picked up and out for delivery.', 'routemile-for-woocommerce');
         $this->heading = __('Your order is on its way!', 'routemile-for-woocommerce');
-        $this->subject = __('[{site_title}]: Your order #{order_number} is out for delivery', 'routemile-for-woocommerce');
+        $this->subject = __('{site_title}: Your order #{order_number} is out for delivery', 'routemile-for-woocommerce');
 
         $this->template_html = 'emails/routew-order-status.php';
         $this->template_plain = 'emails/plain/routew-order-status.php';
         $this->template_base = ROUTEW_PLUGIN_DIR . 'templates/';
 
         $this->placeholders = array(
+            '{site_title}' => '',
             '{order_date}' => '',
             '{order_number}' => '',
         );
@@ -49,7 +50,7 @@ class ROUTEW_Email_Picked_Up extends WC_Email
      */
     public function get_default_subject()
     {
-        return __('[{site_title}]: Your order #{order_number} is out for delivery', 'routemile-for-woocommerce');
+        return __('{site_title}: Your order #{order_number} is out for delivery', 'routemile-for-woocommerce');
     }
 
     /**
