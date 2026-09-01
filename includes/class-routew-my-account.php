@@ -170,28 +170,28 @@ class ROUTEW_My_Account
 				<?php endif; ?>
 			</header>
 
-			<ul class="routew-dashboard__stats" role="list">
-				<li class="routew-stat routew-stat--active">
-					<span class="routew-stat__value"><?php echo esc_html((string) $stats['active']); ?></span>
-					<span class="routew-stat__label"><?php esc_html_e('On the way', 'routemile-for-woocommerce'); ?></span>
+			<ul class="routew-dashboard__stats row g-3 list-unstyled mb-0" role="list">
+				<li class="routew-dashboard__stat routew-dashboard__stat--info col-6 col-md-3">
+					<span class="routew-dashboard__stat-value"><?php echo esc_html((string) $stats['active']); ?></span>
+					<span class="routew-dashboard__stat-label"><?php esc_html_e('On the way', 'routemile-for-woocommerce'); ?></span>
 				</li>
-				<li class="routew-stat routew-stat--completed">
-					<span class="routew-stat__value"><?php echo esc_html((string) $stats['completed']); ?></span>
-					<span class="routew-stat__label"><?php esc_html_e('Delivered', 'routemile-for-woocommerce'); ?></span>
+				<li class="routew-dashboard__stat routew-dashboard__stat--success col-6 col-md-3">
+					<span class="routew-dashboard__stat-value"><?php echo esc_html((string) $stats['completed']); ?></span>
+					<span class="routew-dashboard__stat-label"><?php esc_html_e('Delivered', 'routemile-for-woocommerce'); ?></span>
 				</li>
-				<li class="routew-stat routew-stat--total">
-					<span class="routew-stat__value"><?php echo esc_html((string) $stats['total']); ?></span>
-					<span class="routew-stat__label"><?php esc_html_e('All orders', 'routemile-for-woocommerce'); ?></span>
+				<li class="routew-dashboard__stat col-6 col-md-3">
+					<span class="routew-dashboard__stat-value"><?php echo esc_html((string) $stats['total']); ?></span>
+					<span class="routew-dashboard__stat-label"><?php esc_html_e('All orders', 'routemile-for-woocommerce'); ?></span>
 				</li>
-				<li class="routew-stat routew-stat--addresses">
-					<span class="routew-stat__value"><?php echo esc_html((string) $stats['addresses']); ?></span>
-					<span class="routew-stat__label"><?php esc_html_e('Addresses', 'routemile-for-woocommerce'); ?></span>
+				<li class="routew-dashboard__stat routew-dashboard__stat--accent col-6 col-md-3">
+					<span class="routew-dashboard__stat-value"><?php echo esc_html((string) $stats['addresses']); ?></span>
+					<span class="routew-dashboard__stat-label"><?php esc_html_e('Addresses', 'routemile-for-woocommerce'); ?></span>
 				</li>
 			</ul>
 
-			<div class="routew-dashboard__grid">
+			<div class="routew-dashboard__panels row g-3">
 
-				<section class="routew-dashboard__panel routew-dashboard__panel--orders" aria-labelledby="routew-dashboard-recent-heading">
+				<section class="routew-dashboard__panel col-12 col-md-7" aria-labelledby="routew-dashboard-recent-heading">
 					<header class="routew-dashboard__panel-header">
 						<h3 class="routew-dashboard__panel-title" id="routew-dashboard-recent-heading">
 							<?php esc_html_e('Recent orders', 'routemile-for-woocommerce'); ?>
@@ -212,7 +212,7 @@ class ROUTEW_My_Account
 							</p>
 						</div>
 					<?php else : ?>
-						<ul class="routew-orders-list" role="list">
+						<ul class="routew-dashboard__orders list-unstyled mb-0" role="list">
 							<?php foreach ($recent_orders as $order) : ?>
 								<?php $this->render_recent_order_item($order); ?>
 							<?php endforeach; ?>
@@ -220,7 +220,7 @@ class ROUTEW_My_Account
 					<?php endif; ?>
 				</section>
 
-				<aside class="routew-dashboard__panel routew-dashboard__panel--address" aria-labelledby="routew-dashboard-address-heading">
+				<aside class="routew-dashboard__panel col-12 col-md-5" aria-labelledby="routew-dashboard-address-heading">
 					<header class="routew-dashboard__panel-header">
 						<h3 class="routew-dashboard__panel-title" id="routew-dashboard-address-heading">
 							<?php esc_html_e('Default delivery address', 'routemile-for-woocommerce'); ?>
@@ -239,21 +239,20 @@ class ROUTEW_My_Account
 							<p class="routew-dashboard__empty-text">
 								<?php esc_html_e('Add a delivery address to speed up your next order.', 'routemile-for-woocommerce'); ?>
 							</p>
-							<a class="routew-dashboard__empty-cta"
+							<a class="btn btn-primary btn-sm routew-dashboard__empty-cta"
 							   href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>">
 								<?php esc_html_e('Add address', 'routemile-for-woocommerce'); ?>
 							</a>
 						</div>
 					<?php else : ?>
-						<address class="routew-address-card">
-							<span class="routew-address-card__label"><?php echo esc_html($default_address['label']); ?></span>
-							<span class="routew-address-card__name"><?php echo esc_html($default_address['name']); ?></span>
-							<span class="routew-address-card__line"><?php echo esc_html($default_address['line1']); ?></span>
+						<address class="routew-dashboard__address">
+							<span class="routew-dashboard__address-name"><?php echo esc_html($default_address['label']); ?> · <?php echo esc_html($default_address['name']); ?></span>
+							<span class="routew-dashboard__address-line"><?php echo esc_html($default_address['line1']); ?></span>
 							<?php if (!empty($default_address['line2'])) : ?>
-								<span class="routew-address-card__line"><?php echo esc_html($default_address['line2']); ?></span>
+								<span class="routew-dashboard__address-line"><?php echo esc_html($default_address['line2']); ?></span>
 							<?php endif; ?>
 							<?php if (!empty($default_address['city'])) : ?>
-								<span class="routew-address-card__line"><?php echo esc_html($default_address['city']); ?></span>
+								<span class="routew-dashboard__address-line"><?php echo esc_html($default_address['city']); ?></span>
 							<?php endif; ?>
 						</address>
 					<?php endif; ?>
@@ -284,24 +283,18 @@ class ROUTEW_My_Account
 		$order_url = $order->get_view_order_url();
 
 		?>
-		<li class="routew-order-item">
-			<div class="routew-order-item__primary">
-				<a class="routew-order-item__number" href="<?php echo esc_url($order_url); ?>">
+		<li class="routew-dashboard__orders-item">
+			<div class="routew-dashboard__order-meta">
+				<a class="routew-dashboard__order-number" href="<?php echo esc_url($order_url); ?>">
 					<?php
 					/* translators: %d: order number */
 					printf(esc_html__('#%d', 'routemile-for-woocommerce'), (int) $order->get_order_number());
 					?>
 				</a>
-				<span class="routew-order-item__date"><?php echo esc_html($date_str); ?></span>
-			</div>
-			<div class="routew-order-item__meta">
-				<span class="routew-status-pill <?php echo esc_attr($pill_class); ?>">
-					<?php echo esc_html($label); ?>
-				</span>
-				<span class="routew-order-item__total">
-					<?php echo wp_kses_post($total); ?>
+				<span class="routew-dashboard__order-date">
+					<?php echo esc_html($date_str); ?>
 					<?php if ($item_count) : ?>
-						<span class="routew-order-item__count">
+						<span class="text-secondary">
 							<?php
 							/* translators: %d: item count */
 							printf(esc_html(_n('· %d item', '· %d items', (int) $item_count, 'routemile-for-woocommerce')), (int) $item_count);
@@ -310,40 +303,41 @@ class ROUTEW_My_Account
 					<?php endif; ?>
 				</span>
 			</div>
-			<div class="routew-order-item__action">
-				<a class="routew-order-item__view" href="<?php echo esc_url($order_url); ?>" aria-label="<?php
-					/* translators: %d: order number */
-					printf(esc_attr__('View order %d', 'routemile-for-woocommerce'), (int) $order->get_order_number());
-					?>">
-					<?php esc_html_e('View', 'routemile-for-woocommerce'); ?>
-				</a>
-			</div>
+			<span class="badge routew-dashboard__status-pill <?php echo esc_attr($pill_class); ?>">
+				<?php echo esc_html($label); ?>
+			</span>
+			<span class="routew-dashboard__order-total"><?php echo wp_kses_post($total); ?></span>
 		</li>
 		<?php
 	}
 
 	/**
-	 * Map a WC order status to a CSS pill class.
+	 * Map a WC order status to a Bootstrap 5.3 utility class for status pills.
+	 *
+	 * Returns the tail of a `.text-bg-{variant}` Bootstrap utility, which we
+	 * compose with `.badge` + `.routew-dashboard__status-pill` in the markup.
+	 * Bootstrap variants: success / info / warning / danger / secondary / primary.
 	 *
 	 * @param string $status Order status slug (e.g. "processing", "routew-in-kitchen").
-	 * @return string CSS modifier class.
+	 * @return string Bootstrap text-bg-* utility suffix (e.g. "text-bg-info").
 	 * @since 1.4.0
+	 * @since 1.5.0 Returns Bootstrap utility class instead of bespoke modifier.
 	 */
 	private function status_pill_class($status)
 	{
 		$map = array(
-			'pending'         => 'routew-status-pill--neutral',
-			'on-hold'         => 'routew-status-pill--neutral',
-			'processing'      => 'routew-status-pill--info',
-			'routew-in-kitchen'  => 'routew-status-pill--accent',
-			'routew-assigned'    => 'routew-status-pill--info',
-			'routew-picked-up'   => 'routew-status-pill--info',
-			'completed'       => 'routew-status-pill--success',
-			'cancelled'       => 'routew-status-pill--danger',
-			'refunded'        => 'routew-status-pill--neutral',
-			'failed'          => 'routew-status-pill--danger',
+			'pending'            => 'text-bg-secondary',
+			'on-hold'            => 'text-bg-secondary',
+			'processing'         => 'text-bg-info',
+			'routew-in-kitchen'  => 'text-bg-primary',
+			'routew-assigned'    => 'text-bg-warning',
+			'routew-picked-up'   => 'text-bg-info',
+			'completed'          => 'text-bg-success',
+			'cancelled'          => 'text-bg-danger',
+			'refunded'           => 'text-bg-secondary',
+			'failed'             => 'text-bg-danger',
 		);
-		return isset($map[$status]) ? $map[$status] : 'routew-status-pill--neutral';
+		return isset($map[$status]) ? $map[$status] : 'text-bg-secondary';
 	}
 
 	/**

@@ -189,7 +189,28 @@ foreach ($order->get_items() as $item) {
 		wp_enqueue_style('routew-frontend', plugin_dir_url(__FILE__) . '../assets/css/frontend.css', array(), ROUTEW_VERSION);
 
 		if (is_account_page()) {
-			wp_enqueue_style('routew-my-account', plugin_dir_url(__FILE__) . '../assets/css/my-account.css', array('routew-frontend'), ROUTEW_VERSION);
+			// Bootstrap 5.3 self-hosted at assets/vendor/bootstrap/. Same handle
+			// ('routew-bootstrap') is also used by the agent PWA enqueue site
+			// (class-routew-core.php) — WP dedupes so the file loads once even
+			// when both surfaces are active in a session. (UI-OVERHAUL BATCH 2)
+			wp_enqueue_style(
+				'routew-bootstrap',
+				plugin_dir_url(__FILE__) . '../assets/vendor/bootstrap/bootstrap.min.css',
+				array('routew-frontend'),
+				ROUTEW_VERSION
+			);
+			wp_enqueue_style(
+				'routew-my-account',
+				plugin_dir_url(__FILE__) . '../assets/css/my-account.css',
+				array('routew-frontend', 'routew-bootstrap'),
+				ROUTEW_VERSION
+			);
+			wp_enqueue_style(
+				'routew-my-account-dashboard',
+				plugin_dir_url(__FILE__) . '../assets/css/my-account-dashboard.css',
+				array('routew-my-account'),
+				ROUTEW_VERSION
+			);
 		}
 	}
 

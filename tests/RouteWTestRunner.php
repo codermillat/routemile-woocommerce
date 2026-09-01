@@ -785,6 +785,73 @@ class ROUTEWTestRunner
             $this->fail('UI1 SW CACHE_VERSION not bumped to v2 — old PWAs will serve stale CSS');
         }
 
+        // UI2 — My-account Bootstrap 5 overlay (Batch 2).
+        // Verifies Bootstrap is enqueued on the account page, the body-class
+        // gate still isolates our CSS, the WC my-account hooks are still
+        // registered, the reorder POST handler is intact, and the status
+        // pill class map was migrated from bespoke modifiers to Bootstrap
+        // text-bg-* utility classes.
+        $shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+        if (false !== strpos($shortcodes_php, "'routew-bootstrap'") && false !== strpos($shortcodes_php, 'vendor/bootstrap/bootstrap.min.css') && false !== strpos($shortcodes_php, 'is_account_page')) {
+            $this->pass('UI2 Bootstrap enqueued on my-account page (routew-bootstrap handle, gated by is_account_page)');
+        } else {
+            $this->fail('UI2 Bootstrap not enqueued on my-account page — class-routew-shortcodes.php must wp_enqueue_style the bootstrap CSS inside is_account_page()');
+        }
+
+        if (false !== strpos($shortcodes_php, "'routew-my-account-styled'") && false !== strpos($shortcodes_php, 'add_my_account_body_class')) {
+            $this->pass('UI2 Body class gate preserved: routew-my-account-styled added in add_my_account_body_class()');
+        } else {
+            $this->fail('UI2 Body class gate broken — routew-my-account-styled must still be added on the account page');
+        }
+
+        $my_account_php = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
+        if (false !== strpos($my_account_php, "'woocommerce_account_dashboard'") && false !== strpos($my_account_php, "'woocommerce_account_menu_items'")) {
+            $this->pass('UI2 Required hooks preserved: woocommerce_account_dashboard + woocommerce_account_menu_items');
+        } else {
+            $this->fail('UI2 Missing required WC hooks in class-routew-my-account.php');
+        }
+
+        if (false !== strpos($shortcodes_php, "'template_redirect'") && false !== strpos($shortcodes_php, 'handle_reorder') && false !== strpos($shortcodes_php, "'routew_reorder'")) {
+            $this->pass('UI2 Reorder POST handler preserved (handle_reorder + wp_verify_nonce on routew_reorder)');
+        } else {
+            $this->fail('UI2 Reorder POST handler missing or nonce check removed from class-routew-shortcodes.php');
+        }
+
+        // Status pill class names migrated to Bootstrap text-bg-* utilities.
+        // status_pill_class() should return at least one of each variant.
+        // Anchor on `function status_pill_class` to find the DEFINITION, not a
+        // caller (the caller is above the definition in the file).
+        if (preg_match("/function\s+status_pill_class\s*\(\s*\\\$status\s*\)/", $my_account_php, $spm)) {
+            $map_offset = strpos($my_account_php, $spm[0]);
+            $map_snippet = substr($my_account_php, (int) $map_offset, 1500);
+            $expected = array('text-bg-success', 'text-bg-info', 'text-bg-warning', 'text-bg-danger', 'text-bg-secondary');
+            $missing = array();
+            foreach ($expected as $needle) {
+                if (false === strpos($map_snippet, $needle)) {
+                    $missing[] = $needle;
+                }
+            }
+            if (empty($missing)) {
+                $this->pass('UI2 Status pill class map returns Bootstrap text-bg-* utilities (success/info/warning/danger/secondary)');
+            } else {
+                $this->fail('UI2 Status pill map missing Bootstrap variants: ' . implode(', ', $missing));
+            }
+        } else {
+            $this->fail('UI2 Could not locate status_pill_class() method in class-routew-my-account.php');
+        }
+
+        // UI-X — Bootstrap handle consistency across both surfaces.
+        // Same handle 'routew-bootstrap' must be used in both enqueue sites so
+        // WP dedupes the request when both surfaces are active.
+        $agent_core_php = file_get_contents($this->plugin_dir . '/includes/class-routew-core.php');
+        $agent_count = substr_count($agent_core_php, "'routew-bootstrap'");
+        $shortcodes_count = substr_count($shortcodes_php, "'routew-bootstrap'");
+        if ($agent_count >= 1 && $shortcodes_count >= 1) {
+            $this->pass('UI-X Bootstrap handle "routew-bootstrap" used in BOTH enqueue sites (agent=' . $agent_count . ', my-account=' . $shortcodes_count . ')');
+        } else {
+            $this->fail('UI-X Bootstrap handle not consistent — agent=' . $agent_count . ', my-account=' . $shortcodes_count . ' (need both >= 1)');
+        }
+
         echo "\n";
     }
 

@@ -1,49 +1,40 @@
 /**
- * RouteMile My Account — Dashboard Widgets
+ * RouteMile My Account — Dashboard Widgets, layered on Bootstrap 5.3.
  *
- * Customer dashboard surface for /my-account/ (the root endpoint).
- * Sits on top of my-account.css (layout shell + nav sidebar) and
- * styles the welcome banner, stats row, recent-orders list, and
- * default-address card.
+ * Sits on top of my-account.css (page shell, nav, form-row reset). Styles
+ * the welcome banner, stats row, recent-orders list, and default-address
+ * card with Bootstrap primitives where they fit.
  *
- * Design language: matches the food delivery app aesthetic — warm
- * orange, soft neutrals, generous whitespace, touch-friendly.
+ * @since 1.5.0
  */
 
-/* Tokens — defer to my-account.css where the same names are already
-   defined so the two sheets stay in lockstep. The :root here only
-   adds what's unique to the dashboard. */
+/* ----------------------------------------------------------------------------
+   Tokens — shadow + radius values not in Bootstrap's defaults.
+   ---------------------------------------------------------------------------- */
 :root {
-	--routew-dash-radius-lg: 18px;
-	--routew-dash-radius-md: 14px;
-	--routew-dash-radius-sm: 10px;
 	--routew-dash-shadow-sm: 0 1px 2px rgba(20, 14, 8, 0.04), 0 1px 6px rgba(20, 14, 8, 0.04);
 	--routew-dash-shadow-md: 0 4px 16px rgba(20, 14, 8, 0.06);
 	--routew-dash-shadow-accent: 0 8px 24px rgba(232, 93, 4, 0.18);
-	--routew-dash-info: #1E6FB8;
-	--routew-dash-info-bg: #E7F1FB;
-	--routew-dash-success: #1F8A4C;
-	--routew-dash-success-bg: #E5F4EB;
-	--routew-dash-danger: #C0322B;
-	--routew-dash-danger-bg: #FCEDEC;
 	--routew-dash-neutral: #5A5A5A;
 	--routew-dash-neutral-bg: #F0EEEA;
 }
 
-/* Suppress the default WC "Hello …" greeting and the descriptive
-   paragraph on the dashboard so the widget grid reads as one
-   cohesive surface, not "default copy + our widgets stacked". */
+/* Suppress the default WC "Hello …" greeting + paragraph on the dashboard
+   so the widget grid reads as one cohesive surface. */
 .woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > p {
 	display: none;
 }
-
-/* === Welcome banner ============================================== */
 
 .routew-dashboard {
 	display: block;
 	margin: 0;
 }
 
+/* ----------------------------------------------------------------------------
+   Welcome banner — gradient + decorative radial-gradient blob via ::before.
+   Bootstrap's `.card` doesn't ship the gradient blob pattern, so this stays
+   bespoke.
+   ---------------------------------------------------------------------------- */
 .routew-dashboard__welcome {
 	display: flex;
 	flex-direction: column;
@@ -52,7 +43,7 @@
 	margin-bottom: 12px;
 	background: linear-gradient(135deg, #FFF4ED 0%, #FFE7D6 100%);
 	border: 1px solid rgba(232, 93, 4, 0.18);
-	border-radius: var(--routew-dash-radius-lg);
+	border-radius: 1.125rem;
 	box-shadow: var(--routew-dash-shadow-sm);
 	position: relative;
 	overflow: hidden;
@@ -69,20 +60,87 @@
 	pointer-events: none;
 }
 
-@media (min-width: 700px) {
-	.routew-dashboard__welcome {
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
-		padding: 22px 24px;
-	}
+.routew-dashboard__welcome-text {
+	position: relative;
+	min-width: 0;
 }
 
-/* On mobile: lay the welcome banner out horizontally so the greeting
-   text is on the left and the CTA button is on the right. This
-   halves the banner height (from ~180px stacked to ~80px inline),
-   which is essential to keep the whole dashboard in a single
-   viewport. */
+.routew-dashboard__greeting-eyebrow {
+	display: inline-block;
+	font-size: 0.78em;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+	margin-bottom: 6px;
+}
+
+.routew-dashboard__greeting {
+	margin: 0 0 6px;
+	font-size: 1.35em;
+	font-weight: 700;
+	color: var(--bs-body-color);
+	line-height: 1.2;
+	letter-spacing: -0.01em;
+}
+
+.routew-dashboard__subgreeting {
+	margin: 0;
+	font-size: 0.88em;
+	color: #6B6B6B;
+	line-height: 1.5;
+	max-width: 52ch;
+}
+
+/* Reorder CTA — uses .btn .btn-primary semantics but keeps the custom
+   shadow + scale-on-hover from the original delivery-app aesthetic. */
+.routew-dashboard__reorder {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 10px 18px;
+	min-height: 40px;
+	background-color: var(--bs-primary);
+	border-color: var(--bs-primary);
+	color: #fff !important;
+	font-weight: 600;
+	font-size: 0.9em;
+	border-radius: var(--bs-border-radius);
+	text-decoration: none !important;
+	box-shadow: var(--routew-dash-shadow-accent);
+	transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+	white-space: nowrap;
+	flex-shrink: 0;
+	align-self: flex-start;
+}
+
+.routew-dashboard__reorder:hover,
+.routew-dashboard__reorder:focus-visible {
+	background-color: #D44D00;
+	border-color: #D44D00;
+	transform: translateY(-1px);
+	box-shadow: 0 10px 28px rgba(232, 93, 4, 0.24);
+	color: #fff;
+}
+
+.routew-dashboard__reorder--ghost {
+	background: #fff;
+	color: var(--bs-primary) !important;
+	border: 1.5px solid var(--bs-primary);
+	box-shadow: none;
+}
+
+.routew-dashboard__reorder--ghost:hover,
+.routew-dashboard__reorder--ghost:focus-visible {
+	background: #FFF4ED;
+	color: var(--bs-primary) !important;
+}
+
+.routew-dashboard__reorder-icon {
+	font-size: 1.1em;
+}
+
 @media (max-width: 699px) {
 	.routew-dashboard__welcome {
 		flex-direction: row;
@@ -117,516 +175,222 @@
 	}
 }
 
-.routew-dashboard__welcome-text {
-	position: relative;
-	min-width: 0;
+@media (min-width: 700px) {
+	.routew-dashboard__welcome {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding: 22px 24px;
+	}
 }
 
-.routew-dashboard__greeting-eyebrow {
-	display: inline-block;
-	font-size: 0.78em;
-	font-weight: 600;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
-	color: var(--routew-account-primary);
-	margin-bottom: 6px;
-}
-
-.routew-dashboard__greeting {
-	margin: 0 0 6px;
-	font-size: 1.35em;
-	font-weight: 700;
-	color: var(--routew-account-text);
-	line-height: 1.2;
-	letter-spacing: -0.01em;
-}
-
-.routew-dashboard__subgreeting {
-	margin: 0;
-	font-size: 0.88em;
-	color: var(--routew-account-text-muted);
-	line-height: 1.5;
-	max-width: 52ch;
-}
-
-.routew-dashboard__reorder {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	padding: 10px 18px;
-	min-height: 40px;
-	background: var(--routew-account-primary);
-	color: #fff !important;
-	font-weight: 600;
-	font-size: 0.9em;
-	border-radius: var(--routew-dash-radius-md);
-	text-decoration: none !important;
-	box-shadow: var(--routew-dash-shadow-accent);
-	transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-	white-space: nowrap;
-	flex-shrink: 0;
-	align-self: flex-start;
-}
-
-.routew-dashboard__reorder:hover,
-.routew-dashboard__reorder:focus-visible {
-	background: var(--routew-account-primary-dark);
-	transform: translateY(-1px);
-	box-shadow: 0 10px 28px rgba(232, 93, 4, 0.24);
-	outline: none;
-}
-
-.routew-dashboard__reorder:focus-visible {
-	outline: 2px solid var(--routew-account-primary);
-	outline-offset: 3px;
-}
-
-.routew-dashboard__reorder--ghost {
-	background: #fff;
-	color: var(--routew-account-primary) !important;
-	border: 1.5px solid var(--routew-account-primary);
-	box-shadow: none;
-}
-
-.routew-dashboard__reorder--ghost:hover,
-.routew-dashboard__reorder--ghost:focus-visible {
-	background: var(--routew-account-primary-light);
-	box-shadow: none;
-}
-
-.routew-dashboard__reorder-icon {
-	font-size: 1.1em;
-	line-height: 1;
-}
-
-/* === Stats row ================================================== */
-
+/* ----------------------------------------------------------------------------
+   Stats row — uses Bootstrap .row.g-3 + .col-6.col-md-3 in markup.
+   CSS just provides the per-card polish.
+   ---------------------------------------------------------------------------- */
 .routew-dashboard__stats {
-	display: grid;
-	/* Always 2-up on mobile so the four cards stack as a 2x2 grid
-	   (saves ~50% of the vertical space vs single-column). Each card
-	   stays readable at the narrowest mobile width (300px → ~140px
-	   per card). 4-up only kicks in on wide desktop where the sidebar
-	   has plenty of room. */
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 8px;
-	margin: 0 0 14px;
-	padding: 0;
-	list-style: none;
+	margin-bottom: 14px;
 }
 
-@media (min-width: 1100px) {
-	.routew-dashboard__stats {
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: 12px;
-	}
-}
-
-.routew-stat {
-	display: flex;
-	flex-direction: row;
-	align-items: baseline;
-	gap: 8px;
-	padding: 8px 10px;
-	background: var(--routew-account-card);
-	border: 1px solid var(--routew-account-border);
-	border-radius: var(--routew-dash-radius-md);
+.routew-dashboard__stat {
+	background: #fff;
+	border-radius: var(--bs-border-radius);
+	padding: 14px 12px;
+	text-align: left;
 	box-shadow: var(--routew-dash-shadow-sm);
-	min-height: 40px;
-	position: relative;
-	overflow: hidden;
-	transition: transform 0.15s ease, box-shadow 0.15s ease;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-height: 76px;
+	justify-content: center;
+	border: 1px solid var(--bs-border-color);
 }
 
-.routew-stat::after {
-	content: "";
-	position: absolute;
-	left: 0;
-	top: 0;
-	bottom: 0;
-	width: 3px;
-	background: var(--routew-account-border);
-}
-
-.routew-stat--active::after       { background: var(--routew-account-primary); }
-.routew-stat--completed::after    { background: var(--routew-dash-success); }
-.routew-stat--total::after        { background: var(--routew-dash-info); }
-.routew-stat--addresses::after    { background: #6D4C9A; }   /* warm purple — matches the saved-address theme */
-
-.routew-stat__value {
-	font-size: 1.3em;
+.routew-dashboard__stat-value {
+	font-size: 1.5em;
 	font-weight: 700;
-	color: var(--routew-account-text);
-	line-height: 1;
+	color: var(--bs-body-color);
+	line-height: 1.1;
 	letter-spacing: -0.01em;
-	flex-shrink: 0;
-	min-width: 22px;
 }
 
-.routew-stat__label {
-	font-size: 0.72em;
-	font-weight: 600;
-	letter-spacing: 0;
-	color: var(--routew-account-text-muted);
-	line-height: 1.2;
-	flex: 1;
-	min-width: 0;
-	/* Single-line label so "Delivered" / "All orders" stay readable
-	   in a narrow 2-up stat row. Truncates with an ellipsis if the
-	   card is too narrow to fit the full label. */
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+.routew-dashboard__stat-label {
+	font-size: 0.74em;
+	font-weight: 500;
+	color: #6B6B6B;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
 }
 
-/* === Two-column panel grid ====================================== */
-
-.routew-dashboard__grid {
-	display: grid;
-	/* Always 2-up so Recent Orders + Default Address sit side by side
-	   on every viewport. The Recent Orders column gets 1.6fr (wider
-	   for the order list); the Address column gets 1fr. Below 400px
-	   the grids below stack, but this layout is intentionally tight
-	   so even a 300px viewport shows both panels side by side. */
-	grid-template-columns: 1.6fr 1fr;
-	gap: 12px;
-	align-items: start;
+.routew-dashboard__stat--info .routew-dashboard__stat-value {
+	color: #1E6FB8;
+}
+.routew-dashboard__stat--success .routew-dashboard__stat-value {
+	color: #1F8A4C;
+}
+.routew-dashboard__stat--danger .routew-dashboard__stat-value {
+	color: #C0322B;
+}
+.routew-dashboard__stat--accent .routew-dashboard__stat-value {
+	color: var(--bs-primary);
 }
 
-@media (max-width: 399px) {
-	.routew-dashboard__grid {
-		grid-template-columns: 1fr;
-	}
+/* ----------------------------------------------------------------------------
+   Panel grid — 2-column layout on desktop, single column on mobile.
+   Bootstrap .row.g-3 + .col-12.col-md-6 in markup.
+   ---------------------------------------------------------------------------- */
+.routew-dashboard__panels {
+	margin-bottom: 14px;
 }
 
 .routew-dashboard__panel {
-	background: var(--routew-account-card);
-	border: 1px solid var(--routew-account-border);
-	border-radius: var(--routew-dash-radius-lg);
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	padding: 16px 18px;
 	box-shadow: var(--routew-dash-shadow-sm);
-	overflow: hidden;
+	display: flex;
+	flex-direction: column;
 }
 
 .routew-dashboard__panel-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 12px 14px 8px;
-	gap: 12px;
+	gap: 10px;
+	margin-bottom: 12px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--bs-border-color);
 }
 
 .routew-dashboard__panel-title {
 	margin: 0;
-	font-size: 1.05em;
+	font-size: 1em;
 	font-weight: 700;
-	color: var(--routew-account-text);
-	letter-spacing: -0.005em;
+	color: var(--bs-body-color);
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.routew-dashboard__panel-title::before {
+	content: "";
+	display: inline-block;
+	width: 3px;
+	height: 1em;
+	background: var(--bs-primary);
+	border-radius: 2px;
 }
 
 .routew-dashboard__panel-link {
+	font-size: 0.85em;
+	color: var(--bs-primary);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.routew-dashboard__panel-link:hover {
+	text-decoration: underline;
+}
+
+/* Status pills — map to Bootstrap .badge .text-bg-* utility classes. */
+.routew-dashboard__status-pill {
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
-	font-size: 0.88em;
+	font-size: 0.74em;
 	font-weight: 600;
-	color: var(--routew-account-primary) !important;
-	text-decoration: none !important;
-	padding: 6px 10px;
-	border-radius: var(--routew-dash-radius-sm);
-	transition: background 0.15s ease;
+	padding: 4px 10px;
+	border-radius: 999px;
+	letter-spacing: 0.02em;
+	line-height: 1.4;
 }
 
-.routew-dashboard__panel-link:hover,
-.routew-dashboard__panel-link:focus-visible {
-	background: var(--routew-account-primary-light);
-	outline: none;
-}
-
-/* === Recent orders list ========================================= */
-
-.routew-orders-list {
+/* Recent orders list inside the panel */
+.routew-dashboard__orders {
 	list-style: none;
 	margin: 0;
-	padding: 0 10px 10px;
+	padding: 0;
 }
 
-.routew-order-item {
-	display: grid;
-	grid-template-columns: 1fr auto;
-	grid-template-areas:
-		"primary action"
-		"meta    action";
-	gap: 3px 10px;
-	padding: 10px 10px;
-	border-radius: var(--routew-dash-radius-md);
-	border: 1px solid transparent;
-	transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.routew-order-item + .routew-order-item {
-	margin-top: 2px;
-}
-
-.routew-order-item:hover {
-	background: var(--routew-account-primary-light);
-	border-color: rgba(232, 93, 4, 0.15);
-}
-
-.routew-order-item__primary {
-	grid-area: primary;
-	display: flex;
-	align-items: baseline;
-	gap: 10px;
-	flex-wrap: wrap;
-}
-
-.routew-order-item__number {
-	font-weight: 700;
-	font-size: 1em;
-	color: var(--routew-account-primary) !important;
-	text-decoration: none !important;
-}
-
-.routew-order-item__number:hover {
-	text-decoration: underline !important;
-}
-
-.routew-order-item__date {
-	font-size: 0.85em;
-	color: var(--routew-account-text-muted);
-}
-
-.routew-order-item__meta {
-	grid-area: meta;
+.routew-dashboard__orders li {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 10px;
-	flex-wrap: wrap;
+	padding: 10px 0;
+	border-bottom: 1px solid var(--bs-border-color);
 }
 
-.routew-order-item__total {
-	font-size: 0.95em;
+.routew-dashboard__orders li:last-child {
+	border-bottom: none;
+}
+
+.routew-dashboard__order-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+	flex: 1;
+}
+
+.routew-dashboard__order-number {
 	font-weight: 600;
-	color: var(--routew-account-text);
+	font-size: 0.92em;
+	color: var(--bs-body-color);
+	font-variant-numeric: tabular-nums;
+	text-decoration: none;
 }
 
-.routew-order-item__count {
-	font-weight: 500;
-	color: var(--routew-account-text-muted);
-	margin-left: 2px;
+.routew-dashboard__order-number:hover {
+	color: var(--bs-primary);
 }
 
-.routew-order-item__action {
-	grid-area: action;
-	align-self: center;
-}
-
-.routew-order-item__view {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-height: 36px;
-	padding: 6px 14px;
-	font-size: 0.85em;
-	font-weight: 600;
-	color: var(--routew-account-primary) !important;
-	background: transparent;
-	border: 1.5px solid var(--routew-account-primary);
-	border-radius: var(--routew-dash-radius-sm);
-	text-decoration: none !important;
-	transition: background 0.15s ease, color 0.15s ease;
-	white-space: nowrap;
-}
-
-.routew-order-item__view:hover,
-.routew-order-item__view:focus-visible {
-	background: var(--routew-account-primary);
-	color: #fff !important;
-	outline: none;
-}
-
-@media (max-width: 480px) {
-	.routew-order-item {
-		grid-template-columns: 1fr;
-		grid-template-areas:
-			"primary"
-			"meta"
-			"action";
-	}
-
-	.routew-order-item__action {
-		justify-self: start;
-	}
-}
-
-/* === Status pills =============================================== */
-
-.routew-status-pill {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	padding: 3px 10px;
+.routew-dashboard__order-date {
 	font-size: 0.78em;
-	font-weight: 600;
-	letter-spacing: 0.02em;
-	border-radius: 999px;
-	background: var(--routew-dash-neutral-bg);
-	color: var(--routew-dash-neutral);
-	line-height: 1.4;
+	color: #6B6B6B;
+}
+
+.routew-dashboard__order-total {
+	font-weight: 700;
+	font-size: 0.92em;
+	color: var(--bs-body-color);
+	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
 }
 
-.routew-status-pill::before {
-	content: "";
-	display: inline-block;
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	background: currentColor;
-	opacity: 0.7;
-}
-
-.routew-status-pill--accent {
-	background: var(--routew-account-primary-light);
-	color: var(--routew-account-primary-dark);
-}
-
-.routew-status-pill--info {
-	background: var(--routew-dash-info-bg);
-	color: var(--routew-dash-info);
-}
-
-.routew-status-pill--success {
-	background: var(--routew-dash-success-bg);
-	color: var(--routew-dash-success);
-}
-
-.routew-status-pill--danger {
-	background: var(--routew-dash-danger-bg);
-	color: var(--routew-dash-danger);
-}
-
-.routew-status-pill--neutral {
-	background: var(--routew-dash-neutral-bg);
-	color: var(--routew-dash-neutral);
-}
-
-/* === Address card =============================================== */
-
-.routew-address-card {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	margin: 0 12px 12px;
-	padding: 12px 14px;
-	background: var(--routew-account-bg);
-	border: 1px solid var(--routew-account-border);
-	border-left: 3px solid var(--routew-account-primary);
-	border-radius: var(--routew-dash-radius-md);
-	font-style: normal;
-	font-size: 0.88em;
-	line-height: 1.45;
-}
-
-.routew-address-card__label {
-	display: inline-block;
-	font-size: 0.72em;
-	font-weight: 700;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	color: var(--routew-account-primary);
-	margin-bottom: 4px;
-	padding: 3px 8px;
-	background: var(--routew-account-primary-light);
-	border-radius: 6px;
-	align-self: flex-start;
-}
-
-.routew-address-card__name {
-	font-weight: 600;
-	color: var(--routew-account-text);
-	font-size: 0.98em;
-	margin-top: 2px;
-}
-
-.routew-address-card__line {
-	color: var(--routew-account-text-muted);
-	line-height: 1.55;
-}
-
-/* === Empty states =============================================== */
-
-.routew-dashboard__empty {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	text-align: center;
-	padding: 36px 20px 32px;
-	gap: 6px;
-}
-
-.routew-dashboard__empty--compact {
-	padding: 24px 18px 22px;
-}
-
-.routew-dashboard__empty-icon {
-	font-size: 1.8em;
-	line-height: 1;
-	margin-bottom: 6px;
-	opacity: 0.9;
-}
-
-.routew-dashboard__empty-title {
-	margin: 0;
-	font-size: 1em;
-	font-weight: 700;
-	color: var(--routew-account-text);
-}
-
-.routew-dashboard__empty-text {
-	margin: 0;
-	font-size: 0.88em;
-	color: var(--routew-account-text-muted);
-	max-width: 32ch;
+/* Default address card */
+.routew-dashboard__address {
+	font-size: 0.92em;
+	color: var(--bs-body-color);
 	line-height: 1.5;
 }
 
-.routew-dashboard__empty-cta {
-	margin-top: 12px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-height: 40px;
-	padding: 8px 18px;
-	background: var(--routew-account-primary);
-	color: #fff !important;
-	font-size: 0.88em;
-	font-weight: 600;
-	border-radius: var(--routew-dash-radius-sm);
-	text-decoration: none !important;
-	transition: background 0.15s ease;
+.routew-dashboard__address-name {
+	font-weight: 700;
+	margin-bottom: 4px;
 }
 
-.routew-dashboard__empty-cta:hover,
-.routew-dashboard__empty-cta:focus-visible {
-	background: var(--routew-account-primary-dark);
-	outline: none;
+.routew-dashboard__address-line {
+	display: block;
 }
 
-/* === Reduced motion ============================================= */
+/* Empty state */
+.routew-dashboard__empty {
+	text-align: center;
+	color: #6B6B6B;
+	font-size: 0.9em;
+	padding: 20px 8px;
+}
 
+/* ----------------------------------------------------------------------------
+   Performance / accessibility.
+   ---------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-	.routew-dashboard *,
-	.routew-dashboard *::before,
-	.routew-dashboard *::after {
-		transition-duration: 0.01ms !important;
+	*,
+	*::before,
+	*::after {
 		animation-duration: 0.01ms !important;
-	}
-
-	.routew-dashboard__reorder:hover,
-	.routew-dashboard__reorder:focus-visible {
-		transform: none;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
 	}
 }

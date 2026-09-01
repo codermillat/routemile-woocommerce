@@ -1,66 +1,59 @@
 /**
- * RouteMile My Account - Food Delivery App Style
- * Warm, mobile-first UI for customer account dashboard.
+ * RouteMile My Account — food-delivery-app style, layered on Bootstrap 5.3.
  *
- * Design: Food delivery app aesthetic (Uber Eats / DoorDash inspired)
- * - Warm orange primary, clean neutrals
- * - Card-based layout, rounded corners, soft shadows
- * - Touch-friendly, mobile-first
+ * Bootstrap (enqueued separately as `routew-bootstrap`) supplies the
+ * primitive layer (grid, buttons, cards, badges, alerts, form-row reset,
+ * focus rings). This file keeps the surface-specific bits:
+ *
+ *   1. Brand tokens that override Bootstrap's --bs-* CSS variables.
+ *   2. The page wrapper grid (block-theme defeat): the WC blocks stylesheet
+ *      and several popular block themes (kiosko, twentytwentyfive) set
+ *      `.woocommerce { display: block/flex }`, which collapses the nav +
+ *      content grid. We re-assert `display: grid` with !important.
+ *   3. The mobile bottom-tab nav (position: fixed, safe-area-inset,
+ *      mask-image icons). Bootstrap doesn't ship a bottom-tab pattern.
+ *   4. Form-row breathing room for the classic WC forms (edit-account,
+ *      edit-address). Bootstrap's Reboot touches input padding so we
+ *      override to preserve the WC classic rhythm.
+ *   5. WC message / empty-state polish.
+ *
+ * @since 1.5.0
  */
 
-/* Design tokens */
+/* ----------------------------------------------------------------------------
+   1. Brand tokens — override Bootstrap at :root.
+   ---------------------------------------------------------------------------- */
 :root {
-	--routew-account-primary: #E85D04;
-	--routew-account-primary-dark: #D44D00;
-	--routew-account-primary-light: #FFF4ED;
-	--routew-account-bg: #F8F6F3;
-	--routew-account-card: #FFFFFF;
-	--routew-account-text: #1A1A1A;
-	--routew-account-text-muted: #6B6B6B;
-	--routew-account-border: #E8E4DE;
-	--routew-account-radius: 14px;
-	--routew-account-radius-sm: 10px;
-	--routew-account-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-	--routew-account-shadow-hover: 0 4px 20px rgba(232, 93, 4, 0.12);
+	--bs-primary: #E85D04;
+	--bs-primary-rgb: 232, 93, 4;
+	--bs-success: #1F8A4C;
+	--bs-success-rgb: 31, 138, 76;
+	--bs-info: #1E6FB8;
+	--bs-info-rgb: 30, 111, 184;
+	--bs-warning: #F59E0B;
+	--bs-warning-rgb: 245, 158, 11;
+	--bs-danger: #C0322B;
+	--bs-danger-rgb: 192, 50, 43;
+	--bs-body-bg: #F8F6F3;
+	--bs-body-color: #1A1A1A;
+	--bs-border-color: #E8E4DE;
+	--bs-border-radius: 0.875rem;
+	--bs-border-radius-sm: 0.625rem;
+	--bs-body-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Page background */
+/* ----------------------------------------------------------------------------
+   2. Page wrapper — grid layout survives block-theme defeat.
+   ---------------------------------------------------------------------------- */
 .woocommerce-account.routew-my-account-styled {
-	background: var(--routew-account-bg);
+	background: var(--bs-body-bg);
 	min-height: 100vh;
 }
 
-.woocommerce-account.routew-my-account-styled .entry-content,
-.woocommerce-account.routew-my-account-styled .site-main {
-	background: transparent;
-}
-
-/* Scope: WooCommerce My Account only */
 .woocommerce-account.routew-my-account-styled .woocommerce {
-	max-width: 100%;
-}
-
-/* Page wrapper */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content,
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-
-/* Main layout: dashboard, orders, etc.
-   The .woocommerce wrapper is laid out with CSS grid (not float) so the
-   nav-sidebar + content split survives block themes (kiosko, twentytwentyfive,
-   etc.) that set display: flex/grid on .entry-content and would otherwise
-   collapse the float. `!important` is used to beat the WC blocks stylesheet,
-   which also sets `.woocommerce { display: block; }` and on some themes
-   `.entry-content { display: flex }` collapses the child grid into a single
-   flex item.
-   Default mobile-app layout: nav is a horizontal scrollable row at the
-   top, content flows full-width below. On wider viewports (>=900px) the
-   layout switches to a left sidebar + right content split. */
-.woocommerce-account.routew-my-account-styled .woocommerce {
-	background: var(--routew-account-bg);
+	background: var(--bs-body-bg);
 	padding: 0.75em;
-	border-radius: var(--routew-account-radius);
+	border-radius: var(--bs-border-radius);
 	display: grid !important;
 	grid-template-columns: minmax(0, 1fr) !important;
 	grid-template-areas:
@@ -71,58 +64,35 @@
 	box-sizing: border-box;
 }
 
-/* WC renders the notices wrapper as a sibling of nav + content; let it
-   span the full width so the sidebar + content pairing isn't disturbed
-   when an order notice or coupon notice is present. */
 .woocommerce-account.routew-my-account-styled .woocommerce-notices-wrapper {
 	grid-column: 1 / -1;
 }
 
-/* On wide viewports (>=900px) the layout flips to a left sidebar + right
-   content split. The sidebar is 200px wide so the content area stays
-   usable on the 600–800px containers that block themes like kiosko
-   produce. */
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation {
+	grid-area: nav !important;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content {
+	grid-area: content !important;
+}
+
 @media (min-width: 900px) {
 	.woocommerce-account.routew-my-account-styled .woocommerce {
 		grid-template-columns: 200px minmax(0, 1fr) !important;
-		grid-template-areas:
-			"nav content" !important;
-	}
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation {
-		grid-area: nav !important;
-	}
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content {
-		grid-area: content !important;
+		grid-template-areas: "nav content" !important;
 	}
 }
 
-/* On narrow viewports the nav is a fixed bottom tab bar (handled
-   below in the icon-only @media block). The grid is reset so the
-   nav no longer takes up a grid row at the top — content fills the
-   full vertical space. The `position: fixed` set in the icon-only
-   block removes the nav from the grid flow entirely. */
 @media (max-width: 899px) {
 	.woocommerce-account.routew-my-account-styled .woocommerce {
 		grid-template-areas: "content" !important;
 	}
 }
 
-/* Page title */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .woocommerce-EditAccountForm .form-row,
-.woocommerce-account.routew-my-account-styled .entry-title,
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > h2 {
-	font-size: 1.35em;
-	font-weight: 700;
-	color: var(--routew-account-text);
-	margin-bottom: 1em;
-}
-
-/* Navigation — mobile-app pattern.
-   On narrow viewports the nav is a horizontal scrollable row of compact
-   pills (icon + label) at the top of the page. On wide viewports
-   (>=900px) it becomes a vertical sidebar on the left. Nav items are
-   deliberately compact (36–40px tall) so the rail reads as navigation,
-   not as a stack of card buttons. */
+/* ----------------------------------------------------------------------------
+   3. Bottom-tab nav (mobile) — position: fixed + safe-area-inset.
+   Bootstrap doesn't ship a bottom-tab pattern; this stays as bespoke CSS.
+   ---------------------------------------------------------------------------- */
 .woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation {
 	width: auto;
 	margin-bottom: 0;
@@ -147,53 +117,34 @@
 	margin: 0;
 	padding: 0;
 	flex: 0 0 auto;
-	width: auto;
 }
 
-/* Compact nav link — icon-only on mobile (native-app tab bar feel),
-   icon + label on wider viewports. Padding is tighter (6px vertical,
-   10px horizontal, 32px left for the icon) so the items fit cleanly
-   without the label wrapping. */
 .woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	padding: 10px 12px;
+	justify-content: flex-start;
+	padding: 10px 12px 10px 32px;
 	min-height: 44px;
 	min-width: 52px;
-	background: var(--routew-account-card);
-	border: 1px solid var(--routew-account-border);
-	border-radius: var(--routew-dash-radius-sm, 10px);
+	background: var(--bs-body-bg, #fff);
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius-sm);
 	font-weight: 600;
 	font-size: 0.85em;
-	color: var(--routew-account-text);
+	color: var(--bs-body-color);
 	text-decoration: none;
 	transition: all 0.2s ease;
-	box-shadow: var(--routew-account-shadow);
 	line-height: 1.3;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	justify-content: flex-start;
-	padding-left: 32px;
 }
 
-/* On mobile: hide the nav labels, show only the icon. The icon is a
-   CSS `mask-image` so it stays the same size regardless of text. The
-   link becomes a compact square button (~60×52px) so 5 items fit
-   without horizontal scroll on a 300px+ viewport. Native-app feel:
-   square touch target, larger icon, centred.
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a:hover {
+	border-color: var(--bs-primary);
+	color: var(--bs-primary);
+}
 
-   The whole nav is also `position: fixed` at the bottom of the
-   viewport so it acts like a native mobile-app bottom tab bar —
-   always visible, doesn't take up scrollable content space, gives
-   the dashboard room to fit in a single viewport on a phone.
-
-   To completely suppress the WC default text node inside the <a>
-   (which the block theme can re-render with its own font-size and
-   ignore our `font-size: 0`), we render the text as a `::after`
-   pseudo-element with `aria-label` content, and use `line-height:
-   0; height: 0` to collapse the actual text node. */
 @media (max-width: 899px) {
 	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation {
 		position: fixed !important;
@@ -201,8 +152,8 @@
 		left: 0;
 		right: 0;
 		z-index: 100;
-		background: var(--routew-account-card);
-		border-top: 1px solid var(--routew-account-border);
+		background: #fff;
+		border-top: 1px solid var(--bs-border-color);
 		box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
 		padding: 6px 8px env(safe-area-inset-bottom, 6px);
 		margin: 0;
@@ -217,10 +168,6 @@
 		flex: 1 1 0;
 		min-width: 0;
 	}
-	/* The link is a fixed-size square. The text content is killed
-	   via line-height: 0 + height: 0 (the text node is direct child
-	   of <a> with no wrapping element, so this collapses it). The
-	   ::before pseudo-element holds the icon, positioned at center. */
 	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a {
 		padding: 0 !important;
 		min-width: 0 !important;
@@ -230,667 +177,111 @@
 		justify-content: center !important;
 		align-items: center !important;
 		display: flex !important;
-		/* Hide the WC text node: collapse the line box to 0 height,
-		   and clip anything that escapes. */
 		font-size: 0 !important;
 		line-height: 0 !important;
 		color: transparent !important;
 		text-indent: -9999px !important;
 		overflow: hidden !important;
-		border-radius: 10px;
+		border-radius: var(--bs-border-radius-sm);
 		position: relative;
 	}
 	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a::before {
-		content: "" !important;
-		display: inline-block !important;
-		position: absolute !important;
-		left: 50% !important;
-		top: 50% !important;
-		transform: translate(-50%, -50%) !important;
-		width: 24px;
-		height: 24px;
-		margin: 0 !important;
-		text-indent: 0 !important;
-		font-size: 16px !important;
-		line-height: 1 !important;
-		/* The icon mask uses currentColor for fill. We set the link
-		   text color to transparent (to hide the WC label), so we
-		   must explicitly set the icon color here so the mask
-		   renders. */
-		color: var(--routew-account-text) !important;
-	}
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.is-active a::before {
-		color: #fff !important;
-	}
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a:hover::before {
-		color: var(--routew-account-primary) !important;
-	}
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a * {
-		display: none !important;
-	}
-
-	/* Add bottom padding to the page so the fixed nav doesn't
-	   cover the last line of content (the .woocommerce wrapper
-	   becomes the last visible block above the fixed bar). */
-	.woocommerce-account.routew-my-account-styled .woocommerce {
-		padding-bottom: 76px; /* nav (60px) + breathing room (16px) */
+		content: "";
+		display: inline-block;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		width: 22px;
+		height: 22px;
+		background-color: currentColor;
+		mask-repeat: no-repeat;
+		mask-position: center;
+		mask-size: contain;
+		-webkit-mask-repeat: no-repeat;
+		-webkit-mask-position: center;
+		-webkit-mask-size: contain;
 	}
 }
 
-/* On wide viewports switch the nav back to a vertical sidebar layout
-   so the page reads like a conventional account dashboard. */
-@media (min-width: 900px) {
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul {
-		flex-direction: column;
-		flex-wrap: nowrap;
-		gap: 0.4em;
-		overflow: visible;
-	}
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li {
-		width: 100%;
-	}
+/* Per-endpoint icons — mask-image data URLs.
+   Each nav item gets the right glyph via the WC endpoint URL class. */
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--dashboard a::before,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--orders a::before,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--edit-address a::before,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--edit-account a::before,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--payment-methods a::before,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--customer-logout a::before,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--track a::before,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.is-active a::before {
+	color: var(--bs-primary);
 }
 
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a:hover {
-	border-color: var(--routew-account-primary);
-	background: var(--routew-account-primary-light);
-	color: var(--routew-account-primary);
+/* ----------------------------------------------------------------------------
+   4. Form-row breathing room — Bootstrap Reboot touches input padding
+   and border-radius so we restore the WC classic rhythm on the form
+   fields the user actually edits (edit-account, edit-address).
+   ---------------------------------------------------------------------------- */
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .form-row {
+	margin-bottom: 1em;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75em;
 }
 
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.is-active a {
-	background: var(--routew-account-primary);
-	border-color: var(--routew-account-primary);
-	color: #fff;
-}
-
-/* Content area */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content {
-	width: auto;
-	min-width: 0;
-	padding: 1em;
-	background: var(--routew-account-card);
-	border-radius: var(--routew-account-radius);
-	border: 1px solid var(--routew-account-border);
-	box-shadow: var(--routew-account-shadow);
-}
-
-/* Dashboard welcome */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content p {
-	color: var(--routew-account-text-muted);
-	line-height: 1.6;
-}
-
-/* Orders table - card style */
-.woocommerce-account.routew-my-account-styled .woocommerce-orders-table,
-.woocommerce-account.routew-my-account-styled .woocommerce-order-details {
-	background: transparent;
-	border: none;
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-orders-table thead th,
-.woocommerce-account.routew-my-account-styled .shop_table thead th {
-	background: var(--routew-account-primary-light);
-	color: var(--routew-account-text);
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .form-row label {
 	font-weight: 600;
-	padding: 14px 18px;
-	border: none;
-	border-bottom: 2px solid var(--routew-account-primary);
-	border-radius: var(--routew-account-radius-sm) var(--routew-account-radius-sm) 0 0;
+	font-size: 0.85em;
+	color: var(--bs-body-color);
+	margin-bottom: 4px;
+	display: block;
 }
 
-.woocommerce-account.routew-my-account-styled .woocommerce-orders-table td,
-.woocommerce-account.routew-my-account-styled .shop_table td {
-	padding: 14px 18px;
-	border-color: var(--routew-account-border);
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tbody tr:hover,
-.woocommerce-account.routew-my-account-styled .shop_table tbody tr:hover {
-	background: var(--routew-account-primary-light);
-}
-
-/* Order view - order number header */
-.woocommerce-account.routew-my-account-styled .order-number {
-	font-weight: 700;
-	color: var(--routew-account-primary);
-}
-
-/* Buttons */
-.woocommerce-account.routew-my-account-styled .button,
-.woocommerce-account.routew-my-account-styled .woocommerce-Button {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-height: 44px;
-	padding: 12px 24px;
-	background: var(--routew-account-primary) !important;
-	border: none !important;
-	border-radius: var(--routew-account-radius-sm);
-	color: #fff !important;
-	font-weight: 600;
-	text-decoration: none;
-	transition: all 0.2s ease;
-	cursor: pointer;
-}
-
-.woocommerce-account.routew-my-account-styled .button:hover,
-.woocommerce-account.routew-my-account-styled .woocommerce-Button:hover {
-	background: var(--routew-account-primary-dark) !important;
-	color: #fff !important;
-}
-
-/* Re-order and View buttons on orders list — keep these compact
-   pill-style (NOT the big orange CTA button that the .button base
-   style sets). The orders table renders a .woocommerce-button .button
-   pair that should match the rest of the dashboard's secondary
-   actions: outlined pill, ~36px tall, narrow padding. */
-.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell .button,
-.woocommerce-account.routew-my-account-styled .woocommerce-orders .button,
-.woocommerce-account.routew-my-account-styled .woocommerce-button.button,
-.woocommerce-account.routew-my-account-styled a.button.view,
-.woocommerce-account.routew-my-account-styled a.button.pay,
-.woocommerce-account.routew-my-account-styled a.button.cancel,
-.woocommerce-account.routew-my-account-styled a.button.reorder {
-	display: inline-flex !important;
-	align-items: center;
-	justify-content: center;
-	min-height: 32px !important;
-	max-width: 130px !important;
-	width: auto !important;
-	padding: 4px 14px !important;
-	background: transparent !important;
-	color: var(--routew-account-primary) !important;
-	border: 1.5px solid var(--routew-account-primary) !important;
-	border-radius: 999px !important;
-	font-size: 0.82em;
-	font-weight: 600;
-	text-decoration: none !important;
-	align-self: flex-start;
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell .button:hover,
-.woocommerce-account.routew-my-account-styled .woocommerce-orders .button:hover,
-.woocommerce-account.routew-my-account-styled .woocommerce-button.button:hover,
-.woocommerce-account.routew-my-account-styled a.button.view:hover,
-.woocommerce-account.routew-my-account-styled a.button.pay:hover,
-.woocommerce-account.routew-my-account-styled a.button.cancel:hover,
-.woocommerce-account.routew-my-account-styled a.button.reorder:hover {
-	background: var(--routew-account-primary) !important;
-	color: #fff !important;
-}
-
-/* Form inputs */
-.woocommerce-account.routew-my-account-styled input[type="text"],
-.woocommerce-account.routew-my-account-styled input[type="email"],
-.woocommerce-account.routew-my-account-styled input[type="password"],
-.woocommerce-account.routew-my-account-styled input[type="tel"],
-.woocommerce-account.routew-my-account-styled textarea {
-	padding: 12px 16px;
-	border: 2px solid var(--routew-account-border);
-	border-radius: var(--routew-account-radius-sm);
-	font-size: 0.95em;
-	min-height: 44px;
-	transition: border-color 0.2s;
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content input[type="text"],
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content input[type="email"],
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content input[type="tel"],
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content input[type="password"],
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content select,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content textarea {
 	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius-sm);
+	background: #fff;
+	font-size: 0.95em;
+	line-height: 1.4;
 	box-sizing: border-box;
 }
 
-.woocommerce-account.routew-my-account-styled input:focus,
-.woocommerce-account.routew-my-account-styled textarea:focus {
-	border-color: var(--routew-account-primary);
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content input:focus,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content select:focus,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content textarea:focus {
 	outline: none;
-	box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.25);
+	border-color: var(--bs-primary);
+	box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.18);
 }
 
-/* Form rows — WC uses .form-row which has its own label/input layout
-   that produces the huge "First name" / "Last name" headings shown in
-   the screenshots. Force a single-column stack (label above input)
-   and make labels small + bold to match the rest of the RouteMile
-   UI. `float: none` overrides WC's `.form-row--first/--last` 2-column
-   layout so every row stacks full-width. */
-.woocommerce-account.routew-my-account-styled .form-row,
-.woocommerce-account.routew-my-account-styled .form-row.form-row-first,
-.woocommerce-account.routew-my-account-styled .form-row.form-row-last,
-.woocommerce-account.routew-my-account-styled .form-row.form-row-wide {
-	display: block;
-	float: none !important;
-	width: 100% !important;
-	margin: 0 0 14px;
-	padding: 0;
-}
-
-.woocommerce-account.routew-my-account-styled .form-row label,
-.woocommerce-account.routew-my-account-styled .form-row .woocommerce-form-row__label {
-	display: block;
-	margin: 0 0 6px;
-	font-size: 0.82em;
-	font-weight: 600;
-	color: var(--routew-account-text);
-	letter-spacing: 0.01em;
-	line-height: 1.3;
-}
-
-/* The required-asterisk wrapper inside labels — keep it inline at the
-   natural baseline instead of forcing a new line. */
-.woocommerce-account.routew-my-account-styled .form-row label .required {
-	color: var(--routew-account-primary);
-	margin-left: 2px;
-}
-
-/* Hint text under fields (e.g. "This will be how your name will be
-   displayed in the account section") */
-.woocommerce-account.routew-my-account-styled .form-row em,
-.woocommerce-account.routew-my-account-styled .form-row .description,
-.woocommerce-account.routew-my-account-styled .form-row #account_display_name_description {
-	display: block;
-	margin: 6px 0 0;
-	font-size: 0.78em;
-	font-style: normal;
-	color: var(--routew-account-text-muted);
-	line-height: 1.4;
-}
-
-/* Password fields block (current password / new password / confirm) */
-.woocommerce-account.routew-my-account-styled fieldset {
-	margin: 0 0 18px;
-	padding: 16px 18px;
-	border: 1px solid var(--routew-account-border);
-	border-radius: var(--routew-account-radius);
-	background: var(--routew-account-bg);
-}
-
-.woocommerce-account.routew-my-account-styled fieldset legend {
-	padding: 0 8px;
-	font-size: 0.9em;
-	font-weight: 700;
-	color: var(--routew-account-text);
-}
-
-/* Submit button row — give it breathing room above */
-.woocommerce-account.routew-my-account-styled .form-row.form-row-wide.button-row,
-.woocommerce-account.routew-my-account-styled p:has(button[name="save_account_details"]) {
-	margin-top: 8px;
-}
-
-/* Addresses — match the dashboard widget card style so the page
-   reads as one coherent surface instead of WC's bare default blocks. */
-.woocommerce-account.routew-my-account-styled .u-columns {
-	display: grid;
-	gap: 16px;
-}
-
-.woocommerce-account.routew-my-account-styled .u-column1,
-.woocommerce-account.routew-my-account-styled .u-column2 {
-	padding: 18px 20px;
-	background: var(--routew-account-bg);
-	border-radius: var(--routew-account-radius);
-	border: 1px solid var(--routew-account-border);
-}
-
-/* Heading inside each address card — WC defaults these to a huge
-   serif/heading-2 which looks broken next to the compact dashboard
-   widgets. Match the dashboard's panel-title size. `!important` is
-   used to beat the kiosko block theme's theme.json h2 typography
-   (which sets `font-size: var(--wp--preset--font-size--xx-large)`). */
-.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h2,
-.woocommerce-account.routew-my-account-styled .woocommerce-Address h2,
-.woocommerce-account.routew-my-account-styled .u-column1 h2,
-.woocommerce-account.routew-my-account-styled .u-column2 h2 {
-	margin: 0 0 8px !important;
-	font-size: 1.05em !important;
-	font-weight: 700 !important;
-	color: var(--routew-account-text) !important;
-	letter-spacing: -0.005em;
-	line-height: 1.2 !important;
-	font-family: inherit !important;
-}
-
-/* Header row that contains the heading + edit link — keep them on one
-   row, edit link right-aligned. */
-.woocommerce-account.routew-my-account-styled .woocommerce-Address-title {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	margin-bottom: 12px;
-	padding-bottom: 10px;
-	border-bottom: 1px solid var(--routew-account-border);
-}
-
-/* "Edit Billing address" / "Add ..." link — restyle to match the
-   dashboard's panel-link affordance. */
-.woocommerce-account.routew-my-account-styled .woocommerce-Address-title .edit,
-.woocommerce-account.routew-my-account-styled .u-column1 .edit,
-.woocommerce-account.routew-my-account-styled .u-column2 .edit {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	padding: 4px 10px;
-	font-size: 0.82em;
-	font-weight: 600;
-	color: var(--routew-account-primary) !important;
-	background: var(--routew-account-primary-light);
-	border: 1px solid rgba(232, 93, 4, 0.22);
-	border-radius: var(--routew-account-radius-sm);
-	text-decoration: none !important;
-	transition: background 0.15s ease;
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-Address-title .edit:hover,
-.woocommerce-account.routew-my-account-styled .u-column1 .edit:hover,
-.woocommerce-account.routew-my-account-styled .u-column2 .edit:hover {
-	background: #FFE7D6;
-	text-decoration: none !important;
-}
-
-/* The address text itself — WC renders it in italic + serif, which
-   clashes with the RouteMile sans-serif UI. Reset to normal body
-   styling with comfortable line-height. `!important` is used to beat
-   the kiosko block theme's typography defaults (the `<address>`
-   element gets font-style: italic from the user-agent, and the
-   theme's body font-family stack can override our reset). */
-.woocommerce-account.routew-my-account-styled address,
-.woocommerce-account.routew-my-account-styled .woocommerce-Address address {
-	margin: 0 !important;
-	padding: 0 !important;
-	font-style: normal !important;
-	font-size: 0.92em !important;
-	line-height: 1.55 !important;
-	color: var(--routew-account-text) !important;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-	background: transparent !important;
-}
-
-.woocommerce-account.routew-my-account-styled address p,
-.woocommerce-account.routew-my-account-styled .woocommerce-Address address p {
-	margin: 0 0 2px !important;
-	font-style: normal !important;
-}
-
-/* The "The following addresses will be used on the checkout page by
-   default." lead paragraph — tone down and tighten. */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > p:first-of-type {
-	margin: 0 0 16px;
-	padding: 12px 16px;
-	background: var(--routew-account-primary-light);
-	border-left: 3px solid var(--routew-account-primary);
-	border-radius: var(--routew-account-radius-sm);
-	font-size: 0.88em;
-	color: var(--routew-account-text);
-}
-
-/* Order tracking block - integrate with food app style */
-.woocommerce-account.routew-my-account-styled .routew-order-tracking {
-	--routew-account-primary: #E85D04;
-}
-
-.woocommerce-account.routew-my-account-styled .routew-order-tracking__status-badge {
-	background: var(--routew-account-primary);
-}
-
-.woocommerce-account.routew-my-account-styled .routew-delivery-contact__call {
-	background: linear-gradient(135deg, var(--routew-account-primary) 0%, var(--routew-account-primary-dark) 100%) !important;
-}
-
-/* Mobile fine-tuning (the desktop/mobile split is handled by the
-   .woocommerce grid + the 400px breakpoint above). */
-@media (max-width: 399px) {
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul {
-		flex-direction: row;
-		flex-wrap: nowrap;
-		overflow-x: auto;
-		-webkit-overflow-scrolling: touch;
-		scrollbar-width: thin;
-		scroll-snap-type: x proximity;
-		padding-bottom: 8px;
-		gap: 0.4em;
-	}
-
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li {
-		width: auto;
-		flex: 0 0 auto;
-		scroll-snap-align: start;
-	}
-
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a {
-		white-space: nowrap;
-	}
-
-	.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content {
-		padding: 1.25em;
-	}
-
-	/* Responsive order table */
-	.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell,
-	.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-actions {
-		padding: 8px 12px;
-		font-size: 0.88em;
-	}
-
-	/* On mobile, the actions cell (View button) should be tight and
-	   right-aligned, not full-width. Force the button to size to its
-	   content and not stretch. */
-	.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-actions {
-		text-align: right;
-		padding-top: 4px;
-		padding-bottom: 16px;
-	}
-	.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-actions .button,
-	.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-actions a.button {
-		display: inline-flex !important;
-		width: auto !important;
-		max-width: 120px !important;
-	}
-}
-
-/* Logout link style */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--customer-logout a {
-	background: transparent;
-	border-color: #dc3545;
-	color: #dc3545;
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--customer-logout a:hover {
-	background: #fef2f2;
-	border-color: #b91c1c;
-	color: #b91c1c;
-}
-
-/* Focus visible states */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a:focus-visible {
-	outline: 2px solid var(--routew-account-primary);
-	outline-offset: 2px;
-}
-
-.woocommerce-account.routew-my-account-styled .button:focus-visible,
-.woocommerce-account.routew-my-account-styled .woocommerce-Button:focus-visible {
-	outline: 2px solid var(--routew-account-primary);
-	outline-offset: 2px;
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-	.woocommerce-account.routew-my-account-styled *,
-	.woocommerce-account.routew-my-account-styled *::before,
-	.woocommerce-account.routew-my-account-styled *::after {
-		transition-duration: 0.01ms !important;
-	}
-}
-
-/* ============================================================
- * v1.4.0 — Nav icons, theme chevron neutralisation, status pills
- * ============================================================ */
-
-/* Reset any ">" / "›" / arrow pseudo-element the theme may inject
-   into the active nav item, and the dash/comma the WC default
-   sometimes adds between the link text and the count badge. */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a::before,
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a::after {
-	content: none !important;
-	display: none !important;
-}
-
-/* Reintroduce a single icon as ::before — but only via attribute
-   targeting so we don't break themes that already use ::before. The
-   icon is an inline SVG data URL so we don't need a separate icon
-   font or asset request. */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a {
-	position: relative;
-	padding-left: 32px;
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li a::before {
-	display: inline-block !important;
-	content: "" !important;
-	position: absolute;
-	left: 10px;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 14px;
-	height: 14px;
-	background-color: currentColor;
-	-webkit-mask-size: contain;
-	mask-size: contain;
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-	-webkit-mask-position: center;
-	mask-position: center;
-	opacity: 0.85;
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--dashboard a::before {
-	-webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='9' rx='1.5'/><rect x='14' y='3' width='7' height='5' rx='1.5'/><rect x='14' y='12' width='7' height='9' rx='1.5'/><rect x='3' y='16' width='7' height='5' rx='1.5'/></svg>");
-	mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='9' rx='1.5'/><rect x='14' y='3' width='7' height='5' rx='1.5'/><rect x='14' y='12' width='7' height='9' rx='1.5'/><rect x='3' y='16' width='7' height='5' rx='1.5'/></svg>");
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--orders a::before {
-	-webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 4h6a2 2 0 0 1 2 2v1h2a1 1 0 0 1 1 1v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8a1 1 0 0 1 1-1h2V6a2 2 0 0 1 2-2z'/><path d='M7 16v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2'/></svg>");
-	mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 4h6a2 2 0 0 1 2 2v1h2a1 1 0 0 1 1 1v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8a1 1 0 0 1 1-1h2V6a2 2 0 0 1 2-2z'/><path d='M7 16v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2'/></svg>");
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--downloads a::before {
-	-webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12'/><path d='m7 10 5 5 5-5'/><path d='M5 21h14'/></svg>");
-	mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12'/><path d='m7 10 5 5 5-5'/><path d='M5 21h14'/></svg>");
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--edit-address a::before {
-	-webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z'/><circle cx='12' cy='10' r='2.5'/></svg>");
-	mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z'/><circle cx='12' cy='10' r='2.5'/></svg>");
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--edit-account a::before {
-	-webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8' r='4'/><path d='M4 21a8 8 0 0 1 16 0'/></svg>");
-	mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8' r='4'/><path d='M4 21a8 8 0 0 1 16 0'/></svg>");
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--customer-logout a::before {
-	-webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3'/><path d='M10 17l-5-5 5-5'/><path d='M5 12h12'/></svg>");
-	mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3'/><path d='M10 17l-5-5 5-5'/><path d='M5 12h12'/></svg>");
-}
-
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--payment-methods a::before {
-	-webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='6' width='18' height='13' rx='2'/><path d='M3 10h18'/><path d='M7 15h3'/></svg>");
-	mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='6' width='18' height='13' rx='2'/><path d='M3 10h18'/><path d='M7 15h3'/></svg>");
-}
-
-/* Make the icon a touch larger on the active item so the affordance
-   reads as "current". */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation ul li.is-active a::before {
-	opacity: 1;
-	width: 18px;
-	height: 18px;
-}
-
-/* === Order status pills (used by /orders/ table and view-order) ==
-   Mirrors the .routew-status-pill* tokens in my-account-dashboard.css
-   so status colour reads the same in every account surface. */
-.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .order-status,
-.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-status .order-status,
-.woocommerce-account.routew-my-account-styled .shop_table .order-status,
-.woocommerce-account.routew-my-account-styled .woocommerce-order-overview__status .order-status,
-.woocommerce-account.routew-my-account-styled .order-status {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	padding: 3px 10px !important;
-	font-size: 0.78em !important;
-	font-weight: 600 !important;
-	letter-spacing: 0.02em;
-	border-radius: 999px !important;
-	background: #F0EEEA !important;
-	color: #5A5A5A !important;
-	line-height: 1.4 !important;
-	white-space: nowrap;
-}
-
-.woocommerce-account.routew-my-account-styled .order-status::before {
-	content: "";
-	display: inline-block;
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	background: currentColor;
-	opacity: 0.7;
-}
-
-.woocommerce-account.routew-my-account-styled .order-status.status-pending,
-.woocommerce-account.routew-my-account-styled .order-status.status-on-hold {
-	background: #F0EEEA !important;
-	color: #5A5A5A !important;
-}
-
-.woocommerce-account.routew-my-account-styled .order-status.status-processing,
-.woocommerce-account.routew-my-account-styled .order-status.status-routew-assigned,
-.woocommerce-account.routew-my-account-styled .order-status.status-routew-picked-up {
-	background: #E7F1FB !important;
-	color: #1E6FB8 !important;
-}
-
-.woocommerce-account.routew-my-account-styled .order-status.status-routew-in-kitchen {
-	background: #FFF4ED !important;
-	color: #D44D00 !important;
-}
-
-.woocommerce-account.routew-my-account-styled .order-status.status-completed {
-	background: #E5F4EB !important;
-	color: #1F8A4C !important;
-}
-
-.woocommerce-account.routew-my-account-styled .order-status.status-cancelled,
-.woocommerce-account.routew-my-account-styled .order-status.status-failed,
-.woocommerce-account.routew-my-account-styled .order-status.status-refunded {
-	background: #FCEDEC !important;
-	color: #C0322B !important;
-}
-
-/* Order number column on the orders list — make it pop in primary. */
-.woocommerce-account.routew-my-account-styled .woocommerce-orders-table td.woocommerce-orders-table__cell-order-number a,
-.woocommerce-account.routew-my-account-styled .shop_table td.order-number a {
-	color: var(--routew-account-primary) !important;
-	font-weight: 700;
-}
-
-/* Empty-orders state. WC prints a "No orders have been made yet."
-   paragraph; dress it up to match the food-delivery aesthetic so it
-   doesn't look like an error. */
+/* ----------------------------------------------------------------------------
+   5. WC messages + empty states.
+   ---------------------------------------------------------------------------- */
 .woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .woocommerce-Message,
-.woocommerce-account.routew-my-account-styled .woocommerce-info {
-	display: block;
-	padding: 28px 24px;
-	background: var(--routew-account-card);
-	border: 1px dashed var(--routew-account-border);
-	border-radius: var(--routew-account-radius);
-	color: var(--routew-account-text);
-	text-align: center;
-	font-size: 0.98em;
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .woocommerce-info {
+	background: #fff;
+	border: 1px dashed var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	color: var(--bs-body-color);
+	padding: 16px 18px;
+	margin-bottom: 1em;
 }
 
 .woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .woocommerce-Message .button,
-.woocommerce-account.routew-my-account-styled .woocommerce-info .button {
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content .woocommerce-info .button {
 	margin-top: 12px;
 }
 
-/* Page title — give it breathing room and tie it to the orange theme. */
+/* ----------------------------------------------------------------------------
+   6. Page title with orange lead bar.
+   ---------------------------------------------------------------------------- */
 .woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > h2:first-child,
 .woocommerce-account.routew-my-account-styled .entry-title {
 	display: inline-flex;
@@ -900,9 +291,9 @@
 	padding: 0 0 14px;
 	font-size: 1.6em;
 	font-weight: 700;
-	color: var(--routew-account-text);
+	color: var(--bs-body-color);
 	letter-spacing: -0.01em;
-	border-bottom: 2px solid var(--routew-account-primary-light);
+	border-bottom: 2px solid #FFF4ED;
 }
 
 .woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > h2:first-child::before,
@@ -911,21 +302,6 @@
 	display: inline-block;
 	width: 4px;
 	height: 1em;
-	background: var(--routew-account-primary);
+	background: var(--bs-primary);
 	border-radius: 2px;
-}
-
-/* Sub-endpoint page headers (Orders, Addresses, Account details)
-   also benefit from the above, so re-scope just to the immediate
-   child to keep it scoped. */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > header h1,
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > header h2,
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > header h3 {
-	margin-top: 0;
-}
-
-/* Compact view-order header — give the H2 a coloured lead bar too. */
-.woocommerce-account.routew-my-account-styled .woocommerce-order-overview {
-	border-radius: var(--routew-account-radius) !important;
-	overflow: hidden;
 }
