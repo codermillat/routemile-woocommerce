@@ -44,12 +44,12 @@ class ROUTEW_Admin_Bar
 		$is_open = class_exists('ROUTEW_Store_Hours') ? ROUTEW_Store_Hours::is_store_open() : true;
 
 		if ($is_open) {
-			$title = __('Deliveries: Open', 'routemile-woocommerce');
+			$title = __('Deliveries: Open', 'routemile-for-woocommerce');
 		} else {
 			$hint = class_exists('ROUTEW_Store_Hours') ? ROUTEW_Store_Hours::reopen_hint() : '';
 			$title = '' !== $hint
-				? __('Deliveries: Closed', 'routemile-woocommerce') . ' (' . $hint . ')'
-				: __('Deliveries: Closed', 'routemile-woocommerce');
+				? __('Deliveries: Closed', 'routemile-for-woocommerce') . ' (' . $hint . ')'
+				: __('Deliveries: Closed', 'routemile-for-woocommerce');
 		}
 		$href = '#';
 
@@ -86,13 +86,13 @@ class ROUTEW_Admin_Bar
 		// — previously manage_options only, so shop managers saw the toggle
 		// but could not use it. Fixed in 1.2.10.
 		if (!current_user_can('manage_options') && !current_user_can('manage_woocommerce')) {
-			wp_send_json_error(array('message' => __('Unauthorized access.', 'routemile-woocommerce')), 403);
+			wp_send_json_error(array('message' => __('Unauthorized access.', 'routemile-for-woocommerce')), 403);
 		}
 
 		// Security: Verify nonce to prevent CSRF attacks
 		$nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
 		if (!wp_verify_nonce($nonce, 'routew-admin-nonce')) {
-			wp_send_json_error(array('message' => __('Security verification failed.', 'routemile-woocommerce')), 403);
+			wp_send_json_error(array('message' => __('Security verification failed.', 'routemile-for-woocommerce')), 403);
 		}
 
 		$options = get_option('routew_settings', array());
@@ -125,8 +125,8 @@ class ROUTEW_Admin_Bar
 		// Effective (schedule-aware) state after the toggle.
 		$effective = class_exists('ROUTEW_Store_Hours') ? ROUTEW_Store_Hours::is_store_open() : !empty($options['routew_is_open']);
 		$label = $effective
-			? __('Deliveries: Open', 'routemile-woocommerce')
-			: __('Deliveries: Closed', 'routemile-woocommerce')
+			? __('Deliveries: Open', 'routemile-for-woocommerce')
+			: __('Deliveries: Closed', 'routemile-for-woocommerce')
 				. (class_exists('ROUTEW_Store_Hours') && '' !== ($h = ROUTEW_Store_Hours::reopen_hint()) ? ' (' . $h . ')' : '');
 
 		wp_send_json_success(array(

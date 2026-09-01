@@ -54,7 +54,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
         // POST /wp-json/routemile/v1/checkout/cart-update
         //
         // Block-checkout live total refresh hook. Called from the picker
-        // via `wc.blocksCheckout.extensionCartUpdate({ namespace: 'routemile-woocommerce',
+        // via `wc.blocksCheckout.extensionCartUpdate({ namespace: 'routemile-for-woocommerce',
         // data: { lat, lng } })`. The picker used to fall back to a debounced
         // `$(document.body).trigger('update_checkout')`, but the block
         // checkout's React tree does not listen for that jQuery event — the
@@ -96,7 +96,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
                     'q' => array(
                         'required' => true,
                         'type' => 'string',
-                        'description' => __('Address or place to look up.', 'routemile-woocommerce'),
+                        'description' => __('Address or place to look up.', 'routemile-for-woocommerce'),
                         'sanitize_callback' => function ($param) {
                             return sanitize_text_field($param);
                         },
@@ -125,7 +125,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
 
         $query = trim((string) $request->get_param('q'));
         if (mb_strlen($query) < 3) {
-            return new WP_Error('query_too_short', __('Please type at least 3 characters.', 'routemile-woocommerce'), array('status' => 400));
+            return new WP_Error('query_too_short', __('Please type at least 3 characters.', 'routemile-for-woocommerce'), array('status' => 400));
         }
 
         $coords = (new ROUTEW_Mapping_Service())->get_coords($query);
@@ -157,8 +157,8 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
             // truth shared with classic + blocks checkout validation (1.2.16).
             'is_open' => class_exists('ROUTEW_Checkout') ? ROUTEW_Checkout::is_store_open() : (isset($options['routew_is_open']) ? filter_var($options['routew_is_open'], FILTER_VALIDATE_BOOLEAN) : true),
             'messages' => array(
-                'out_of_zone' => __('Sorry, we do not deliver to this location.', 'routemile-woocommerce'),
-                'store_closed' => __('Sorry, we are currently closed for deliveries.', 'routemile-woocommerce'),
+                'out_of_zone' => __('Sorry, we do not deliver to this location.', 'routemile-for-woocommerce'),
+                'store_closed' => __('Sorry, we are currently closed for deliveries.', 'routemile-for-woocommerce'),
             )
         );
 
@@ -187,7 +187,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
 
         // Basic coordinate validation
         if (abs($lat) > 90 || abs($lng) > 180) {
-            return new WP_Error('invalid_coordinates', __('Invalid coordinates provided.', 'routemile-woocommerce'), array('status' => 400));
+            return new WP_Error('invalid_coordinates', __('Invalid coordinates provided.', 'routemile-for-woocommerce'), array('status' => 400));
         }
 
         $options = get_option('routew_settings');
@@ -195,7 +195,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
         // Store open? Schedule-aware — single source of truth shared with the
         // classic + blocks checkout validators and the GET settings endpoint.
         if (class_exists('ROUTEW_Checkout') && !ROUTEW_Checkout::is_store_open()) {
-            return new WP_Error('store_closed', __('Sorry, we are currently closed for deliveries.', 'routemile-woocommerce'), array('status' => 400));
+            return new WP_Error('store_closed', __('Sorry, we are currently closed for deliveries.', 'routemile-for-woocommerce'), array('status' => 400));
         }
 
         // Restaurant coordinates — explicit setting, else geocoded address (cached)
@@ -213,7 +213,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
         }
 
         if (!isset($distance_data['distance']) || !is_object($distance_data['distance']) || !isset($distance_data['distance']->value)) {
-            return new WP_Error('distance_error', __('Could not calculate delivery distance.', 'routemile-woocommerce'), array('status' => 500));
+            return new WP_Error('distance_error', __('Could not calculate delivery distance.', 'routemile-for-woocommerce'), array('status' => 500));
         }
 
         $distance_in_km = $distance_data['distance']->value / 1000;
@@ -228,7 +228,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
                 'status' => 'error',
                 'in_zone' => false,
                 'code' => 'out_of_zone',
-                'message' => __('Sorry, we do not deliver to your location.', 'routemile-woocommerce'),
+                'message' => __('Sorry, we do not deliver to your location.', 'routemile-for-woocommerce'),
                 'distance_km' => round($distance_in_km, 2),
             ));
         }
@@ -313,7 +313,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
      * Persist pin coordinates to the session and return the refreshed cart.
      *
      * The block-checkout picker fires this via
-     * `extensionCartUpdate({ namespace: 'routemile-woocommerce', data: { lat, lng } })`
+     * `extensionCartUpdate({ namespace: 'routemile-for-woocommerce', data: { lat, lng } })`
      * after every drag/geolocation. The Store API applies the returned
      * `cart` directly to the visible totals — no manual refresh needed.
      *
@@ -334,7 +334,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
         $lng = (float) $request->get_param('lng');
 
         if (abs($lat) > 90 || abs($lng) > 180) {
-            return new WP_Error('invalid_coordinates', __('Invalid coordinates provided.', 'routemile-woocommerce'), array('status' => 400));
+            return new WP_Error('invalid_coordinates', __('Invalid coordinates provided.', 'routemile-for-woocommerce'), array('status' => 400));
         }
 
         // REST requests don't get WC()->session by default; bootstrap it the
@@ -348,7 +348,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
         }
 
         if (!WC()->session) {
-            return new WP_Error('session_unavailable', __('Checkout session is not available.', 'routemile-woocommerce'), array('status' => 500));
+            return new WP_Error('session_unavailable', __('Checkout session is not available.', 'routemile-for-woocommerce'), array('status' => 500));
         }
 
         WC()->session->set('customer_lat', $lat);
@@ -384,7 +384,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
             'lat' => array(
                 'required' => true,
                 'type' => 'number',
-                'description' => __('Latitude coordinate (-90 to 90).', 'routemile-woocommerce'),
+                'description' => __('Latitude coordinate (-90 to 90).', 'routemile-for-woocommerce'),
                 'validate_callback' => function ($param, $request, $key) {
                     return is_numeric($param) && abs((float) $param) <= 90;
                 },
@@ -398,7 +398,7 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
             'lng' => array(
                 'required' => true,
                 'type' => 'number',
-                'description' => __('Longitude coordinate (-180 to 180).', 'routemile-woocommerce'),
+                'description' => __('Longitude coordinate (-180 to 180).', 'routemile-for-woocommerce'),
                 'validate_callback' => function ($param, $request, $key) {
                     return is_numeric($param) && abs((float) $param) <= 180;
                 },

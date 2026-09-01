@@ -57,7 +57,7 @@ class ROUTEW_Rate_Limiter
                     array('source' => 'routemile-rate-limiter')
                 );
             }
-            return new WP_Error('rate_limit_exceeded', __('You are making too many requests. Please wait a moment and try again.', 'routemile-woocommerce'));
+            return new WP_Error('rate_limit_exceeded', __('You are making too many requests. Please wait a moment and try again.', 'routemile-for-woocommerce'));
         }
 
         // Add current request timestamp

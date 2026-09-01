@@ -2,6 +2,12 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
+// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_query, WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+// Delivery-agent order filtering: meta_key/meta_value/meta_query lookups
+// against `_routew_delivery_*` are the documented way to filter WC orders by
+// per-order delivery state. Inherent to the rider dashboard read path.
+// Re-enabled at EOF.
+
 /**
  * Manages the delivery boy view.
  *
@@ -55,9 +61,9 @@ public function __construct()
 
         if (isset($_GET['routew_agent_manifest'])) {
             $manifest = array(
-                'name' => __('RouteMile Agent', 'routemile-woocommerce'),
-                'short_name' => __('FX Agent', 'routemile-woocommerce'),
-                'description' => __('Delivery agent dashboard for RouteMile orders.', 'routemile-woocommerce'),
+                'name' => __('RouteMile Agent', 'routemile-for-woocommerce'),
+                'short_name' => __('FX Agent', 'routemile-for-woocommerce'),
+                'description' => __('Delivery agent dashboard for RouteMile orders.', 'routemile-for-woocommerce'),
                 'start_url' => home_url('/delivery-dashboard/'),
                 'scope' => home_url('/'),
                 'display' => 'standalone',
@@ -113,7 +119,7 @@ public function __construct()
         check_ajax_referer('routew_agent_state', 'nonce');
 
         if (!is_user_logged_in() || !current_user_can('routew_delivery_access')) {
-            wp_send_json_error(array('message' => __('Unauthorized access.', 'routemile-woocommerce')), 403);
+            wp_send_json_error(array('message' => __('Unauthorized access.', 'routemile-for-woocommerce')), 403);
         }
 
         $agent_id = get_current_user_id();
@@ -204,14 +210,14 @@ public function __construct()
 		check_ajax_referer('routew_delivery_action', 'nonce');
 
 		if (!is_user_logged_in() || !current_user_can('routew_delivery_access')) {
-			wp_send_json_error(array('message' => __('Unauthorized access.', 'routemile-woocommerce')));
+			wp_send_json_error(array('message' => __('Unauthorized access.', 'routemile-for-woocommerce')));
 		}
 
 		$order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
 		$status = isset($_POST['status']) ? sanitize_text_field(wp_unslash($_POST['status'])) : '';
 
 		if (!$order_id || !$status) {
-			wp_send_json_error(array('message' => __('Missing order ID or status.', 'routemile-woocommerce')));
+			wp_send_json_error(array('message' => __('Missing order ID or status.', 'routemile-for-woocommerce')));
 		}
 
         // Whitelist allowed status transitions for delivery agents.
@@ -219,7 +225,7 @@ public function __construct()
 // an agent cannot jump straight from assigned to delivered (1.2.16).
 $allowed_statuses = array('routew-picked-up', 'completed');
 if (!in_array($status, $allowed_statuses, true)) {
-    wp_send_json_error(array('message' => __('Invalid status transition.', 'routemile-woocommerce')), 400);
+    wp_send_json_error(array('message' => __('Invalid status transition.', 'routemile-for-woocommerce')), 400);
 }
 
         // Load the order BEFORE the picked-up guard reads its status — the
@@ -228,29 +234,29 @@ if (!in_array($status, $allowed_statuses, true)) {
         $order = wc_get_order($order_id);
 
         if (!$order) {
-            wp_send_json_error(array('message' => __('Invalid order.', 'routemile-woocommerce')));
+            wp_send_json_error(array('message' => __('Invalid order.', 'routemile-for-woocommerce')));
         }
 
 if ('completed' === $status && 'routew-picked-up' !== $order->get_status()) {
-    wp_send_json_error(array('message' => __('You must mark the order as picked up before marking it delivered.', 'routemile-woocommerce')), 400);
+    wp_send_json_error(array('message' => __('You must mark the order as picked up before marking it delivered.', 'routemile-for-woocommerce')), 400);
 }
 
 		$assigned_id = $order->get_meta('_routew_delivery_boy_id', true);
 
 		if (empty($assigned_id) || (int) $assigned_id !== (int) get_current_user_id()) {
-			wp_send_json_error(array('message' => __('You are not assigned to this order.', 'routemile-woocommerce')));
+			wp_send_json_error(array('message' => __('You are not assigned to this order.', 'routemile-for-woocommerce')));
 		}
 
 		// Update status
 		if (is_callable(array($order, 'update_status'))) {
-			$note = ('routew-picked-up' === $status) ? __('Order picked up by delivery agent (AJAX).', 'routemile-woocommerce') : __('Order delivered by delivery agent (AJAX).', 'routemile-woocommerce');
+			$note = ('routew-picked-up' === $status) ? __('Order picked up by delivery agent (AJAX).', 'routemile-for-woocommerce') : __('Order delivered by delivery agent (AJAX).', 'routemile-for-woocommerce');
 			if ($order->update_status($status, $note)) {
-				wp_send_json_success(array('message' => __('Status updated successfully.', 'routemile-woocommerce')));
+				wp_send_json_success(array('message' => __('Status updated successfully.', 'routemile-for-woocommerce')));
 			} else {
-				wp_send_json_error(array('message' => __('Failed to update order status.', 'routemile-woocommerce')));
+				wp_send_json_error(array('message' => __('Failed to update order status.', 'routemile-for-woocommerce')));
 			}
 		} else {
-			wp_send_json_error(array('message' => __('Order update not callable.', 'routemile-woocommerce')));
+			wp_send_json_error(array('message' => __('Order update not callable.', 'routemile-for-woocommerce')));
 		}
 	}
 
@@ -300,7 +306,7 @@ public function login_redirect_woocommerce($redirect, $user)
 public function mark_picked_up()
     {
         $order = $this->verify_delivery_action();
-        $order->update_status('routew-picked-up', __('Order picked up by delivery agent.', 'routemile-woocommerce'));
+        $order->update_status('routew-picked-up', __('Order picked up by delivery agent.', 'routemile-for-woocommerce'));
 
         wp_safe_redirect(home_url('/delivery-dashboard/?updated=1'));
         exit;
@@ -316,9 +322,9 @@ public function mark_picked_up()
         $order = $this->verify_delivery_action();
         // Must already be picked up (1.2.16).
         if ('routew-picked-up' !== $order->get_status()) {
-            wp_die(__('You must mark the order as picked up before marking it delivered.', 'routemile-woocommerce'));
+            wp_die(esc_html__('You must mark the order as picked up before marking it delivered.', 'routemile-for-woocommerce'));
         }
-        $order->update_status('completed', __('Order delivered by delivery agent.', 'routemile-woocommerce'));
+        $order->update_status('completed', __('Order delivered by delivery agent.', 'routemile-for-woocommerce'));
 
         wp_safe_redirect(home_url('/delivery-dashboard/?delivered=1'));
         exit;
@@ -333,24 +339,24 @@ public function mark_picked_up()
 	private function verify_delivery_action()
 	{
 		if (!is_user_logged_in() || !current_user_can('routew_delivery_access')) {
-			wp_die(__('Unauthorized.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Unauthorized.', 'routemile-for-woocommerce'));
 		}
 
 		$nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
 		if (!wp_verify_nonce($nonce, 'routew_delivery_action')) {
-			wp_die(__('Invalid nonce.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Invalid nonce.', 'routemile-for-woocommerce'));
 		}
 
 		$order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
 		$order = $order_id ? wc_get_order($order_id) : false;
 
 		if (!$order) {
-			wp_die(__('Invalid order.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Invalid order.', 'routemile-for-woocommerce'));
 		}
 
 		$assigned_id = $order->get_meta('_routew_delivery_boy_id', true);
 		if (empty($assigned_id) || (int) $assigned_id !== (int) get_current_user_id()) {
-			wp_die(__('You are not assigned to this order.', 'routemile-woocommerce'));
+			wp_die(esc_html__('You are not assigned to this order.', 'routemile-for-woocommerce'));
 		}
 
 		return $order;
@@ -371,11 +377,11 @@ public function mark_picked_up()
 		$nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
 
 		if (!$agent_id || !wp_verify_nonce($nonce, 'routew_settle_cash_' . $agent_id)) {
-			wp_die(__('Security verification failed. Please try again.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Security verification failed. Please try again.', 'routemile-for-woocommerce'));
 		}
 
 		if (!is_user_logged_in() || get_current_user_id() !== $agent_id || !current_user_can('routew_delivery_access')) {
-			wp_die(__('Only the delivery agent can request a hand-over of their own collected cash.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Only the delivery agent can request a hand-over of their own collected cash.', 'routemile-for-woocommerce'));
 		}
 
 		$amount = ROUTEW_Agent_Cash::create_request($agent_id, get_current_user_id());
@@ -389,7 +395,7 @@ public function mark_picked_up()
 
 		$note = sprintf(
 			/* translators: 1: formatted amount, 2: agent name. */
-			__('Cash hand-over of %1$s requested by %2$s — awaiting manager approval.', 'routemile-woocommerce'),
+			__('Cash hand-over of %1$s requested by %2$s — awaiting manager approval.', 'routemile-for-woocommerce'),
 			wp_strip_all_tags(wc_price($amount)),
 			wp_get_current_user()->display_name
 		);
@@ -423,11 +429,11 @@ public function mark_picked_up()
 
 		if (!$id || !in_array($decision, array(ROUTEW_Agent_Cash::STATUS_ACCEPTED, ROUTEW_Agent_Cash::STATUS_REJECTED), true)
 			|| !wp_verify_nonce($nonce, 'routew_review_cash_' . $id)) {
-			wp_die(__('Security verification failed. Please try again.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Security verification failed. Please try again.', 'routemile-for-woocommerce'));
 		}
 
 		if (!current_user_can('edit_shop_orders')) {
-			wp_die(__('Only managers and admins can approve cash hand-overs.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Only managers and admins can approve cash hand-overs.', 'routemile-for-woocommerce'));
 		}
 
 		$result = ROUTEW_Agent_Cash::review_request($id, $decision, get_current_user_id());
@@ -441,14 +447,14 @@ public function mark_picked_up()
 		if (ROUTEW_Agent_Cash::STATUS_ACCEPTED === $decision) {
 			$note = sprintf(
 				/* translators: 1: formatted amount, 2: reviewer name. */
-				__('Cash hand-over of %1$s ACCEPTED by %2$s. Agent balance cleared.', 'routemile-woocommerce'),
+				__('Cash hand-over of %1$s ACCEPTED by %2$s. Agent balance cleared.', 'routemile-for-woocommerce'),
 				wp_strip_all_tags(wc_price($result['amount'])),
 				$reviewer
 			);
 		} else {
 			$note = sprintf(
 				/* translators: 1: formatted amount, 2: reviewer name. */
-				__('Cash hand-over request of %1$s REJECTED by %2$s. Amount stays on the agent\'s balance.', 'routemile-woocommerce'),
+				__('Cash hand-over request of %1$s REJECTED by %2$s. Amount stays on the agent\'s balance.', 'routemile-for-woocommerce'),
 				wp_strip_all_tags(wc_price($result['amount'])),
 				$reviewer
 			);
@@ -472,3 +478,5 @@ public function mark_picked_up()
 }
 
 new ROUTEW_Delivery_Boy_View();
+
+// phpcs:enable

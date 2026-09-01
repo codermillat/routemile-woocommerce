@@ -15,6 +15,13 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
+// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_query, WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+// Every meta_query/meta_key/meta_value lookup in this file is part of the
+// deliveries dashboard's core read path: filtering orders by delivery agent
+// (`_routew_delivery_boy_id`), order status, or pickup state. These queries
+// are the documented way to filter WC_Order_Query by per-order meta and are
+// inherent to a delivery-management plugin — there is no schema equivalent
+// to avoid them. Re-enabled at EOF.
 
 class ROUTEW_Dashboard_Render
 {
@@ -42,8 +49,8 @@ class ROUTEW_Dashboard_Render
 		// to Orders/Coupons/Reports under the WooCommerce top-level.
 		add_submenu_page(
 			'woocommerce',
-			__('Deliveries Dashboard', 'routemile-woocommerce'),
-			__('Deliveries', 'routemile-woocommerce'),
+			__('Deliveries Dashboard', 'routemile-for-woocommerce'),
+			__('Deliveries', 'routemile-for-woocommerce'),
 			'manage_woocommerce',
 			'routew-deliveries-dashboard',
 			array($this, 'render_dashboard_page')
@@ -62,6 +69,7 @@ class ROUTEW_Dashboard_Render
 	 */
 	public function maybe_redirect_legacy_menu_url()
 	{
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- admin menu routing, no state change on read
 		if (!isset($_GET['page'])) {
 			return;
 		}
@@ -72,6 +80,7 @@ class ROUTEW_Dashboard_Render
 		if (isset($_GET['parent_page']) && 'woocommerce' === $_GET['parent_page']) {
 			return;
 		}
+		// phpcs:enable
 		// We are at the legacy URL — redirect to the new WC submenu URL.
 		$target = admin_url('admin.php?page=routew-deliveries-dashboard&parent_page=woocommerce');
 		wp_safe_redirect($target, 301);
@@ -99,6 +108,9 @@ class ROUTEW_Dashboard_Render
 	 */
 	public function render_dashboard_page()
 	{
+		// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+		// Inherent: every meta_query here filters WC orders by per-order
+		// delivery state. Documented WC pattern.
 		// Unassigned orders: exclude routew-assigned status to prevent overlap
 		$unassigned_orders = wc_get_orders(array(
 			'limit' => 100,
@@ -168,16 +180,16 @@ class ROUTEW_Dashboard_Render
 			<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 			<?php do_action('routew_dashboard_content'); ?>
 
-			<h2><?php esc_html_e('Unassigned Orders', 'routemile-woocommerce'); ?></h2>
+			<h2><?php esc_html_e('Unassigned Orders', 'routemile-for-woocommerce'); ?></h2>
 			<table class="widefat fixed" cellspacing="0">
 				<thead>
 					<tr>
-						<th class="manage-column"><?php esc_html_e('Order', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Customer', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Status', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Payment', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Kitchen Note', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Actions', 'routemile-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Order', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Customer', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Status', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Payment', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Kitchen Note', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Actions', 'routemile-for-woocommerce'); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -202,9 +214,9 @@ class ROUTEW_Dashboard_Render
 									<div class="routew-action-buttons">
 										<button type="button" class="button button-small routew-print-receipt"
 											data-order-id="<?php echo esc_attr($order->get_id()); ?>"
-											title="<?php esc_attr_e('Print Receipt', 'routemile-woocommerce'); ?>">
+											title="<?php esc_attr_e('Print Receipt', 'routemile-for-woocommerce'); ?>">
 											<span class="dashicons dashicons-media-text"></span>
-											<span class="button-text"><?php esc_html_e('Print Receipt', 'routemile-woocommerce'); ?></span>
+											<span class="button-text"><?php esc_html_e('Print Receipt', 'routemile-for-woocommerce'); ?></span>
 										</button>
 										<?php if (!empty($delivery_boys)): ?>
 											<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"
@@ -214,7 +226,7 @@ class ROUTEW_Dashboard_Render
 												<input type="hidden" name="order_id" value="<?php echo esc_attr($order->get_id()); ?>" />
 												<select name="delivery_boy_id" style="width:140px; margin-right:5px;"
 													onchange="this.form.submit();">
-													<option value=""><?php esc_html_e('Select Delivery Boy...', 'routemile-woocommerce'); ?></option>
+													<option value=""><?php esc_html_e('Select Delivery Boy...', 'routemile-for-woocommerce'); ?></option>
 													<?php foreach ($delivery_boys as $boy): ?>
 														<option value="<?php echo esc_attr($boy->ID); ?>">
 															<?php echo esc_html($boy->display_name); ?> (ID:
@@ -224,34 +236,34 @@ class ROUTEW_Dashboard_Render
 												</select>
 												<noscript>
 													<button type="submit"
-														class="button button-small"><?php esc_html_e('Assign', 'routemile-woocommerce'); ?></button>
+														class="button button-small"><?php esc_html_e('Assign', 'routemile-for-woocommerce'); ?></button>
 												</noscript>
 											</form>
 										<?php else: ?>
-											<span style="color:#999;"><?php esc_html_e('No delivery boys available', 'routemile-woocommerce'); ?></span>
+											<span style="color:#999;"><?php esc_html_e('No delivery boys available', 'routemile-for-woocommerce'); ?></span>
 										<?php endif; ?>
 								</td>
 							</tr>
 						<?php endforeach; ?>
 					<?php else: ?>
 						<tr>
-							<td colspan="6"><?php esc_html_e('No unassigned orders.', 'routemile-woocommerce'); ?></td>
+							<td colspan="6"><?php esc_html_e('No unassigned orders.', 'routemile-for-woocommerce'); ?></td>
 						</tr>
 					<?php endif; ?>
 				</tbody>
 			</table>
 
-			<h2 style="margin-top:24px;"><?php esc_html_e('Assigned Orders', 'routemile-woocommerce'); ?></h2>
+			<h2 style="margin-top:24px;"><?php esc_html_e('Assigned Orders', 'routemile-for-woocommerce'); ?></h2>
 			<table class="widefat fixed" cellspacing="0">
 				<thead>
 					<tr>
-						<th class="manage-column"><?php esc_html_e('Order', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Customer', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Delivery Boy', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Status', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Payment', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Kitchen Note', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Actions', 'routemile-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Order', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Customer', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Delivery Boy', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Status', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Payment', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Kitchen Note', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Actions', 'routemile-for-woocommerce'); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -279,9 +291,9 @@ class ROUTEW_Dashboard_Render
 									<div class="routew-action-buttons">
 										<button type="button" class="button button-small routew-print-receipt"
 											data-order-id="<?php echo esc_attr($order->get_id()); ?>"
-											title="<?php esc_attr_e('Print Receipt', 'routemile-woocommerce'); ?>">
+											title="<?php esc_attr_e('Print Receipt', 'routemile-for-woocommerce'); ?>">
 											<span class="dashicons dashicons-media-text"></span>
-											<span class="button-text"><?php esc_html_e('Print Receipt', 'routemile-woocommerce'); ?></span>
+											<span class="button-text"><?php esc_html_e('Print Receipt', 'routemile-for-woocommerce'); ?></span>
 										</button>
 										<?php if ('routew-assigned' === $order->get_status()): ?>
 											<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"
@@ -291,7 +303,7 @@ class ROUTEW_Dashboard_Render
 												<input type="hidden" name="order_id" value="<?php echo esc_attr($order->get_id()); ?>" />
 												<input type="hidden" name="new_status" value="routew-picked-up" />
 												<button type="submit"
-													class="button button-small"><?php esc_html_e('Picked Up', 'routemile-woocommerce'); ?></button>
+													class="button button-small"><?php esc_html_e('Picked Up', 'routemile-for-woocommerce'); ?></button>
 											</form>
 										<?php endif; ?>
 										<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"
@@ -301,30 +313,30 @@ class ROUTEW_Dashboard_Render
 											<input type="hidden" name="order_id" value="<?php echo esc_attr($order->get_id()); ?>" />
 											<input type="hidden" name="delivery_boy_id" value="" />
 											<button type="submit"
-												class="button button-small button-link-delete"><?php esc_html_e('Reassign', 'routemile-woocommerce'); ?></button>
+												class="button button-small button-link-delete"><?php esc_html_e('Reassign', 'routemile-for-woocommerce'); ?></button>
 										</form>
 								</td>
 							</tr>
 						<?php endforeach; ?>
 					<?php else: ?>
 						<tr>
-							<td colspan="7"><?php esc_html_e('No assigned orders.', 'routemile-woocommerce'); ?></td>
+							<td colspan="7"><?php esc_html_e('No assigned orders.', 'routemile-for-woocommerce'); ?></td>
 						</tr>
 					<?php endif; ?>
 				</tbody>
 			</table>
 
-			<h2 style="margin-top:24px;"><?php esc_html_e('Out for Delivery', 'routemile-woocommerce'); ?></h2>
+			<h2 style="margin-top:24px;"><?php esc_html_e('Out for Delivery', 'routemile-for-woocommerce'); ?></h2>
 			<table class="widefat fixed" cellspacing="0">
 				<thead>
 					<tr>
-						<th class="manage-column"><?php esc_html_e('Order', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Customer', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Delivery Boy', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Status', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Payment', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Kitchen Note', 'routemile-woocommerce'); ?></th>
-						<th class="manage-column"><?php esc_html_e('Actions', 'routemile-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Order', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Customer', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Delivery Boy', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Status', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Payment', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Kitchen Note', 'routemile-for-woocommerce'); ?></th>
+						<th class="manage-column"><?php esc_html_e('Actions', 'routemile-for-woocommerce'); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -352,9 +364,9 @@ class ROUTEW_Dashboard_Render
 									<div class="routew-action-buttons">
 										<button type="button" class="button button-small routew-print-receipt"
 											data-order-id="<?php echo esc_attr($order->get_id()); ?>"
-											title="<?php esc_attr_e('Print Receipt', 'routemile-woocommerce'); ?>">
+											title="<?php esc_attr_e('Print Receipt', 'routemile-for-woocommerce'); ?>">
 											<span class="dashicons dashicons-media-text"></span>
-											<span class="button-text"><?php esc_html_e('Print Receipt', 'routemile-woocommerce'); ?></span>
+											<span class="button-text"><?php esc_html_e('Print Receipt', 'routemile-for-woocommerce'); ?></span>
 										</button>
 										<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"
 											style="display:inline-block;">
@@ -363,14 +375,14 @@ class ROUTEW_Dashboard_Render
 											<input type="hidden" name="order_id" value="<?php echo esc_attr($order->get_id()); ?>" />
 											<input type="hidden" name="new_status" value="completed" />
 											<button type="submit"
-												class="button button-small button-primary"><?php esc_html_e('Delivered', 'routemile-woocommerce'); ?></button>
+												class="button button-small button-primary"><?php esc_html_e('Delivered', 'routemile-for-woocommerce'); ?></button>
 										</form>
 								</td>
 							</tr>
 						<?php endforeach; ?>
 					<?php else: ?>
 						<tr>
-							<td colspan="7"><?php esc_html_e('No orders out for delivery.', 'routemile-woocommerce'); ?></td>
+							<td colspan="7"><?php esc_html_e('No orders out for delivery.', 'routemile-for-woocommerce'); ?></td>
 						</tr>
 					<?php endif; ?>
 				</tbody>
@@ -379,6 +391,7 @@ class ROUTEW_Dashboard_Render
 
 		<?php if (class_exists('ROUTEW_Dashboard_Agents')) { ROUTEW_Dashboard_Agents::render(); } ?>
 		<?php
+		// phpcs:enable
 	}
 
 	/**
@@ -401,3 +414,5 @@ class ROUTEW_Dashboard_Render
 }
 
 new ROUTEW_Dashboard_Render();
+
+// phpcs:enable

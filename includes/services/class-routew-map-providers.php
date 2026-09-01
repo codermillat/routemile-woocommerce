@@ -55,10 +55,10 @@ class ROUTEW_Map_Providers
 	{
 		return array(
 			'google' => array(
-				'label' => __('Google Maps', 'routemile-woocommerce'),
+				'label' => __('Google Maps', 'routemile-for-woocommerce'),
 				'engine' => 'google',
 				'requires_key' => true,
-				'free_tier' => __('Requires a Google Cloud billing account. Free monthly credit covers small stores.', 'routemile-woocommerce'),
+				'free_tier' => __('Requires a Google Cloud billing account. Free monthly credit covers small stores.', 'routemile-for-woocommerce'),
 				'signup_url' => 'https://console.cloud.google.com/google/maps-apis/start',
 				'capabilities' => array('map', 'geocode', 'routing'),
 				'geocode_url' => 'https://maps.googleapis.com/maps/api/geocode/json',
@@ -66,10 +66,10 @@ class ROUTEW_Map_Providers
 				'attribution' => '',
 			),
 			'osm' => array(
-				'label' => __('OpenStreetMap (no key required)', 'routemile-woocommerce'),
+				'label' => __('OpenStreetMap (no key required)', 'routemile-for-woocommerce'),
 				'engine' => 'leaflet',
 				'requires_key' => false,
-				'free_tier' => __('Completely free — no signup, no card. Runs on volunteer infrastructure: address lookups are throttled to one per second site-wide and the public routing server asks that busy stores not use it. Best for low-volume stores; switch to Geoapify if you outgrow it.', 'routemile-woocommerce'),
+				'free_tier' => __('Completely free — no signup, no card. Runs on volunteer infrastructure: address lookups are throttled to one per second site-wide and the public routing server asks that busy stores not use it. Best for low-volume stores; switch to Geoapify if you outgrow it.', 'routemile-for-woocommerce'),
 				'signup_url' => '',
 				'capabilities' => array('map', 'geocode', 'routing'),
 				'tile_url' => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -86,10 +86,10 @@ class ROUTEW_Map_Providers
 				'geocode_min_interval' => 1,
 			),
 			'maptiler' => array(
-				'label' => __('MapTiler', 'routemile-woocommerce'),
+				'label' => __('MapTiler', 'routemile-for-woocommerce'),
 				'engine' => 'leaflet',
 				'requires_key' => true,
-				'free_tier' => __('Free key, no card required: 100k tile loads and 100k geocoding requests per month. No road routing — distance uses the straight-line estimate.', 'routemile-woocommerce'),
+				'free_tier' => __('Free key, no card required: 100k tile loads and 100k geocoding requests per month. No road routing — distance uses the straight-line estimate.', 'routemile-for-woocommerce'),
 				'signup_url' => 'https://cloud.maptiler.com/account/keys/',
 				'capabilities' => array('map', 'geocode'),
 				'tile_url' => 'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key={key}',
@@ -99,10 +99,10 @@ class ROUTEW_Map_Providers
 				'attribution' => '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 			),
 			'geoapify' => array(
-				'label' => __('Geoapify', 'routemile-woocommerce'),
+				'label' => __('Geoapify', 'routemile-for-woocommerce'),
 				'engine' => 'leaflet',
 				'requires_key' => true,
-				'free_tier' => __('Free key, no card required: 3,000 requests per day covering tiles, geocoding and road routing in one provider.', 'routemile-woocommerce'),
+				'free_tier' => __('Free key, no card required: 3,000 requests per day covering tiles, geocoding and road routing in one provider.', 'routemile-for-woocommerce'),
 				'signup_url' => 'https://myprojects.geoapify.com/',
 				'capabilities' => array('map', 'geocode', 'routing'),
 				'tile_url' => 'https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey={key}',

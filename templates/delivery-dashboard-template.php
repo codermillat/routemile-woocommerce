@@ -11,14 +11,23 @@
  *
  * @package RouteMile
  */
+// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_query, WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+// Rider dashboard: meta_key/meta_value lookups against `_routew_delivery_*`
+// are how the rider's own order list is filtered. Documented WC pattern.
+// Template-local variables (`$new_orders`, `$picked_up_orders`,
+// `$delivered_orders`, `$reviewer`, etc.) are include-only locals, not real
+// globals. Re-enabled at EOF.
 
 if (!defined('ABSPATH')) {
     exit;
 }
+// Rider dashboard: meta_key/meta_value lookups against `_routew_delivery_*`
+// are how the rider's own order list is filtered. Documented WC pattern.
+// Re-enabled at EOF.
 
 // Auth check: must be logged in with delivery access
 if (!is_user_logged_in() || !current_user_can('routew_delivery_access')) {
-    wp_redirect(home_url());
+    wp_safe_redirect(home_url());
     exit;
 }
 
@@ -92,7 +101,11 @@ if (!function_exists('routew_render_order_card')) {
             <div class="routew-order-card <?php echo $is_cod ? 'routew-order-card--cod' : ''; ?> <?php echo $history ? 'routew-order-card--history' : ''; ?>">
                 <div class="routew-card-header">
                     <h3>
-                        <?php printf(esc_html__('Order #%s', 'routemile-woocommerce'), esc_html($order->get_order_number())); ?>
+                        <?php printf(
+                            /* translators: %s: order number. */
+                            esc_html__('Order #%s', 'routemile-for-woocommerce'),
+                            esc_html($order->get_order_number())
+                        ); ?>
                         <?php if ($history && $completed): ?>
                             <span class="routew-card-header__date">
                                 <?php echo esc_html($completed->date_i18n(get_option('date_format') . ' ' . get_option('time_format'))); ?>
@@ -105,7 +118,7 @@ if (!function_exists('routew_render_order_card')) {
                 <?php if ($is_cod): ?>
                     <div class="routew-cod-strip <?php echo $history ? 'routew-cod-strip--settled' : ''; ?>" role="status">
                         <?php echo routew_agent_icon('cash'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <span class="routew-cod-strip__label"><?php echo $history ? esc_html__('Collected on delivery', 'routemile-woocommerce') : esc_html__('Collect on delivery', 'routemile-woocommerce'); ?></span>
+                        <span class="routew-cod-strip__label"><?php echo $history ? esc_html__('Collected on delivery', 'routemile-for-woocommerce') : esc_html__('Collect on delivery', 'routemile-for-woocommerce'); ?></span>
                         <span class="routew-cod-strip__amount"><?php echo wp_kses_post($order->get_formatted_order_total()); ?></span>
                         <span class="routew-cod-strip__method"><?php echo esc_html($order->get_payment_method_title()); ?></span>
                     </div>
@@ -117,9 +130,9 @@ if (!function_exists('routew_render_order_card')) {
                             $routew_method_title = $order->get_payment_method_title();
                             if ('' !== $routew_method_title) {
                                 // translators: %s = payment method title, e.g. "Direct bank transfer".
-                                printf(esc_html__('Prepaid — %s. Nothing to collect.', 'routemile-woocommerce'), esc_html($routew_method_title));
+                                printf(esc_html__('Prepaid — %s. Nothing to collect.', 'routemile-for-woocommerce'), esc_html($routew_method_title));
                             } else {
-                                esc_html_e('Prepaid. Nothing to collect.', 'routemile-woocommerce');
+                                esc_html_e('Prepaid. Nothing to collect.', 'routemile-for-woocommerce');
                             }
                             ?>
                         </span>
@@ -128,30 +141,30 @@ if (!function_exists('routew_render_order_card')) {
                 <div class="routew-card-body">
                     <div class="routew-card-section">
                         <p><?php echo routew_agent_icon('person'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                            <strong><?php esc_html_e('Customer:', 'routemile-woocommerce'); ?></strong>
+                            <strong><?php esc_html_e('Customer:', 'routemile-for-woocommerce'); ?></strong>
                             <?php echo esc_html($order->get_formatted_billing_full_name()); ?></p>
                         <p><?php echo routew_agent_icon('phone'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                            <strong><?php esc_html_e('Phone:', 'routemile-woocommerce'); ?></strong>
+                            <strong><?php esc_html_e('Phone:', 'routemile-for-woocommerce'); ?></strong>
                             <a class="routew-call-link"
                                 href="tel:<?php echo esc_attr($order->get_billing_phone()); ?>"><?php echo esc_html($order->get_billing_phone()); ?></a>
                         </p>
 
                         <?php if ($delivery_address): ?>
                             <p><?php echo routew_agent_icon('home'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                                <strong><?php esc_html_e('Delivery Address:', 'routemile-woocommerce'); ?></strong>
+                                <strong><?php esc_html_e('Delivery Address:', 'routemile-for-woocommerce'); ?></strong>
                                 <?php echo esc_html($delivery_address); ?></p>
                             <?php if ($delivery_distance): ?>
                                 <p><?php echo routew_agent_icon('ruler'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                                    <strong><?php esc_html_e('Distance:', 'routemile-woocommerce'); ?></strong>
+                                    <strong><?php esc_html_e('Distance:', 'routemile-for-woocommerce'); ?></strong>
                                     <?php echo esc_html($delivery_distance); ?> km</p>
                             <?php endif; ?>
                         <?php else: ?>
                             <p><?php echo routew_agent_icon('home'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                                <strong><?php esc_html_e('Address:', 'routemile-woocommerce'); ?></strong>
+                                <strong><?php esc_html_e('Address:', 'routemile-for-woocommerce'); ?></strong>
                                 <?php echo wp_kses_post($shipping_address); ?></p>
                             <?php if ($unit): ?>
                                 <p><?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                                    <strong><?php esc_html_e('Unit:', 'routemile-woocommerce'); ?></strong>
+                                    <strong><?php esc_html_e('Unit:', 'routemile-for-woocommerce'); ?></strong>
                                     <?php echo esc_html($unit); ?></p>
                             <?php endif; ?>
                         <?php endif; ?>
@@ -160,7 +173,7 @@ if (!function_exists('routew_render_order_card')) {
                         <div class="routew-customer-note">
                             <div class="routew-customer-note__title">
                                 <?php echo routew_agent_icon('note'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                                <?php esc_html_e('Delivery instructions', 'routemile-woocommerce'); ?>
+                                <?php esc_html_e('Delivery instructions', 'routemile-for-woocommerce'); ?>
                             </div>
                             <p class="routew-customer-note__line"><?php echo esc_html($instructions); ?></p>
                         </div>
@@ -172,17 +185,17 @@ if (!function_exists('routew_render_order_card')) {
                     if ($delivery_lat && $delivery_lng && is_numeric($delivery_lat) && is_numeric($delivery_lng)) {
                         // Use precise coordinate-based map link for exact pinpoint location
                         $map_url = "https://www.google.com/maps?q=" . urlencode(trim($delivery_lat) . ',' . trim($delivery_lng));
-                        $map_label = __('Open Exact Location', 'routemile-woocommerce');
+                        $map_label = __('Open Exact Location', 'routemile-for-woocommerce');
                         $map_class = 'routew-button-map-precise';
                     } elseif ($delivery_address) {
                         // Use delivery address if coordinates are missing but delivery address exists
-                        $map_url = "https://www.google.com/maps/search/?api=1&query=" . urlencode(trim(strip_tags($delivery_address)));
-                        $map_label = __('Search Delivery Address', 'routemile-woocommerce');
+                        $map_url = "https://www.google.com/maps/search/?api=1&query=" . urlencode(trim(wp_strip_all_tags($delivery_address)));
+                        $map_label = __('Search Delivery Address', 'routemile-for-woocommerce');
                         $map_class = 'routew-button-map-address';
                     } else {
                         // Final fallback to shipping address
-                        $map_url = "https://www.google.com/maps/search/?api=1&query=" . urlencode(trim(strip_tags($shipping_address)));
-                        $map_label = __('Search Location', 'routemile-woocommerce');
+                        $map_url = "https://www.google.com/maps/search/?api=1&query=" . urlencode(trim(wp_strip_all_tags($shipping_address)));
+                        $map_label = __('Search Location', 'routemile-for-woocommerce');
                         $map_class = 'routew-button-map-fallback';
                     }
                     ?>
@@ -191,16 +204,16 @@ if (!function_exists('routew_render_order_card')) {
                         <?php echo routew_agent_icon('pin'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
                         <?php echo esc_html($map_label); ?></a>
                     <a href="tel:<?php echo esc_attr($order->get_billing_phone()); ?>"
-                        class="routew-button routew-button-call" aria-label="<?php echo esc_attr__('Call customer', 'routemile-woocommerce'); ?>">
+                        class="routew-button routew-button-call" aria-label="<?php echo esc_attr__('Call customer', 'routemile-for-woocommerce'); ?>">
                         <?php echo routew_agent_icon('phone'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <span class="routew-button-call__label"><?php esc_html_e('Call', 'routemile-woocommerce'); ?></span></a>
+                        <span class="routew-button-call__label"><?php esc_html_e('Call', 'routemile-for-woocommerce'); ?></span></a>
                     <?php if (!$history && 'routew-assigned' === $status): ?>
                         <button type="button" class="routew-button routew-button-pickup routew-action-btn"
                             data-action="routew_update_delivery_status" data-status="routew-picked-up"
                             data-order-id="<?php echo esc_attr($order->get_id()); ?>"
                             data-nonce="<?php echo esc_attr(wp_create_nonce('routew_delivery_action')); ?>">
                             <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                            <?php esc_html_e('Mark Picked Up', 'routemile-woocommerce'); ?>
+                            <?php esc_html_e('Mark Picked Up', 'routemile-for-woocommerce'); ?>
                         </button>
                     <?php endif; ?>
                     <?php if (!$history && 'routew-picked-up' === $status): ?>
@@ -209,7 +222,7 @@ if (!function_exists('routew_render_order_card')) {
                             data-order-id="<?php echo esc_attr($order->get_id()); ?>"
                             data-nonce="<?php echo esc_attr(wp_create_nonce('routew_delivery_action')); ?>">
                             <?php echo routew_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                            <?php esc_html_e('Mark Delivered', 'routemile-woocommerce'); ?>
+                            <?php esc_html_e('Mark Delivered', 'routemile-for-woocommerce'); ?>
                         </button>
                     <?php endif; ?>
                 </div>
@@ -241,6 +254,8 @@ $delivered_orders = wc_get_orders(array(
     'orderby' => 'date',
     'order' => 'DESC',
 ));
+// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_query, WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+// Note: the NonPrefixedVariableFound disable stays active until EOF.
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -254,7 +269,7 @@ $delivered_orders = wc_get_orders(array(
     <link rel="apple-touch-icon" href="<?php echo esc_url(ROUTEW_PLUGIN_URL . 'assets/img/agent-icon.svg'); ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="<?php esc_attr_e('FX Agent', 'routemile-woocommerce'); ?>">
+    <meta name="apple-mobile-web-app-title" content="<?php esc_attr_e('FX Agent', 'routemile-for-woocommerce'); ?>">
     <?php wp_head(); ?>
 </head>
 
@@ -269,7 +284,7 @@ $delivered_orders = wc_get_orders(array(
                         <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
                     </span>
                     <div class="routew-app-header__titles">
-                        <h1><?php esc_html_e('RouteMile Agent', 'routemile-woocommerce'); ?></h1>
+                        <h1><?php esc_html_e('RouteMile Agent', 'routemile-for-woocommerce'); ?></h1>
                         <p class="routew-app-header__agent">
                             <?php echo esc_html($routew_agent->display_name); ?>
                             <span class="routew-app-header__dot" aria-hidden="true"></span>
@@ -281,23 +296,23 @@ $delivered_orders = wc_get_orders(array(
             <div class="routew-agent-stats" role="status">
                 <div class="routew-agent-stats__item">
                     <span class="routew-agent-stats__value"><?php echo absint($routew_state['today']['delivered']); ?></span>
-                    <span class="routew-agent-stats__label"><?php esc_html_e('Delivered today', 'routemile-woocommerce'); ?></span>
+                    <span class="routew-agent-stats__label"><?php esc_html_e('Delivered today', 'routemile-for-woocommerce'); ?></span>
                 </div>
                 <div class="routew-agent-stats__item">
                     <span class="routew-agent-stats__value"><?php echo absint($routew_state['today']['active']); ?></span>
-                    <span class="routew-agent-stats__label"><?php esc_html_e('Active now', 'routemile-woocommerce'); ?></span>
+                    <span class="routew-agent-stats__label"><?php esc_html_e('Active now', 'routemile-for-woocommerce'); ?></span>
                 </div>
                 <div class="routew-agent-stats__item">
                     <span class="routew-agent-stats__value"><?php echo wp_kses_post(wc_price($routew_state['today']['collected'], array('currency' => get_woocommerce_currency()))); ?></span>
-                    <span class="routew-agent-stats__label"><?php esc_html_e('Collected today', 'routemile-woocommerce'); ?></span>
+                    <span class="routew-agent-stats__label"><?php esc_html_e('Collected today', 'routemile-for-woocommerce'); ?></span>
                 </div>
                 <div class="routew-agent-stats__item routew-agent-stats__item--due">
                     <span class="routew-agent-stats__value"><?php echo wp_kses_post(wc_price($routew_cash['unsettled'], array('currency' => get_woocommerce_currency()))); ?></span>
-                    <span class="routew-agent-stats__label"><?php esc_html_e('To hand over', 'routemile-woocommerce'); ?></span>
+                    <span class="routew-agent-stats__label"><?php esc_html_e('To hand over', 'routemile-for-woocommerce'); ?></span>
                 </div>
                 <div class="routew-agent-stats__item">
                     <span class="routew-agent-stats__value"><?php echo absint($routew_state['counts']['delivered']); ?></span>
-                    <span class="routew-agent-stats__label"><?php esc_html_e('All-time delivered', 'routemile-woocommerce'); ?></span>
+                    <span class="routew-agent-stats__label"><?php esc_html_e('All-time delivered', 'routemile-for-woocommerce'); ?></span>
                 </div>
             </div>
             <?php if ($routew_cash['pending']): ?>
@@ -305,7 +320,7 @@ $delivered_orders = wc_get_orders(array(
                     <span class="routew-settle-bar__text">
                         <?php
                         // translators: 1: formatted amount.
-                        printf(esc_html__('Hand-over of %1$s sent — waiting for manager approval.', 'routemile-woocommerce'),
+                        printf(esc_html__('Hand-over of %1$s sent — waiting for manager approval.', 'routemile-for-woocommerce'),
                             wp_kses_post(wc_price($routew_cash['pending']['amount'], array('currency' => get_woocommerce_currency())))
                         );
                         ?>
@@ -316,7 +331,7 @@ $delivered_orders = wc_get_orders(array(
                     <span class="routew-settle-bar__text">
                         <?php
                         // translators: %s = formatted amount.
-                        printf(esc_html__('You are holding %s of the store\'s cash.', 'routemile-woocommerce'),
+                        printf(esc_html__('You are holding %s of the store\'s cash.', 'routemile-for-woocommerce'),
                             wp_kses_post(wc_price($routew_cash['unsettled'], array('currency' => get_woocommerce_currency())))
                         );
                         ?>
@@ -327,7 +342,7 @@ $delivered_orders = wc_get_orders(array(
                         <input type="hidden" name="agent_id" value="<?php echo esc_attr(get_current_user_id()); ?>" />
                         <button type="submit" class="routew-button routew-settle-btn" data-routew-settle-amount="<?php echo esc_attr(wp_strip_all_tags(wc_price($routew_cash['unsettled']))); ?>">
                             <?php echo routew_agent_icon('cash'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                            <?php esc_html_e('Request hand-over', 'routemile-woocommerce'); ?>
+                            <?php esc_html_e('Request hand-over', 'routemile-for-woocommerce'); ?>
                         </button>
                     </form>
                 </div>
@@ -336,10 +351,10 @@ $delivered_orders = wc_get_orders(array(
                     <?php
                     $reviewer = get_user_by('id', absint($routew_cash['last_accepted']['reviewed_by']));
                     // translators: 1: formatted amount, 2: date/time, 3: approver name.
-                    printf(esc_html__('Last hand-over: %1$s on %2$s, approved by %3$s. All settled.', 'routemile-woocommerce'),
+                    printf(esc_html__('Last hand-over: %1$s on %2$s, approved by %3$s. All settled.', 'routemile-for-woocommerce'),
                         wp_kses_post(wc_price($routew_cash['last_accepted']['amount'], array('currency' => get_woocommerce_currency()))),
                         esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), (int) $routew_cash['last_accepted']['reviewed_at'])),
-                        esc_html($reviewer ? $reviewer->display_name : __('manager', 'routemile-woocommerce'))
+                        esc_html($reviewer ? $reviewer->display_name : __('manager', 'routemile-for-woocommerce'))
                     );
                     ?>
                 </p>
@@ -350,7 +365,7 @@ $delivered_orders = wc_get_orders(array(
                     <span class="routew-cod-summary__text">
                         <?php
                         // translators: 1 = formatted amount, 2 = number of orders.
-                        printf(esc_html__('Cash to collect: %1$s across %2$s COD order(s)', 'routemile-woocommerce'),
+                        printf(esc_html__('Cash to collect: %1$s across %2$s COD order(s)', 'routemile-for-woocommerce'),
                             wp_kses_post(wc_price($routew_state['cod']['total'], array('currency' => get_woocommerce_currency()))),
                             absint($routew_state['cod']['count'])
                         );
@@ -369,8 +384,8 @@ $delivered_orders = wc_get_orders(array(
                 <?php else: ?>
                     <div class="routew-no-orders">
                         <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <p><?php esc_html_e('No new deliveries assigned.', 'routemile-woocommerce'); ?></p>
-                        <p class="routew-no-orders__hint"><?php esc_html_e('New orders appear here automatically — leave the app open.', 'routemile-woocommerce'); ?></p>
+                        <p><?php esc_html_e('No new deliveries assigned.', 'routemile-for-woocommerce'); ?></p>
+                        <p class="routew-no-orders__hint"><?php esc_html_e('New orders appear here automatically — leave the app open.', 'routemile-for-woocommerce'); ?></p>
                     </div>
                 <?php endif; ?>
             </div>
@@ -383,7 +398,7 @@ $delivered_orders = wc_get_orders(array(
                 <?php else: ?>
                     <div class="routew-no-orders">
                         <?php echo routew_agent_icon('clock'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <p><?php esc_html_e('No deliveries in progress.', 'routemile-woocommerce'); ?></p>
+                        <p><?php esc_html_e('No deliveries in progress.', 'routemile-for-woocommerce'); ?></p>
                     </div>
                 <?php endif; ?>
             </div>
@@ -396,29 +411,29 @@ $delivered_orders = wc_get_orders(array(
                 <?php else: ?>
                     <div class="routew-no-orders">
                         <?php echo routew_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <p><?php esc_html_e('No delivered orders yet.', 'routemile-woocommerce'); ?></p>
+                        <p><?php esc_html_e('No delivered orders yet.', 'routemile-for-woocommerce'); ?></p>
                     </div>
                 <?php endif; ?>
             </div>
         </main>
 
-        <nav class="routew-tabbar" role="tablist" aria-label="<?php esc_attr_e('Delivery status filters', 'routemile-woocommerce'); ?>">
+        <nav class="routew-tabbar" role="tablist" aria-label="<?php esc_attr_e('Delivery status filters', 'routemile-for-woocommerce'); ?>">
             <button type="button" id="tab-new-orders" class="routew-tab-link active" role="tab" aria-selected="true"
                 aria-controls="new-orders" data-routew-tab="new-orders">
                 <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                <span class="routew-tabbar__label"><?php esc_html_e('New', 'routemile-woocommerce'); ?></span>
+                <span class="routew-tabbar__label"><?php esc_html_e('New', 'routemile-for-woocommerce'); ?></span>
                 <span class="routew-tabbar__count"><?php echo count($new_orders); ?></span>
             </button>
             <button type="button" id="tab-in-progress" class="routew-tab-link" role="tab" aria-selected="false"
                 aria-controls="in-progress" data-routew-tab="in-progress">
                 <?php echo routew_agent_icon('clock'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                <span class="routew-tabbar__label"><?php esc_html_e('In Progress', 'routemile-woocommerce'); ?></span>
+                <span class="routew-tabbar__label"><?php esc_html_e('In Progress', 'routemile-for-woocommerce'); ?></span>
                 <span class="routew-tabbar__count"><?php echo count($picked_up_orders); ?></span>
             </button>
             <button type="button" id="tab-delivered" class="routew-tab-link" role="tab" aria-selected="false"
                 aria-controls="delivered" data-routew-tab="delivered">
                 <?php echo routew_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                <span class="routew-tabbar__label"><?php esc_html_e('Delivered', 'routemile-woocommerce'); ?></span>
+                <span class="routew-tabbar__label"><?php esc_html_e('Delivered', 'routemile-for-woocommerce'); ?></span>
                 <span class="routew-tabbar__count"><?php echo count($delivered_orders); ?></span>
             </button>
         </nav>
@@ -430,3 +445,4 @@ $delivered_orders = wc_get_orders(array(
 </body>
 
 </html>
+<?php // phpcs:enable ?>

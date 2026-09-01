@@ -22,10 +22,10 @@ class ROUTEW_Email_Picked_Up extends WC_Email
     {
         $this->id = 'routew_order_picked_up';
         $this->customer_email = true;
-        $this->title = __('Order Picked Up', 'routemile-woocommerce');
-        $this->description = __('This email is sent when the order is picked up and out for delivery.', 'routemile-woocommerce');
-        $this->heading = __('Your order is on its way!', 'routemile-woocommerce');
-        $this->subject = __('[{site_title}]: Your order #{order_number} is out for delivery', 'routemile-woocommerce');
+        $this->title = __('Order Picked Up', 'routemile-for-woocommerce');
+        $this->description = __('This email is sent when the order is picked up and out for delivery.', 'routemile-for-woocommerce');
+        $this->heading = __('Your order is on its way!', 'routemile-for-woocommerce');
+        $this->subject = __('[{site_title}]: Your order #{order_number} is out for delivery', 'routemile-for-woocommerce');
 
         $this->template_html = 'emails/routew-order-status.php';
         $this->template_plain = 'emails/plain/routew-order-status.php';
@@ -49,7 +49,7 @@ class ROUTEW_Email_Picked_Up extends WC_Email
      */
     public function get_default_subject()
     {
-        return __('[{site_title}]: Your order #{order_number} is out for delivery', 'routemile-woocommerce');
+        return __('[{site_title}]: Your order #{order_number} is out for delivery', 'routemile-for-woocommerce');
     }
 
     /**
@@ -59,7 +59,7 @@ class ROUTEW_Email_Picked_Up extends WC_Email
      */
     public function get_default_heading()
     {
-        return __('Your order is on its way! 🎉', 'routemile-woocommerce');
+        return __('Your order is on its way! 🎉', 'routemile-for-woocommerce');
     }
 
     /**
@@ -103,7 +103,7 @@ class ROUTEW_Email_Picked_Up extends WC_Email
                 'order' => $this->object,
                 'email_heading' => $this->get_heading(),
                 'additional_content' => $this->get_additional_content(),
-                'status_message' => __('Your order has been picked up and is on its way to you!', 'routemile-woocommerce'),
+                'status_message' => __('Your order has been picked up and is on its way to you!', 'routemile-for-woocommerce'),
                 'sent_to_admin' => false,
                 'plain_text' => false,
                 'email' => $this,
@@ -126,7 +126,7 @@ class ROUTEW_Email_Picked_Up extends WC_Email
                 'order' => $this->object,
                 'email_heading' => $this->get_heading(),
                 'additional_content' => $this->get_additional_content(),
-                'status_message' => __('Your order has been picked up and is on its way to you!', 'routemile-woocommerce'),
+                'status_message' => __('Your order has been picked up and is on its way to you!', 'routemile-for-woocommerce'),
                 'sent_to_admin' => false,
                 'plain_text' => true,
                 'email' => $this,
@@ -143,6 +143,6 @@ class ROUTEW_Email_Picked_Up extends WC_Email
      */
     public function get_default_additional_content()
     {
-        return __('Get ready to receive your delicious order!', 'routemile-woocommerce');
+        return __('Get ready to receive your delicious order!', 'routemile-for-woocommerce');
     }
 }

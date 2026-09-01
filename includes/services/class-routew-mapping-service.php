@@ -92,8 +92,8 @@ class ROUTEW_Mapping_Service
 	{
 		return new WP_Error('api_key_missing', sprintf(
 			/* translators: %s: map provider name. */
-			__('%s requires an API key. Add one in WooCommerce → Settings → RouteMile, or switch to OpenStreetMap which needs no key.', 'routemile-woocommerce'),
-			isset($this->provider['label']) ? $this->provider['label'] : __('The map provider', 'routemile-woocommerce')
+			__('%s requires an API key. Add one in WooCommerce → Settings → RouteMile, or switch to OpenStreetMap which needs no key.', 'routemile-for-woocommerce'),
+			isset($this->provider['label']) ? $this->provider['label'] : __('The map provider', 'routemile-for-woocommerce')
 		));
 	}
 
@@ -148,7 +148,7 @@ class ROUTEW_Mapping_Service
 			if ('routing_unsupported' !== $code && function_exists('wc_get_logger')) {
 				wc_get_logger()->warning(
 					'Routing failed (' . $code . '), using straight-line estimate: ' . $result->get_error_message(),
-					array('source' => 'routemile-woocommerce')
+					array('source' => 'routemile-for-woocommerce')
 				);
 			}
 
@@ -183,7 +183,7 @@ class ROUTEW_Mapping_Service
 				'value' => $metres,
 				'text' => sprintf(
 					/* translators: %s: distance in kilometres. */
-					__('%s km', 'routemile-woocommerce'),
+					__('%s km', 'routemile-for-woocommerce'),
 					number_format_i18n($km, ($km < 10 ? 1 : 0))
 				),
 			),
@@ -191,7 +191,7 @@ class ROUTEW_Mapping_Service
 				'value' => $seconds,
 				'text' => sprintf(
 					/* translators: %d: duration in minutes. */
-					_n('%d min', '%d mins', $mins, 'routemile-woocommerce'),
+					_n('%d min', '%d mins', $mins, 'routemile-for-woocommerce'),
 					$mins
 				),
 			),
@@ -229,7 +229,7 @@ class ROUTEW_Mapping_Service
 
 		$address = isset($options['routew_restaurant_address']) ? trim((string) $options['routew_restaurant_address']) : '';
 		if ('' === $address) {
-			return new WP_Error('restaurant_location_missing', __('Restaurant address or coordinates are not configured.', 'routemile-woocommerce'));
+			return new WP_Error('restaurant_location_missing', __('Restaurant address or coordinates are not configured.', 'routemile-for-woocommerce'));
 		}
 
 		$coords = $this->get_coords($address);
@@ -270,13 +270,13 @@ class ROUTEW_Mapping_Service
 	{
 		if (is_array($value)) {
 			if (!isset($value['lat'], $value['lng'])) {
-				return new WP_Error('invalid_location', __('Invalid location array. Expected lat,lng.', 'routemile-woocommerce'));
+				return new WP_Error('invalid_location', __('Invalid location array. Expected lat,lng.', 'routemile-for-woocommerce'));
 			}
 			return array('lat' => (float) $value['lat'], 'lng' => (float) $value['lng']);
 		}
 
 		if (!is_string($value)) {
-			return new WP_Error('invalid_location', __('Invalid location type.', 'routemile-woocommerce'));
+			return new WP_Error('invalid_location', __('Invalid location type.', 'routemile-for-woocommerce'));
 		}
 
 		$value = trim($value);
@@ -307,7 +307,7 @@ class ROUTEW_Mapping_Service
 		}
 
 		if (!in_array('geocode', (array) $this->provider['capabilities'], true)) {
-			return new WP_Error('geocoding_unsupported', __('The configured map provider cannot look up addresses.', 'routemile-woocommerce'));
+			return new WP_Error('geocoding_unsupported', __('The configured map provider cannot look up addresses.', 'routemile-for-woocommerce'));
 		}
 
 		$cache_key = 'routew_geo_' . md5($this->provider['id'] . '|' . strtolower(trim($address)));
@@ -322,7 +322,7 @@ class ROUTEW_Mapping_Service
 			if (function_exists('wc_get_logger')) {
 				wc_get_logger()->error(
 					'Geocoding failed (' . $this->provider['id'] . '): ' . $location->get_error_message(),
-					array('source' => 'routemile-woocommerce')
+					array('source' => 'routemile-for-woocommerce')
 				);
 			}
 			return $location;

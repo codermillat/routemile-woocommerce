@@ -153,8 +153,8 @@ class ROUTEW_Checkout_Address
 			return $fields;
 		}
 
-		$fields['address_1']['label'] = __('Flat / Floor / Block / Society / Tower', 'routemile-woocommerce');
-		$fields['address_1']['placeholder'] = __('e.g. Flat 4B, 2nd floor, Tower A, Green Valley Society', 'routemile-woocommerce');
+		$fields['address_1']['label'] = __('Flat / Floor / Block / Society / Tower', 'routemile-for-woocommerce');
+		$fields['address_1']['placeholder'] = __('e.g. Flat 4B, 2nd floor, Tower A, Green Valley Society', 'routemile-for-woocommerce');
 		$fields['address_1']['required'] = true;
 		// The map pin is the location; this is the "find me in the
 		// building" detail, so browsers should not autofill a street.

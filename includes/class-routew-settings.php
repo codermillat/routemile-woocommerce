@@ -2,6 +2,13 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
+// phpcs:disable WordPress.Security.NonceVerification.Missing
+// save_wc_settings_tab() reads $_POST['routew_settings'] inside a handler
+// that fires only after WooCommerce has verified its own settings-tab nonce
+// (settings_errors / options.php handle nonce checking for the registered
+// `routew_settings_group` option). An extra wp_verify_nonce() here would
+// be redundant and fail every legitimate save.
+
 /**
  * Manages the settings page for the plugin.
  *
@@ -25,7 +32,7 @@ class ROUTEW_Settings
 	/** Add the RouteMile tab to WooCommerce → Settings. */
 	public function register_wc_settings_tab($tabs)
 	{
-		$tabs['routemile-woocommerce'] = __('RouteMile', 'routemile-woocommerce');
+		$tabs['routemile-for-woocommerce'] = __('RouteMile', 'routemile-for-woocommerce');
 		return $tabs;
 	}
 
@@ -46,6 +53,7 @@ class ROUTEW_Settings
 		if (!current_user_can('manage_woocommerce')) {
 			return;
 		}
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized below via sanitize_settings() callback
 		$input = (array) wc_clean(wp_unslash($_POST['routew_settings']));
 		update_option('routew_settings', $this->sanitize_settings($input));
 	}
@@ -61,14 +69,14 @@ class ROUTEW_Settings
 		// General Settings Section
 		add_settings_section(
 			'routew_general_settings_section',
-			__('General Settings', 'routemile-woocommerce'),
+			__('General Settings', 'routemile-for-woocommerce'),
 			null,
 			'routemile-settings'
 		);
 
 		add_settings_field(
 			'routew_restaurant_address',
-			__('Restaurant Address', 'routemile-woocommerce'),
+			__('Restaurant Address', 'routemile-for-woocommerce'),
 			array($this, 'render_text_field'),
 			'routemile-settings',
 			'routew_general_settings_section',
@@ -77,26 +85,26 @@ class ROUTEW_Settings
 
 		add_settings_field(
 			'routew_restaurant_latlng',
-			__('Restaurant Coordinates (lat, lng)', 'routemile-woocommerce'),
+			__('Restaurant Coordinates (lat, lng)', 'routemile-for-woocommerce'),
 			array($this, 'render_text_field'),
 			'routemile-settings',
 			'routew_general_settings_section',
 			array(
 				'id' => 'routew_restaurant_latlng',
-				'description' => __('Optional. Exact "lat, lng" used for fee & zone checks, e.g. 40.7128, -74.0060. Overrides the address above.', 'routemile-woocommerce')
+				'description' => __('Optional. Exact "lat, lng" used for fee & zone checks, e.g. 40.7128, -74.0060. Overrides the address above.', 'routemile-for-woocommerce')
 			)
 		);
 
 		add_settings_field(
 			'routew_preparation_time',
-			__('Default Preparation Time (minutes)', 'routemile-woocommerce'),
+			__('Default Preparation Time (minutes)', 'routemile-for-woocommerce'),
 			array($this, 'render_prep_time_field'),
 			'routemile-settings',
 			'routew_general_settings_section',
 			array(
 				'id' => 'routew_preparation_time',
 				'default' => 20,
-				'description' => __('How long your kitchen needs to prepare a typical order. RouteMile adds this to travel time to show customers an estimated arrival, e.g. 20 min cooking + 15 min ride = “Arrives in ~35 minutes”. Most restaurants keep 15–30.', 'routemile-woocommerce'),
+				'description' => __('How long your kitchen needs to prepare a typical order. RouteMile adds this to travel time to show customers an estimated arrival, e.g. 20 min cooking + 15 min ride = “Arrives in ~35 minutes”. Most restaurants keep 15–30.', 'routemile-for-woocommerce'),
 			)
 		);
 
@@ -114,19 +122,19 @@ class ROUTEW_Settings
 		// selected, so customers paid the delivery cost twice. The Shipping
 		// Method API is now the single place the charge is added.)
 		// Uninstall opt-in (1.2.16).
-		add_settings_field('routew_remove_on_uninstall', __('Remove Data on Uninstall', 'routemile-woocommerce'), array($this, 'render_checkbox_field'), 'routemile-settings', 'routew_general_settings_section', array('id' => 'routew_remove_on_uninstall', 'label' => __('Delete all RouteMile data (settings, saved profiles, the delivery_boy role) on uninstall. Order meta is never deleted either way.', 'routemile-woocommerce')));
+		add_settings_field('routew_remove_on_uninstall', __('Remove Data on Uninstall', 'routemile-for-woocommerce'), array($this, 'render_checkbox_field'), 'routemile-settings', 'routew_general_settings_section', array('id' => 'routew_remove_on_uninstall', 'label' => __('Delete all RouteMile data (settings, saved profiles, the delivery_boy role) on uninstall. Order meta is never deleted either way.', 'routemile-for-woocommerce')));
 
 		// Delivery Zone Settings Section
 		add_settings_section(
 			'routew_delivery_zone_settings_section',
-			__('Delivery Zone Settings', 'routemile-woocommerce'),
+			__('Delivery Zone Settings', 'routemile-for-woocommerce'),
 			null,
 			'routemile-settings'
 		);
 
 		add_settings_field(
 			'routew_delivery_zone_radius',
-			__('Delivery Radius (km)', 'routemile-woocommerce'),
+			__('Delivery Radius (km)', 'routemile-for-woocommerce'),
 			array($this, 'render_number_field'),
 			'routemile-settings',
 			'routew_delivery_zone_settings_section',
@@ -135,51 +143,51 @@ class ROUTEW_Settings
 
 		add_settings_field(
 			'routew_auto_set_assigned_status',
-			__('Auto-Set Status on Assign', 'routemile-woocommerce'),
+			__('Auto-Set Status on Assign', 'routemile-for-woocommerce'),
 			array($this, 'render_checkbox_field'),
 			'routemile-settings',
 			'routew_delivery_zone_settings_section',
-			array('id' => 'routew_auto_set_assigned_status', 'label' => __('Automatically set order status to "Assigned" when a delivery boy is assigned from the order edit page', 'routemile-woocommerce'))
+			array('id' => 'routew_auto_set_assigned_status', 'label' => __('Automatically set order status to "Assigned" when a delivery boy is assigned from the order edit page', 'routemile-for-woocommerce'))
 		);
 
 		// Receipt Branding Settings Section
 		add_settings_section(
 			'routew_receipt_branding_section',
-			__('Receipt Branding', 'routemile-woocommerce'),
+			__('Receipt Branding', 'routemile-for-woocommerce'),
 			array($this, 'render_receipt_branding_description'),
 			'routemile-settings'
 		);
 
 		add_settings_field(
 			'routew_receipt_logo',
-			__('Receipt Logo', 'routemile-woocommerce'),
+			__('Receipt Logo', 'routemile-for-woocommerce'),
 			array($this, 'render_image_upload_field'),
 			'routemile-settings',
 			'routew_receipt_branding_section',
-			array('id' => 'routew_receipt_logo', 'description' => __('Recommended: 200x80px, PNG or JPG', 'routemile-woocommerce'))
+			array('id' => 'routew_receipt_logo', 'description' => __('Recommended: 200x80px, PNG or JPG', 'routemile-for-woocommerce'))
 		);
 
 		add_settings_field(
 			'routew_receipt_restaurant_name',
-			__('Restaurant Name (for Receipt)', 'routemile-woocommerce'),
+			__('Restaurant Name (for Receipt)', 'routemile-for-woocommerce'),
 			array($this, 'render_text_field'),
 			'routemile-settings',
 			'routew_receipt_branding_section',
-			array('id' => 'routew_receipt_restaurant_name', 'description' => __('Leave empty to use site name', 'routemile-woocommerce'))
+			array('id' => 'routew_receipt_restaurant_name', 'description' => __('Leave empty to use site name', 'routemile-for-woocommerce'))
 		);
 
 		add_settings_field(
 			'routew_receipt_address',
-			__('Restaurant Address (for Receipt)', 'routemile-woocommerce'),
+			__('Restaurant Address (for Receipt)', 'routemile-for-woocommerce'),
 			array($this, 'render_textarea_field'),
 			'routemile-settings',
 			'routew_receipt_branding_section',
-			array('id' => 'routew_receipt_address', 'description' => __('Full address as it appears on receipts', 'routemile-woocommerce'))
+			array('id' => 'routew_receipt_address', 'description' => __('Full address as it appears on receipts', 'routemile-for-woocommerce'))
 		);
 
 		add_settings_field(
 			'routew_receipt_phone',
-			__('Restaurant Phone (for Receipt)', 'routemile-woocommerce'),
+			__('Restaurant Phone (for Receipt)', 'routemile-for-woocommerce'),
 			array($this, 'render_text_field'),
 			'routemile-settings',
 			'routew_receipt_branding_section',
@@ -188,16 +196,16 @@ class ROUTEW_Settings
 
 		add_settings_field(
 			'routew_receipt_tagline',
-			__('Receipt Tagline', 'routemile-woocommerce'),
+			__('Receipt Tagline', 'routemile-for-woocommerce'),
 			array($this, 'render_text_field'),
 			'routemile-settings',
 			'routew_receipt_branding_section',
-			array('id' => 'routew_receipt_tagline', 'description' => __('Optional tagline shown below logo (e.g., "Delicious Food, Delivered Fast!")', 'routemile-woocommerce'))
+			array('id' => 'routew_receipt_tagline', 'description' => __('Optional tagline shown below logo (e.g., "Delicious Food, Delivered Fast!")', 'routemile-for-woocommerce'))
 		);
 
 		add_settings_field(
 			'routew_receipt_footer_message',
-			__('Receipt Footer Message', 'routemile-woocommerce'),
+			__('Receipt Footer Message', 'routemile-for-woocommerce'),
 			array($this, 'render_text_field'),
 			'routemile-settings',
 			'routew_receipt_branding_section',
@@ -212,7 +220,7 @@ class ROUTEW_Settings
 	public function render_receipt_branding_description()
 	{
 		?>
-		<p class="description"><?php esc_html_e('Customize your delivery receipts with your restaurant branding. These settings are used only for printed receipts.', 'routemile-woocommerce'); ?></p>
+		<p class="description"><?php esc_html_e('Customize your delivery receipts with your restaurant branding. These settings are used only for printed receipts.', 'routemile-for-woocommerce'); ?></p>
 		<?php
 	}
 
@@ -251,8 +259,8 @@ class ROUTEW_Settings
 			<input type="password" name="routew_settings[<?php echo esc_attr($id); ?>]" value="<?php echo esc_attr($value); ?>"
 				class="regular-text routew-key-input" autocomplete="new-password">
 			<button type="button" class="button routew-key-toggle"
-				data-show="<?php esc_attr_e('Show', 'routemile-woocommerce'); ?>"
-				data-hide="<?php esc_attr_e('Hide', 'routemile-woocommerce'); ?>"><?php esc_html_e('Show', 'routemile-woocommerce'); ?></button>
+				data-show="<?php esc_attr_e('Show', 'routemile-for-woocommerce'); ?>"
+				data-hide="<?php esc_attr_e('Hide', 'routemile-for-woocommerce'); ?>"><?php esc_html_e('Show', 'routemile-for-woocommerce'); ?></button>
 			<?php if ($description) : ?>
 				<p class="description"><?php echo esc_html($description); ?></p>
 			<?php endif; ?>
@@ -296,9 +304,9 @@ class ROUTEW_Settings
 			'routew-admin-settings-media',
 			'routewAdminMediaStrings',
 			array(
-				'selectTitle' => __('Select or Upload Logo', 'routemile-woocommerce'),
-				'useButton'   => __('Use this logo', 'routemile-woocommerce'),
-				'removeLabel' => __('Remove Logo', 'routemile-woocommerce'),
+				'selectTitle' => __('Select or Upload Logo', 'routemile-for-woocommerce'),
+				'useButton'   => __('Use this logo', 'routemile-for-woocommerce'),
+				'removeLabel' => __('Remove Logo', 'routemile-for-woocommerce'),
 			)
 		);
 		?>
@@ -312,12 +320,12 @@ class ROUTEW_Settings
 			</div>
 			
 			<button type="button" class="button routew-upload-image-btn" data-target="<?php echo esc_attr($id); ?>">
-				<?php esc_html_e('Upload Logo', 'routemile-woocommerce'); ?>
+				<?php esc_html_e('Upload Logo', 'routemile-for-woocommerce'); ?>
 			</button>
 			
 			<?php if ($value) : ?>
 				<button type="button" class="button routew-remove-image-btn" data-target="<?php echo esc_attr($id); ?>">
-					<?php esc_html_e('Remove Logo', 'routemile-woocommerce'); ?>
+					<?php esc_html_e('Remove Logo', 'routemile-for-woocommerce'); ?>
 				</button>
 			<?php endif; ?>
 			
@@ -377,7 +385,7 @@ class ROUTEW_Settings
 		$description = isset($args['description']) ? $args['description'] : '';
 		?>
 		<input type="number" min="0" step="1" name="routew_settings[<?php echo esc_attr($id); ?>]"
-			value="<?php echo esc_attr($value); ?>" class="small-text"> <?php esc_html_e('minutes', 'routemile-woocommerce'); ?>
+			value="<?php echo esc_attr($value); ?>" class="small-text"> <?php esc_html_e('minutes', 'routemile-for-woocommerce'); ?>
 		<?php if ($description) : ?>
 			<p class="description"><?php echo esc_html($description); ?></p>
 		<?php endif;
@@ -482,4 +490,6 @@ class ROUTEW_Settings
 }
 
 new ROUTEW_Settings();
+
+// phpcs:enable
 

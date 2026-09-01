@@ -52,23 +52,23 @@ class ROUTEW_Pricing
 	{
 		add_settings_section(
 			'routew_pricing_section',
-			__('Pricing Rules', 'routemile-woocommerce'),
+			__('Pricing Rules', 'routemile-for-woocommerce'),
 			array($this, 'render_section_description'),
 			'routemile-settings'
 		);
 
-		add_settings_field('routew_fee_mode', __('Fee Structure', 'routemile-woocommerce'), array($this, 'render_mode_field'), 'routemile-settings', 'routew_pricing_section');
-		add_settings_field('routew_delivery_fee_base', __('Base Fee (starting amount)', 'routemile-woocommerce'), array($this, 'render_perkm_amount_field'), 'routemile-settings', 'routew_pricing_section', array('id' => 'routew_delivery_fee_base', 'default' => 5.00, 'step' => 0.01, 'hint' => __('The flat starting cost of every delivery, before distance is added.', 'routemile-woocommerce')));
-		add_settings_field('routew_delivery_fee_per_km', __('Charge per kilometre', 'routemile-woocommerce'), array($this, 'render_perkm_amount_field'), 'routemile-settings', 'routew_pricing_section', array('id' => 'routew_delivery_fee_per_km', 'default' => 1.50, 'step' => 0.01, 'hint' => __('Added for each kilometre between your restaurant and the customer.', 'routemile-woocommerce')));
-		add_settings_field('routew_fee_tiers', __('Distance Tiers', 'routemile-woocommerce'), array($this, 'render_tiers_field'), 'routemile-settings', 'routew_pricing_section');
-		add_settings_field('routew_free_delivery_threshold', __('Free Delivery From', 'routemile-woocommerce'), array($this, 'render_amount_field'), 'routemile-settings', 'routew_pricing_section', array('id' => 'routew_free_delivery_threshold', 'hint' => __('Order subtotal at or above this amount gets free delivery. 0 disables.', 'routemile-woocommerce')));
-		add_settings_field('routew_minimum_order', __('Minimum Order', 'routemile-woocommerce'), array($this, 'render_amount_field'), 'routemile-settings', 'routew_pricing_section', array('id' => 'routew_minimum_order', 'hint' => __('Orders below this subtotal cannot be placed for delivery. 0 disables.', 'routemile-woocommerce')));
+		add_settings_field('routew_fee_mode', __('Fee Structure', 'routemile-for-woocommerce'), array($this, 'render_mode_field'), 'routemile-settings', 'routew_pricing_section');
+		add_settings_field('routew_delivery_fee_base', __('Base Fee (starting amount)', 'routemile-for-woocommerce'), array($this, 'render_perkm_amount_field'), 'routemile-settings', 'routew_pricing_section', array('id' => 'routew_delivery_fee_base', 'default' => 5.00, 'step' => 0.01, 'hint' => __('The flat starting cost of every delivery, before distance is added.', 'routemile-for-woocommerce')));
+		add_settings_field('routew_delivery_fee_per_km', __('Charge per kilometre', 'routemile-for-woocommerce'), array($this, 'render_perkm_amount_field'), 'routemile-settings', 'routew_pricing_section', array('id' => 'routew_delivery_fee_per_km', 'default' => 1.50, 'step' => 0.01, 'hint' => __('Added for each kilometre between your restaurant and the customer.', 'routemile-for-woocommerce')));
+		add_settings_field('routew_fee_tiers', __('Distance Tiers', 'routemile-for-woocommerce'), array($this, 'render_tiers_field'), 'routemile-settings', 'routew_pricing_section');
+		add_settings_field('routew_free_delivery_threshold', __('Free Delivery From', 'routemile-for-woocommerce'), array($this, 'render_amount_field'), 'routemile-settings', 'routew_pricing_section', array('id' => 'routew_free_delivery_threshold', 'hint' => __('Order subtotal at or above this amount gets free delivery. 0 disables.', 'routemile-for-woocommerce')));
+		add_settings_field('routew_minimum_order', __('Minimum Order', 'routemile-for-woocommerce'), array($this, 'render_amount_field'), 'routemile-settings', 'routew_pricing_section', array('id' => 'routew_minimum_order', 'hint' => __('Orders below this subtotal cannot be placed for delivery. 0 disables.', 'routemile-for-woocommerce')));
 	}
 
 	/** Describe the pricing section. */
 	public function render_section_description()
 	{
-		echo '<p>' . esc_html__('All delivery pricing is configured here — tiers, free delivery, and the minimum order. Amounts are in your store currency.', 'routemile-woocommerce') . '</p>';
+		echo '<p>' . esc_html__('All delivery pricing is configured here — tiers, free delivery, and the minimum order. Amounts are in your store currency.', 'routemile-for-woocommerce') . '</p>';
 	}
 
 	/** Render the fee-mode select. */
@@ -77,10 +77,10 @@ class ROUTEW_Pricing
 		$options = get_option('routew_settings');
 		$mode = isset($options['routew_fee_mode']) ? $options['routew_fee_mode'] : 'perkm';
 		echo '<select name="routew_settings[routew_fee_mode]" data-routew-fee-mode-select>';
-		printf('<option value="perkm"%s>%s</option>', selected($mode, 'perkm', false), esc_html__('Base fee + charge per km (simple)', 'routemile-woocommerce'));
-		printf('<option value="tiers"%s>%s</option>', selected($mode, 'tiers', false), esc_html__('Fixed price per distance zone (tiers)', 'routemile-woocommerce'));
+		printf('<option value="perkm"%s>%s</option>', selected($mode, 'perkm', false), esc_html__('Base fee + charge per km (simple)', 'routemile-for-woocommerce'));
+		printf('<option value="tiers"%s>%s</option>', selected($mode, 'tiers', false), esc_html__('Fixed price per distance zone (tiers)', 'routemile-for-woocommerce'));
 		echo '</select>';
-		echo '<p class="description">' . esc_html__('Pick how you want to charge for distance. Only the fields that belong to your choice are shown.', 'routemile-woocommerce') . '</p>';
+		echo '<p class="description">' . esc_html__('Pick how you want to charge for distance. Only the fields that belong to your choice are shown.', 'routemile-for-woocommerce') . '</p>';
 	}
 
 	/**
@@ -110,7 +110,7 @@ class ROUTEW_Pricing
 		$tiers = self::effective_tiers(isset($options['routew_fee_tiers']) ? $options['routew_fee_tiers'] : array());
 
 		echo '<div data-routew-show-when="feemode:tiers">';
-		echo '<table class="routew-tiers-table"><tr><th scope="col">' . esc_html__('Up to (km)', 'routemile-woocommerce') . '</th><th scope="col">' . esc_html__('Delivery fee', 'routemile-woocommerce') . '</th></tr>';
+		echo '<table class="routew-tiers-table"><tr><th scope="col">' . esc_html__('Up to (km)', 'routemile-for-woocommerce') . '</th><th scope="col">' . esc_html__('Delivery fee', 'routemile-for-woocommerce') . '</th></tr>';
 		for ($i = 0; $i < self::TIER_ROWS; $i++) {
 			$to = isset($tiers[$i]['to']) ? $tiers[$i]['to'] : '';
 			$fee = isset($tiers[$i]['fee']) ? $tiers[$i]['fee'] : '';
@@ -122,7 +122,7 @@ class ROUTEW_Pricing
 			);
 		}
 		echo '</table>';
-		echo '<p class="description">' . esc_html__('Example: a row "3 km → ₹40" means any order up to 3 km costs ₹40 delivery. Rows are matched top-down by distance. Enter 0 in the last used row\'s "Up to" column to mean "and above". Empty rows are ignored.', 'routemile-woocommerce') . '</p>';
+		echo '<p class="description">' . esc_html__('Example: a row "3 km → ₹40" means any order up to 3 km costs ₹40 delivery. Rows are matched top-down by distance. Enter 0 in the last used row\'s "Up to" column to mean "and above". Empty rows are ignored.', 'routemile-for-woocommerce') . '</p>';
 		echo '</div>';
 	}
 
@@ -347,7 +347,7 @@ class ROUTEW_Pricing
 		$missing = $minimum - (float) $subtotal;
 		return sprintf(
 			/* translators: 1: minimum order amount with currency (e.g. "₹200"), 2: shortfall amount the customer must add (e.g. "₹50"). */
-			__('The minimum delivery order is %1$s — please add %2$s more to your cart.', 'routemile-woocommerce'),
+			__('The minimum delivery order is %1$s — please add %2$s more to your cart.', 'routemile-for-woocommerce'),
 			wp_strip_all_tags(wc_price($minimum)),
 			wp_strip_all_tags(wc_price($missing))
 		);

@@ -48,7 +48,7 @@ class ROUTEW_Settings_Maps
 	{
 		add_settings_field(
 			'routew_google_maps_api_key',
-			__('Google Maps API Key', 'routemile-woocommerce'),
+			__('Google Maps API Key', 'routemile-for-woocommerce'),
 			array($this, 'render_google_key_field'),
 			'routemile-settings',
 			'routew_map_provider_section'
@@ -56,26 +56,26 @@ class ROUTEW_Settings_Maps
 
 		add_settings_field(
 			'routew_google_maps_server_key',
-			__('Google Server Key (optional)', 'routemile-woocommerce'),
+			__('Google Server Key (optional)', 'routemile-for-woocommerce'),
 			array($this, 'render_text_field_maps'),
 			'routemile-settings',
 			'routew_map_provider_section',
 			array(
 				'id' => 'routew_google_maps_server_key',
-				'description' => __('Optional separate key for Geocoding/Distance Matrix — lets you restrict the main key to your site domain and this one to your server IP. Falls back to the main key when empty.', 'routemile-woocommerce'),
+				'description' => __('Optional separate key for Geocoding/Distance Matrix — lets you restrict the main key to your site domain and this one to your server IP. Falls back to the main key when empty.', 'routemile-for-woocommerce'),
 				'show_when' => 'provider:google',
 			)
 		);
 
 		add_settings_field(
 			'routew_google_maps_map_id',
-			__('Google Map ID (optional)', 'routemile-woocommerce'),
+			__('Google Map ID (optional)', 'routemile-for-woocommerce'),
 			array($this, 'render_text_field_maps'),
 			'routemile-settings',
 			'routew_map_provider_section',
 			array(
 				'id' => 'routew_google_maps_map_id',
-				'description' => __('Optional Map ID from your Cloud Console (enables Advanced Markers). Leave empty for classic markers.', 'routemile-woocommerce'),
+				'description' => __('Optional Map ID from your Cloud Console (enables Advanced Markers). Leave empty for classic markers.', 'routemile-for-woocommerce'),
 				'show_when' => 'provider:google',
 			)
 		);
@@ -95,9 +95,9 @@ class ROUTEW_Settings_Maps
 			<input type="password" name="routew_settings[routew_google_maps_api_key]" value="<?php echo esc_attr($value); ?>"
 				class="regular-text routew-key-input" autocomplete="new-password">
 			<button type="button" class="button routew-key-toggle"
-				data-show="<?php esc_attr_e('Show', 'routemile-woocommerce'); ?>"
-				data-hide="<?php esc_attr_e('Hide', 'routemile-woocommerce'); ?>"><?php esc_html_e('Show', 'routemile-woocommerce'); ?></button>
-			<p class="description"><?php esc_html_e('Paste your Google Maps JavaScript API key. Only needed when Google Maps is selected above — OpenStreetMap needs no key at all.', 'routemile-woocommerce'); ?></p>
+				data-show="<?php esc_attr_e('Show', 'routemile-for-woocommerce'); ?>"
+				data-hide="<?php esc_attr_e('Hide', 'routemile-for-woocommerce'); ?>"><?php esc_html_e('Show', 'routemile-for-woocommerce'); ?></button>
+			<p class="description"><?php esc_html_e('Paste your Google Maps JavaScript API key. Only needed when Google Maps is selected above — OpenStreetMap needs no key at all.', 'routemile-for-woocommerce'); ?></p>
 		</div>
 		<?php
 	}
@@ -134,14 +134,14 @@ class ROUTEW_Settings_Maps
 	{
 		add_settings_section(
 			'routew_map_provider_section',
-			__('Map Provider', 'routemile-woocommerce'),
+			__('Map Provider', 'routemile-for-woocommerce'),
 			array($this, 'render_section_description'),
 			'routemile-settings'
 		);
 
 		add_settings_field(
 			'routew_map_provider',
-			__('Map Provider', 'routemile-woocommerce'),
+			__('Map Provider', 'routemile-for-woocommerce'),
 			array($this, 'render_provider_field'),
 			'routemile-settings',
 			'routew_map_provider_section',
@@ -150,7 +150,7 @@ class ROUTEW_Settings_Maps
 
 		add_settings_field(
 			'routew_map_provider_key',
-			__('Provider API Key', 'routemile-woocommerce'),
+			__('Provider API Key', 'routemile-for-woocommerce'),
 			array($this, 'render_key_field'),
 			'routemile-settings',
 			'routew_map_provider_section',
@@ -159,7 +159,7 @@ class ROUTEW_Settings_Maps
 
 		add_settings_field(
 			'routew_road_distance_factor',
-			__('Road Distance Factor', 'routemile-woocommerce'),
+			__('Road Distance Factor', 'routemile-for-woocommerce'),
 			array($this, 'render_factor_field'),
 			'routemile-settings',
 			'routew_map_provider_section',
@@ -172,7 +172,7 @@ class ROUTEW_Settings_Maps
 		// admin is responsible for honouring the upstream terms.
 		add_settings_field(
 			'routew_show_map_credit',
-			__('Show Provider Credit', 'routemile-woocommerce'),
+			__('Show Provider Credit', 'routemile-for-woocommerce'),
 			array($this, 'render_show_credit_field'),
 			'routemile-settings',
 			'routew_map_provider_section'
@@ -196,7 +196,7 @@ class ROUTEW_Settings_Maps
 				value="1"
 				<?php checked($checked); ?>
 			/>
-			<?php esc_html_e('Show map provider attribution (e.g. "Powered by Geoapify") on the customer-facing checkout map. Off by default per WP.org Guideline 10 — leave off unless the provider requires visible credit for license terms.', 'routemile-woocommerce'); ?>
+			<?php esc_html_e('Show map provider attribution (e.g. "Powered by Geoapify") on the customer-facing checkout map. Off by default per WP.org Guideline 10 — leave off unless the provider requires visible credit for license terms.', 'routemile-for-woocommerce'); ?>
 		</label>
 		<?php
 	}
@@ -204,7 +204,7 @@ class ROUTEW_Settings_Maps
 	/** Describe the section. */
 	public function render_section_description()
 	{
-		echo '<p>' . esc_html__('Choose which mapping service powers the checkout location picker, address lookup and distance calculation. OpenStreetMap works with no key and no billing account; the others need a free key.', 'routemile-woocommerce') . '</p>';
+		echo '<p>' . esc_html__('Choose which mapping service powers the checkout location picker, address lookup and distance calculation. OpenStreetMap works with no key and no billing account; the others need a free key.', 'routemile-for-woocommerce') . '</p>';
 	}
 
 	/**
@@ -235,9 +235,9 @@ class ROUTEW_Settings_Maps
 		foreach ($all as $id => $provider) {
 			$caps = array();
 			if (in_array('routing', $provider['capabilities'], true)) {
-				$caps[] = __('road distance', 'routemile-woocommerce');
+				$caps[] = __('road distance', 'routemile-for-woocommerce');
 			} else {
-				$caps[] = __('straight-line distance only', 'routemile-woocommerce');
+				$caps[] = __('straight-line distance only', 'routemile-for-woocommerce');
 			}
 
 			$signup = '';
@@ -245,7 +245,7 @@ class ROUTEW_Settings_Maps
 				$signup = sprintf(
 					' <a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
 					esc_url($provider['signup_url']),
-					esc_html__('Get a key', 'routemile-woocommerce')
+					esc_html__('Get a key', 'routemile-for-woocommerce')
 				);
 			}
 
@@ -279,7 +279,7 @@ class ROUTEW_Settings_Maps
 			esc_attr($value)
 		);
 
-		echo '<p class="description">' . esc_html__('Paste the API key from your MapTiler or Geoapify account. Not needed for OpenStreetMap; Google uses its own fields below.', 'routemile-woocommerce') . '</p>';
+		echo '<p class="description">' . esc_html__('Paste the API key from your MapTiler or Geoapify account. Not needed for OpenStreetMap; Google uses its own fields below.', 'routemile-for-woocommerce') . '</p>';
 	}
 
 	/**
@@ -295,7 +295,7 @@ class ROUTEW_Settings_Maps
 			esc_attr((string) ROUTEW_Map_Providers::road_factor())
 		);
 
-		echo '<p class="description">' . esc_html__('Only for providers that cannot measure real road distance: straight-line distance is multiplied by this to approximate a driving route. 1.3 suits most towns and cities.', 'routemile-woocommerce') . '</p>';
+		echo '<p class="description">' . esc_html__('Only for providers that cannot measure real road distance: straight-line distance is multiplied by this to approximate a driving route. 1.3 suits most towns and cities.', 'routemile-for-woocommerce') . '</p>';
 	}
 
 	/**
@@ -318,7 +318,7 @@ class ROUTEW_Settings_Maps
 			if (isset($all[$candidate])) {
 				$sanitized['routew_map_provider'] = $candidate;
 			} else {
-				set_transient('routew_admin_notice', __('Unknown map provider submitted; previous provider kept.', 'routemile-woocommerce'), 30);
+				set_transient('routew_admin_notice', __('Unknown map provider submitted; previous provider kept.', 'routemile-for-woocommerce'), 30);
 			}
 		}
 
@@ -331,9 +331,15 @@ class ROUTEW_Settings_Maps
 			if ($factor >= 1.0 && $factor <= 3.0) {
 				$sanitized['routew_road_distance_factor'] = $factor;
 			} else {
-				set_transient('routew_admin_notice', __('Road Distance Factor must be between 1.0 and 3.0; previous value kept.', 'routemile-woocommerce'), 30);
+				set_transient('routew_admin_notice', __('Road Distance Factor must be between 1.0 and 3.0; previous value kept.', 'routemile-for-woocommerce'), 30);
 			}
 		}
+
+		// Provider-credit opt-in (Guideline 10): '1' when the checkbox is
+		// posted, '0' when it is absent (unchecked). Storing the explicit
+		// '0' on uncheck is what makes unticking persist — without it, the
+		// option key is never written and the box reads unchecked forever.
+		$sanitized['routew_show_map_credit'] = isset($input['routew_show_map_credit']) ? 1 : 0;
 
 		return $sanitized;
 	}

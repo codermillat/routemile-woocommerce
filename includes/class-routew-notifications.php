@@ -71,7 +71,7 @@ class ROUTEW_Notifications
 		$agent = get_user_by('id', $agent_id);
 		if (!$agent || empty($agent->user_email) || !is_email($agent->user_email)) {
 			/* translators: %d: delivery agent user ID */
-			$order->add_order_note(sprintf(__('Assignment notification skipped: no valid email address for delivery agent (user #%d).', 'routemile-woocommerce'), $agent_id));
+			$order->add_order_note(sprintf(__('Assignment notification skipped: no valid email address for delivery agent (user #%d).', 'routemile-for-woocommerce'), $agent_id));
 			return;
 		}
 
@@ -80,40 +80,44 @@ class ROUTEW_Notifications
 
 		$subject = sprintf(
 			/* translators: 1: site name, 2: order number */
-			__('[%1$s] New delivery assigned to you — Order #%2$s', 'routemile-woocommerce'),
+			__('[%1$s] New delivery assigned to you — Order #%2$s', 'routemile-for-woocommerce'),
 			$site_name,
 			$order_number
 		);
 
-		$message = sprintf(__('Hello %s,', 'routemile-woocommerce'), $agent->display_name) . "\r\n\r\n";
+		$message = sprintf(
+			/* translators: %s: delivery agent display name. */
+			__('Hello %s,', 'routemile-for-woocommerce'),
+			$agent->display_name
+		) . "\r\n\r\n";
 		$message .= sprintf(
 			/* translators: %s: order number */
-			__('You have been assigned to deliver Order #%s.', 'routemile-woocommerce'),
+			__('You have been assigned to deliver Order #%s.', 'routemile-for-woocommerce'),
 			$order_number
 		) . "\r\n\r\n";
 
 		$shipping_address = trim((string) $order->get_formatted_shipping_address());
 		if ('' !== $shipping_address) {
-			$message .= __('Delivery address:', 'routemile-woocommerce') . "\r\n";
+			$message .= __('Delivery address:', 'routemile-for-woocommerce') . "\r\n";
 			$message .= str_replace(array('<br/>', '<br />', '<br>'), "\r\n", $shipping_address) . "\r\n\r\n";
 		}
 
 		/* translators: %s: formatted order total */
-		$message .= sprintf(__('Order total: %s', 'routemile-woocommerce'), wp_strip_all_tags($order->get_formatted_order_total())) . "\r\n";
+		$message .= sprintf(__('Order total: %s', 'routemile-for-woocommerce'), wp_strip_all_tags($order->get_formatted_order_total())) . "\r\n";
 		if ('cod' === $order->get_payment_method()) {
-			$message .= __('Payment: Cash on Delivery — collect the order total from the customer.', 'routemile-woocommerce') . "\r\n";
+			$message .= __('Payment: Cash on Delivery — collect the order total from the customer.', 'routemile-for-woocommerce') . "\r\n";
 		}
 
-		$message .= "\r\n" . __('Your delivery dashboard:', 'routemile-woocommerce') . "\r\n" . home_url('/delivery-dashboard/') . "\r\n";
+		$message .= "\r\n" . __('Your delivery dashboard:', 'routemile-for-woocommerce') . "\r\n" . home_url('/delivery-dashboard/') . "\r\n";
 
 		$sent = wp_mail($agent->user_email, $subject, $message);
 
 		if ($sent) {
 			/* translators: %s: delivery agent display name */
-			$order->add_order_note(sprintf(__('Assignment notification emailed to %s.', 'routemile-woocommerce'), $agent->display_name));
+			$order->add_order_note(sprintf(__('Assignment notification emailed to %s.', 'routemile-for-woocommerce'), $agent->display_name));
 		} else {
 			/* translators: %s: delivery agent display name */
-			$order->add_order_note(sprintf(__('Could not email the assignment notification to %s.', 'routemile-woocommerce'), $agent->display_name));
+			$order->add_order_note(sprintf(__('Could not email the assignment notification to %s.', 'routemile-for-woocommerce'), $agent->display_name));
 		}
 	}
 }

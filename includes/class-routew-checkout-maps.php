@@ -64,7 +64,7 @@ class ROUTEW_Checkout_Maps
             if (function_exists('wc_get_logger')) {
                 wc_get_logger()->warning(
                     sprintf('Map provider %s has no API key — map disabled', $provider['id']),
-                    array('source' => 'routemile-woocommerce')
+                    array('source' => 'routemile-for-woocommerce')
                 );
             }
             return;
@@ -220,26 +220,26 @@ class ROUTEW_Checkout_Maps
             'restaurant_center' => $restaurant_center,
             'radius_km' => isset($options['routew_delivery_zone_radius']) ? (float) $options['routew_delivery_zone_radius'] : (float) ROUTEW_Config::DEFAULT_DELIVERY_RADIUS,
             'translations' => array(
-                'calculating' => __('Calculating delivery fee...', 'routemile-woocommerce'),
+                'calculating' => __('Calculating delivery fee...', 'routemile-for-woocommerce'),
                 // Success-toast labels (1.2.15): previously the toast reused
                 // the "calculating" string with the ellipsis stripped.
-                'delivery_fee_estimated' => __('Delivery fee:', 'routemile-woocommerce'),
-                'free_delivery' => __('Free delivery', 'routemile-woocommerce'),
-                'out_of_zone' => __('Sorry, we do not deliver to this location.', 'routemile-woocommerce'),
-                'error_generic' => __('An error occurred. Please try again.', 'routemile-woocommerce'),
+                'delivery_fee_estimated' => __('Delivery fee:', 'routemile-for-woocommerce'),
+                'free_delivery' => __('Free delivery', 'routemile-for-woocommerce'),
+                'out_of_zone' => __('Sorry, we do not deliver to this location.', 'routemile-for-woocommerce'),
+                'error_generic' => __('An error occurred. Please try again.', 'routemile-for-woocommerce'),
                 // Distinct from error_generic: a map that will not load is a
                 // store configuration problem, not something retrying fixes
                 // (1.3.0 — the old message told customers to try again after
                 // a Google billing error).
-                'map_unavailable' => __('The delivery map could not load. Please contact the store.', 'routemile-woocommerce'),
-                'estimated' => __('estimated', 'routemile-woocommerce'),
-                'drag_pin' => __('Drag to set your exact delivery point', 'routemile-woocommerce'),
-                'search_no_results' => __('No match found. Try a different search, or drag the map pin.', 'routemile-woocommerce'),
-                'geolocation_unsupported' => __('Geolocation is not supported by your browser.', 'routemile-woocommerce'),
-                'locating' => __('Locating…', 'routemile-woocommerce'),
-                'location_denied' => __('Location permission denied. Please allow access in your browser settings.', 'routemile-woocommerce'),
-                'location_unavailable' => __('Location unavailable. Please try again.', 'routemile-woocommerce'),
-                'location_timeout' => __('Location request timed out. Please try again.', 'routemile-woocommerce'),
+                'map_unavailable' => __('The delivery map could not load. Please contact the store.', 'routemile-for-woocommerce'),
+                'estimated' => __('estimated', 'routemile-for-woocommerce'),
+                'drag_pin' => __('Drag to set your exact delivery point', 'routemile-for-woocommerce'),
+                'search_no_results' => __('No match found. Try a different search, or drag the map pin.', 'routemile-for-woocommerce'),
+                'geolocation_unsupported' => __('Geolocation is not supported by your browser.', 'routemile-for-woocommerce'),
+                'locating' => __('Locating…', 'routemile-for-woocommerce'),
+                'location_denied' => __('Location permission denied. Please allow access in your browser settings.', 'routemile-for-woocommerce'),
+                'location_unavailable' => __('Location unavailable. Please try again.', 'routemile-for-woocommerce'),
+                'location_timeout' => __('Location request timed out. Please try again.', 'routemile-for-woocommerce'),
             ),
         );
     }

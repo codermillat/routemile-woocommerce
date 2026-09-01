@@ -7,6 +7,9 @@
  * @package RouteMile/Templates/Emails
  * @version 1.1.0
  */
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+// Template-local variables (`$item_totals`, `$key`, `$total`, etc.) —
+// include-only template, not real globals. Re-enabled at EOF.
 
 if (!defined('ABSPATH')) {
     exit;
@@ -15,6 +18,7 @@ if (!defined('ABSPATH')) {
 /*
  * @hooked WC_Emails::email_header() Output the email header
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core hook
 do_action('woocommerce_email_header', $email_heading, $email);
 ?>
 
@@ -24,7 +28,7 @@ do_action('woocommerce_email_header', $email_heading, $email);
     <?php
     printf(
         /* translators: %s: Order number */
-        esc_html__('Order #%s', 'routemile-woocommerce'),
+        esc_html__('Order #%s', 'routemile-for-woocommerce'),
         esc_html($order->get_order_number())
     );
     ?>
@@ -35,13 +39,14 @@ do_action('woocommerce_email_header', $email_heading, $email);
         style="width: 100%; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;" border="1">
         <thead>
             <tr>
-                <th class="td" scope="col" style="text-align:left;"><?php esc_html_e('Product', 'routemile-woocommerce'); ?></th>
-                <th class="td" scope="col" style="text-align:left;"><?php esc_html_e('Quantity', 'routemile-woocommerce'); ?></th>
-                <th class="td" scope="col" style="text-align:left;"><?php esc_html_e('Price', 'routemile-woocommerce'); ?></th>
+                <th class="td" scope="col" style="text-align:left;"><?php esc_html_e('Product', 'routemile-for-woocommerce'); ?></th>
+                <th class="td" scope="col" style="text-align:left;"><?php esc_html_e('Quantity', 'routemile-for-woocommerce'); ?></th>
+                <th class="td" scope="col" style="text-align:left;"><?php esc_html_e('Price', 'routemile-for-woocommerce'); ?></th>
             </tr>
         </thead>
         <tbody>
             <?php
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce's own builder, returns order rows markup
             echo wc_get_email_order_items(
                 $order,
                 array(
@@ -58,9 +63,9 @@ do_action('woocommerce_email_header', $email_heading, $email);
             <?php
             $item_totals = $order->get_order_item_totals();
             if ($item_totals) {
-                $i = 0;
+                $key = 0;
                 foreach ($item_totals as $total) {
-                    $i++;
+                    $key++;
                     ?>
                     <tr>
                         <th class="td" scope="row" colspan="2"
@@ -88,12 +93,14 @@ do_action('woocommerce_email_header', $email_heading, $email);
 /*
  * @hooked WC_Emails::order_meta() Shows order meta data.
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core hook
 do_action('woocommerce_email_order_meta', $order, $sent_to_admin, $plain_text, $email);
 
 /*
  * @hooked WC_Emails::customer_details() Shows customer details
  * @hooked WC_Emails::email_address() Shows email address
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core hook
 do_action('woocommerce_email_customer_details', $order, $sent_to_admin, $plain_text, $email);
 ?>
 
@@ -105,5 +112,7 @@ do_action('woocommerce_email_customer_details', $order, $sent_to_admin, $plain_t
 /*
  * @hooked WC_Emails::email_footer() Output the email footer
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core hook
 do_action('woocommerce_email_footer', $email);
+// phpcs:enable
 ?>

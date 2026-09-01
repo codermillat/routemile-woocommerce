@@ -2,6 +2,12 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
+// phpcs:disable WordPress.Security.NonceVerification.Recommended
+// should_load() only reads $_GET['page'] / $_GET['tab'] to decide whether
+// this presentation layer should enqueue on the current admin screen.
+// It performs no state change; WC's settings tab handles its own nonce
+// lifecycle. Re-enabled at EOF.
+
 /**
  * ROUTEW_Settings_Ui — presentation layer for the RouteMile settings tab.
  *
@@ -46,7 +52,8 @@ class ROUTEW_Settings_Ui
 	{
 		$screen = function_exists('get_current_screen') ? get_current_screen() : null;
 		$page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
-		return ('woocommerce_page_wc-settings' === ($screen ? $screen->id : '')) || ('wc-settings' === $page && isset($_GET['tab']) && 'routemile-woocommerce' === $_GET['tab']);
+		$tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : '';
+		return ('woocommerce_page_wc-settings' === ($screen ? $screen->id : '')) || ('wc-settings' === $page && 'routemile-for-woocommerce' === $tab);
 	}
 
 	/**
@@ -102,3 +109,5 @@ class ROUTEW_Settings_Ui
 }
 
 new ROUTEW_Settings_Ui();
+
+// phpcs:enable

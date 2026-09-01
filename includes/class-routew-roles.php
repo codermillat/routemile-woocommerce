@@ -2,6 +2,12 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+// phpcs:disable WordPress.Security.NonceVerification.Missing
+// save_agent_phone_field() runs inside WordPress core's user-edit profile
+// form (show_user_profile / edit_user_profile hooks). WP core verifies its
+// own user-edit nonce before this callback fires; the `edit_user` capability
+// check above also gates write access.
+
 /**
  * Manages custom user roles for the plugin.
  *
@@ -54,7 +60,7 @@ class ROUTEW_Roles
 
         add_role(
             'delivery_boy',
-            __('Delivery Boy', 'routemile-woocommerce'),
+            __('Delivery Boy', 'routemile-for-woocommerce'),
             array(
                 'read' => true,  // Core capability — grants basic wp-admin access on its own
                 'upload_files' => false,
@@ -138,18 +144,18 @@ class ROUTEW_Roles
 
         $phone = get_user_meta($user->ID, 'routew_agent_phone', true);
         ?>
-        <h2><?php esc_html_e('RouteMile Agent', 'routemile-woocommerce'); ?></h2>
+        <h2><?php esc_html_e('RouteMile Agent', 'routemile-for-woocommerce'); ?></h2>
         <table class="form-table" role="presentation">
             <tr>
                 <th>
-                    <label for="routew_agent_phone"><?php esc_html_e('Agent mobile number', 'routemile-woocommerce'); ?></label>
+                    <label for="routew_agent_phone"><?php esc_html_e('Agent mobile number', 'routemile-for-woocommerce'); ?></label>
                 </th>
                 <td>
                     <input type="tel" id="routew_agent_phone" name="routew_agent_phone" class="regular-text"
                         value="<?php echo esc_attr($phone); ?>"
                         autocomplete="tel" inputmode="tel" />
                     <p class="description">
-                        <?php esc_html_e('Shown to the customer on order tracking while this agent has the order. Use the full dialable number, e.g. +91 98765 43210.', 'routemile-woocommerce'); ?>
+                        <?php esc_html_e('Shown to the customer on order tracking while this agent has the order. Use the full dialable number, e.g. +91 98765 43210.', 'routemile-for-woocommerce'); ?>
                     </p>
                 </td>
             </tr>
@@ -173,6 +179,7 @@ class ROUTEW_Roles
             return;
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WordPress core user-edit form provides its own nonce before reaching this hook
         $phone = sanitize_text_field(wp_unslash($_POST['routew_agent_phone']));
         if ('' === $phone) {
             delete_user_meta($user_id, 'routew_agent_phone');
@@ -184,3 +191,5 @@ class ROUTEW_Roles
 }
 
 new ROUTEW_Roles();
+
+// phpcs:enable

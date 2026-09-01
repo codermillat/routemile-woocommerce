@@ -88,8 +88,16 @@ class ROUTEW_Delivery_Fee
         // from a straight-line estimate, so the label must not read as a
         // driven-route promise (1.3.0).
         $text = !empty($distance_data['estimated'])
-            ? sprintf(__('ETA ~ %d mins (estimated)', 'routemile-woocommerce'), $mins)
-            : sprintf(__('ETA ~ %d mins', 'routemile-woocommerce'), $mins);
+            ? sprintf(
+                /* translators: %d: estimated travel time in minutes. */
+                __('ETA ~ %d mins (estimated)', 'routemile-for-woocommerce'),
+                $mins
+            )
+            : sprintf(
+                /* translators: %d: estimated travel time in minutes. */
+                __('ETA ~ %d mins', 'routemile-for-woocommerce'),
+                $mins
+            );
 
         $eta_html = sprintf(' <small class="routew-eta-label">%s</small>', esc_html($text));
         return $label . $eta_html;

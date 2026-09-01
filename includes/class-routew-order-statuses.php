@@ -31,30 +31,33 @@ class ROUTEW_Order_Statuses
 	public function register_order_statuses()
 	{
 		register_post_status('wc-routew-in-kitchen', array(
-			'label' => _x('In the Kitchen', 'Order status', 'routemile-woocommerce'),
+			'label' => _x('In the Kitchen', 'Order status', 'routemile-for-woocommerce'),
 			'public' => true,
 			'exclude_from_search' => false,
 			'show_in_admin_all_list' => true,
 			'show_in_admin_status_list' => true,
-			'label_count' => _n_noop('In the Kitchen <span class="count">(%s)</span>', 'In the Kitchen <span class="count">(%s)</span>', 'routemile-woocommerce')
+			/* translators: %s: order count for this status. */
+			'label_count' => _n_noop('In the Kitchen <span class="count">(%s)</span>', 'In the Kitchen <span class="count">(%s)</span>', 'routemile-for-woocommerce')
 		));
 
 		register_post_status('wc-routew-assigned', array(
-			'label' => _x('Assigned', 'Order status', 'routemile-woocommerce'),
+			'label' => _x('Assigned', 'Order status', 'routemile-for-woocommerce'),
 			'public' => true,
 			'exclude_from_search' => false,
 			'show_in_admin_all_list' => true,
 			'show_in_admin_status_list' => true,
-			'label_count' => _n_noop('Assigned <span class="count">(%s)</span>', 'Assigned <span class="count">(%s)</span>', 'routemile-woocommerce')
+			/* translators: %s: order count for this status. */
+			'label_count' => _n_noop('Assigned <span class="count">(%s)</span>', 'Assigned <span class="count">(%s)</span>', 'routemile-for-woocommerce')
 		));
 
 		register_post_status('wc-routew-picked-up', array(
-			'label' => _x('Picked Up', 'Order status', 'routemile-woocommerce'),
+			'label' => _x('Picked Up', 'Order status', 'routemile-for-woocommerce'),
 			'public' => true,
 			'exclude_from_search' => false,
 			'show_in_admin_all_list' => true,
 			'show_in_admin_status_list' => true,
-			'label_count' => _n_noop('Picked Up <span class="count">(%s)</span>', 'Picked Up <span class="count">(%s)</span>', 'routemile-woocommerce')
+			/* translators: %s: order count for this status. */
+			'label_count' => _n_noop('Picked Up <span class="count">(%s)</span>', 'Picked Up <span class="count">(%s)</span>', 'routemile-for-woocommerce')
 		));
 	}
 
@@ -75,18 +78,18 @@ class ROUTEW_Order_Statuses
 			$new_order_statuses[$key] = $status;
 
 			if ('wc-processing' === $key) {
-				$new_order_statuses['wc-routew-in-kitchen'] = _x('In the Kitchen', 'Order status', 'routemile-woocommerce');
-				$new_order_statuses['wc-routew-assigned'] = _x('Assigned', 'Order status', 'routemile-woocommerce');
-				$new_order_statuses['wc-routew-picked-up'] = _x('Picked Up', 'Order status', 'routemile-woocommerce');
+				$new_order_statuses['wc-routew-in-kitchen'] = _x('In the Kitchen', 'Order status', 'routemile-for-woocommerce');
+				$new_order_statuses['wc-routew-assigned'] = _x('Assigned', 'Order status', 'routemile-for-woocommerce');
+				$new_order_statuses['wc-routew-picked-up'] = _x('Picked Up', 'Order status', 'routemile-for-woocommerce');
 				$inserted = true;
 			}
 		}
 
 		// If we didn't find 'wc-processing', append our statuses at the end
 		if (!$inserted) {
-			$new_order_statuses['wc-routew-in-kitchen'] = _x('In the Kitchen', 'Order status', 'routemile-woocommerce');
-			$new_order_statuses['wc-routew-assigned'] = _x('Assigned', 'Order status', 'routemile-woocommerce');
-			$new_order_statuses['wc-routew-picked-up'] = _x('Picked Up', 'Order status', 'routemile-woocommerce');
+			$new_order_statuses['wc-routew-in-kitchen'] = _x('In the Kitchen', 'Order status', 'routemile-for-woocommerce');
+			$new_order_statuses['wc-routew-assigned'] = _x('Assigned', 'Order status', 'routemile-for-woocommerce');
+			$new_order_statuses['wc-routew-picked-up'] = _x('Picked Up', 'Order status', 'routemile-for-woocommerce');
 		}
 
 		return $new_order_statuses;

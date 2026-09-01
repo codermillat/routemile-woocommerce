@@ -2,6 +2,10 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
+// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_query, WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+// Reporting: meta_key lookups against `_routew_*` are how per-order
+// delivery analytics aggregate. Inherent to reporting reads.
+
 /**
  * Manages the reporting functionality for the plugin.
  *
@@ -31,7 +35,7 @@ class ROUTEW_Reporting
 	{
 		?>
 		<div class="routew-reports">
-			<h2><?php esc_html_e('Today\'s Report', 'routemile-woocommerce'); ?></h2>
+			<h2><?php esc_html_e('Today\'s Report', 'routemile-for-woocommerce'); ?></h2>
 			<?php
 			// Site-timezone day boundary — previously a plain 'Y-m-d' string
 			// was passed to date_created, which wc_get_orders interprets in
@@ -56,11 +60,11 @@ class ROUTEW_Reporting
 			}
 			?>
 			<p>
-				<strong><?php esc_html_e('Total Deliveries:', 'routemile-woocommerce'); ?></strong>
+				<strong><?php esc_html_e('Total Deliveries:', 'routemile-for-woocommerce'); ?></strong>
 				<?php echo esc_html($total_deliveries); ?>
 			</p>
 			<p>
-				<strong><?php esc_html_e('Total Delivery Fees:', 'routemile-woocommerce'); ?></strong>
+				<strong><?php esc_html_e('Total Delivery Fees:', 'routemile-for-woocommerce'); ?></strong>
 				<?php echo wp_kses_post(wc_price($total_fees)); ?>
 			</p>
 		</div>
@@ -69,3 +73,5 @@ class ROUTEW_Reporting
 }
 
 new ROUTEW_Reporting();
+
+// phpcs:enable

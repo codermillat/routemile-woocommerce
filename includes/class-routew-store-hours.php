@@ -83,14 +83,14 @@ class ROUTEW_Store_Hours
 	{
 		add_settings_section(
 			'routew_hours_section',
-			__('Opening Hours', 'routemile-woocommerce'),
+			__('Opening Hours', 'routemile-for-woocommerce'),
 			array($this, 'render_section_description'),
 			'routemile-settings'
 		);
 
 		add_settings_field(
 			'routew_hours_enabled',
-			__('Enable Schedule', 'routemile-woocommerce'),
+			__('Enable Schedule', 'routemile-for-woocommerce'),
 			array($this, 'render_enable_field'),
 			'routemile-settings',
 			'routew_hours_section'
@@ -98,7 +98,7 @@ class ROUTEW_Store_Hours
 
 		add_settings_field(
 			'routew_hours',
-			__('Weekly Hours', 'routemile-woocommerce'),
+			__('Weekly Hours', 'routemile-for-woocommerce'),
 			array($this, 'render_hours_field'),
 			'routemile-settings',
 			'routew_hours_section'
@@ -106,7 +106,7 @@ class ROUTEW_Store_Hours
 
 		add_settings_field(
 			'routew_hours_override',
-			__('Special Occasion Override', 'routemile-woocommerce'),
+			__('Special Occasion Override', 'routemile-for-woocommerce'),
 			array($this, 'render_override_field'),
 			'routemile-settings',
 			'routew_hours_section'
@@ -116,7 +116,7 @@ class ROUTEW_Store_Hours
 	/** Describe the hours section. */
 	public function render_section_description()
 	{
-		echo '<p>' . esc_html__('The admin-bar toggle closes deliveries immediately at any time; this schedule additionally pauses ordering outside your opening hours.', 'routemile-woocommerce') . '</p>';
+		echo '<p>' . esc_html__('The admin-bar toggle closes deliveries immediately at any time; this schedule additionally pauses ordering outside your opening hours.', 'routemile-for-woocommerce') . '</p>';
 	}
 
 	/** Render the enable checkbox. */
@@ -124,7 +124,7 @@ class ROUTEW_Store_Hours
 	{
 		$options = get_option('routew_settings');
 		$enabled = !empty($options['routew_hours_enabled']);
-		echo '<label><input type="checkbox" name="routew_settings[routew_hours_enabled]" value="1"' . checked($enabled, true, false) . ' /> ' . esc_html__('Close ordering automatically outside the hours below', 'routemile-woocommerce') . '</label>';
+		echo '<label><input type="checkbox" name="routew_settings[routew_hours_enabled]" value="1"' . checked($enabled, true, false) . ' /> ' . esc_html__('Close ordering automatically outside the hours below', 'routemile-for-woocommerce') . '</label>';
 	}
 
 	/**
@@ -142,10 +142,10 @@ class ROUTEW_Store_Hours
 			<label>
 				<input type="checkbox" name="routew_settings[routew_hours_override_enabled]" value="1"
 					<?php checked(!empty($options['routew_hours_override_enabled']) && '' !== $until); ?> />
-				<?php esc_html_e('Stay open regardless of the weekly schedule', 'routemile-woocommerce'); ?>
+				<?php esc_html_e('Stay open regardless of the weekly schedule', 'routemile-for-woocommerce'); ?>
 			</label>
 			<p class="description" style="margin:4px 0 8px;">
-				<?php esc_html_e('For special occasions — a holiday the weekly schedule marks as closed, or an all-day event. Ordering stays open until the moment below (the manual Open/Closed admin-bar toggle still wins).', 'routemile-woocommerce'); ?>
+				<?php esc_html_e('For special occasions — a holiday the weekly schedule marks as closed, or an all-day event. Ordering stays open until the moment below (the manual Open/Closed admin-bar toggle still wins).', 'routemile-for-woocommerce'); ?>
 			</p>
 			<input type="datetime-local" name="routew_settings[routew_hours_override_until]"
 				value="<?php echo esc_attr($until); ?>" />
@@ -154,12 +154,13 @@ class ROUTEW_Store_Hours
 				if ('' !== $until) {
 					$ts = strtotime($until);
 					printf(
-						esc_html__('Currently forcing OPEN until %s.', 'routemile-woocommerce'),
+						/* translators: %s: formatted date/time when the override ends. */
+						esc_html__('Currently forcing OPEN until %s.', 'routemile-for-woocommerce'),
 						esc_html(false === $ts ? $until : date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $ts))
 					);
 					echo ' ';
 				}
-				esc_html_e('Leave empty and untick to rely on the weekly schedule only.', 'routemile-woocommerce');
+				esc_html_e('Leave empty and untick to rely on the weekly schedule only.', 'routemile-for-woocommerce');
 				?>
 			</p>
 		</div>
@@ -172,12 +173,12 @@ class ROUTEW_Store_Hours
 		$hours = self::get_hours();
 
 		$day_names = array(
-			__('Sunday', 'routemile-woocommerce'), __('Monday', 'routemile-woocommerce'), __('Tuesday', 'routemile-woocommerce'),
-			__('Wednesday', 'routemile-woocommerce'), __('Thursday', 'routemile-woocommerce'), __('Friday', 'routemile-woocommerce'), __('Saturday', 'routemile-woocommerce'),
+			__('Sunday', 'routemile-for-woocommerce'), __('Monday', 'routemile-for-woocommerce'), __('Tuesday', 'routemile-for-woocommerce'),
+			__('Wednesday', 'routemile-for-woocommerce'), __('Thursday', 'routemile-for-woocommerce'), __('Friday', 'routemile-for-woocommerce'), __('Saturday', 'routemile-for-woocommerce'),
 		);
 
 		echo '<table class="routew-hours-table">';
-		echo '<tr class="routew-hours-table__head"><th scope="col"></th><td><strong>' . esc_html__('Opens', 'routemile-woocommerce') . '</strong> &nbsp;–&nbsp; <strong>' . esc_html__('Closes', 'routemile-woocommerce') . '</strong></td></tr>';
+		echo '<tr class="routew-hours-table__head"><th scope="col"></th><td><strong>' . esc_html__('Opens', 'routemile-for-woocommerce') . '</strong> &nbsp;–&nbsp; <strong>' . esc_html__('Closes', 'routemile-for-woocommerce') . '</strong></td></tr>';
 		foreach ($day_names as $i => $name) {
 			$day = $hours[$i]; // get_hours() already merged defaults per day.
 			printf(
@@ -190,13 +191,13 @@ class ROUTEW_Store_Hours
 					</td>
 				</tr>',
 				esc_html($name),
-				$i,
+				(int) $i,
 				esc_attr($day['open']),
 				esc_attr($day['close']),
 				checked(!empty($day['all_day']), true, false),
-				esc_html__('Open all day', 'routemile-woocommerce'),
+				esc_html__('Open all day', 'routemile-for-woocommerce'),
 				checked(!empty($day['closed']), true, false),
-				esc_html__('Closed all day', 'routemile-woocommerce')
+				esc_html__('Closed all day', 'routemile-for-woocommerce')
 			);
 		}
 		echo '</table>';
@@ -273,7 +274,7 @@ class ROUTEW_Store_Hours
 				$sanitized['routew_hours_override_enabled'] = 'yes';
 				$sanitized['routew_hours_override_until'] = $until_raw;
 			} else {
-				set_transient('routew_admin_notice', __('Special-occasion override date was invalid; override not saved.', 'routemile-woocommerce'), 30);
+				set_transient('routew_admin_notice', __('Special-occasion override date was invalid; override not saved.', 'routemile-for-woocommerce'), 30);
 			}
 		} else {
 			$sanitized['routew_hours_override_enabled'] = 'no';
@@ -435,12 +436,16 @@ class ROUTEW_Store_Hours
 		$day = (int) gmdate('w', $now);
 		$minutes = (int) gmdate('G', $now) * 60 + (int) gmdate('i', $now);
 
-		$day_names = array(__('Sunday', 'routemile-woocommerce'), __('Monday', 'routemile-woocommerce'), __('Tuesday', 'routemile-woocommerce'), __('Wednesday', 'routemile-woocommerce'), __('Thursday', 'routemile-woocommerce'), __('Friday', 'routemile-woocommerce'), __('Saturday', 'routemile-woocommerce'));
+		$day_names = array(__('Sunday', 'routemile-for-woocommerce'), __('Monday', 'routemile-for-woocommerce'), __('Tuesday', 'routemile-for-woocommerce'), __('Wednesday', 'routemile-for-woocommerce'), __('Thursday', 'routemile-for-woocommerce'), __('Friday', 'routemile-for-woocommerce'), __('Saturday', 'routemile-for-woocommerce'));
 
 		// Still open later today?
 		$today = isset($hours[$day]) && is_array($hours[$day]) ? $hours[$day] : null;
 		if ($today && empty($today['closed']) && self::to_minutes($today['open']) > $minutes) {
-			return sprintf(__('We open today at %s.', 'routemile-woocommerce'), esc_html($today['open']));
+			return sprintf(
+				/* translators: %s: opening time for today. */
+				__( 'We open today at %s.', 'routemile-for-woocommerce' ),
+				esc_html($today['open'])
+			);
 		}
 
 		// Next open day.
@@ -448,7 +453,12 @@ class ROUTEW_Store_Hours
 			$idx = ($day + $offset) % 7;
 			$candidate = isset($hours[$idx]) && is_array($hours[$idx]) ? $hours[$idx] : null;
 			if ($candidate && empty($candidate['closed'])) {
-				return sprintf(__('We reopen %s at %s.', 'routemile-woocommerce'), $day_names[$idx], esc_html($candidate['open']));
+				return sprintf(
+					/* translators: 1: day name, 2: opening time. */
+					__( 'We reopen %1$s at %2$s.', 'routemile-for-woocommerce' ),
+					$day_names[$idx],
+					esc_html($candidate['open'])
+				);
 			}
 		}
 		return '';

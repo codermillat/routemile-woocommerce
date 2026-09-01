@@ -26,8 +26,8 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 		public function __construct( $instance_id = 0 ) {
 			$this->id                 = 'routemile_delivery';
 			$this->instance_id        = absint( $instance_id );
-			$this->method_title       = __( 'RouteMile Delivery', 'routemile-woocommerce' );
-			$this->method_description = __( 'Dynamic distance-based shipping for RouteMile.', 'routemile-woocommerce' );
+			$this->method_title       = __( 'RouteMile Delivery', 'routemile-for-woocommerce' );
+			$this->method_description = __( 'Dynamic distance-based shipping for RouteMile.', 'routemile-for-woocommerce' );
 			$this->supports           = array(
 				'shipping-zones',
 				'instance-settings',
@@ -61,10 +61,10 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 		function init_form_fields() {
 			$this->instance_form_fields = array(
 				'title' => array(
-					'title'       => __( 'Title', 'routemile-woocommerce' ),
+					'title'       => __( 'Title', 'routemile-for-woocommerce' ),
 					'type'        => 'text',
-					'description' => __( 'This controls the title which the user sees during checkout.', 'routemile-woocommerce' ),
-					'default'     => __( 'RouteMile Delivery', 'routemile-woocommerce' ),
+					'description' => __( 'This controls the title which the user sees during checkout.', 'routemile-for-woocommerce' ),
+					'default'     => __( 'RouteMile Delivery', 'routemile-for-woocommerce' ),
 					'desc_tip'    => true,
 				),
 			);
@@ -95,20 +95,20 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 			// "adding rate" entry predates the v1.3.4 deploy; fixed 1.3.8).
 			if ( class_exists( 'ROUTEW_Map_Providers' ) && ! ROUTEW_Map_Providers::supports( 'map', $options ) ) {
 				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->info( 'calculate_shipping: no configured map provider — no rate', array( 'source' => 'routemile-woocommerce' ) );
+					wc_get_logger()->info( 'calculate_shipping: no configured map provider — no rate', array( 'source' => 'routemile-for-woocommerce' ) );
 				}
 				return;
 			}
 			if ( ! class_exists( 'ROUTEW_Map_Providers' ) && empty( $options['routew_google_maps_api_key'] ) ) {
 				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->info( 'calculate_shipping: no Google key (legacy path) — no rate', array( 'source' => 'routemile-woocommerce' ) );
+					wc_get_logger()->info( 'calculate_shipping: no Google key (legacy path) — no rate', array( 'source' => 'routemile-for-woocommerce' ) );
 				}
 				return;
 			}
 
 			if ( ! WC()->session ) {
 				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->info( 'calculate_shipping: no session — no rate', array( 'source' => 'routemile-woocommerce' ) );
+					wc_get_logger()->info( 'calculate_shipping: no session — no rate', array( 'source' => 'routemile-for-woocommerce' ) );
 				}
 				return;
 			}
@@ -119,7 +119,7 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 			// admin-created orders also calculate rates (v1.2.19).
 			if ( class_exists( 'ROUTEW_Store_Hours' ) && ! ROUTEW_Store_Hours::is_store_open() ) {
 				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->info( 'calculate_shipping: store closed (routew_is_open=false)', array( 'source' => 'routemile-woocommerce' ) );
+					wc_get_logger()->info( 'calculate_shipping: store closed (routew_is_open=false)', array( 'source' => 'routemile-for-woocommerce' ) );
 				}
 				return;
 			}
@@ -130,7 +130,7 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 
 			if ( ! $customer_lat || ! $customer_lng ) {
 				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->info( 'calculate_shipping: no pinned location yet — no rate', array( 'source' => 'routemile-woocommerce' ) );
+					wc_get_logger()->info( 'calculate_shipping: no pinned location yet — no rate', array( 'source' => 'routemile-for-woocommerce' ) );
 				}
 				return; // Can't calculate shipping without a pinned location
 			}
@@ -141,7 +141,7 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 
 			if ( is_wp_error( $restaurant ) ) {
 				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->error( 'calculate_shipping: ' . $restaurant->get_error_message(), array( 'source' => 'routemile-woocommerce' ) );
+					wc_get_logger()->error( 'calculate_shipping: ' . $restaurant->get_error_message(), array( 'source' => 'routemile-for-woocommerce' ) );
 				}
 				return;
 			}
@@ -154,17 +154,17 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 			if ( is_wp_error( $distance_data ) ) {
 				// Log and surface a user-friendly error at checkout
 				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->error( 'RouteMile distance error: ' . $distance_data->get_error_message(), array( 'source' => 'routemile-woocommerce' ) );
+					wc_get_logger()->error( 'RouteMile distance error: ' . $distance_data->get_error_message(), array( 'source' => 'routemile-for-woocommerce' ) );
 				}
 				if ( function_exists( 'wc_add_notice' ) && function_exists( 'is_checkout' ) && is_checkout() ) {
-					wc_add_notice( __( 'We could not calculate delivery distance. Please verify your location and try again.', 'routemile-woocommerce' ), 'error' );
+					wc_add_notice( __( 'We could not calculate delivery distance. Please verify your location and try again.', 'routemile-for-woocommerce' ), 'error' );
 				}
 				return;
 			}
 
 			if ( ! isset( $distance_data['distance'] ) || ! is_object( $distance_data['distance'] ) || ! isset( $distance_data['distance']->value ) ) {
 				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->error( 'calculate_shipping: distance response missing distance value', array( 'source' => 'routemile-woocommerce' ) );
+					wc_get_logger()->error( 'calculate_shipping: distance response missing distance value', array( 'source' => 'routemile-for-woocommerce' ) );
 				}
 				return;
 			}
@@ -185,7 +185,7 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 
 			if ( $distance_in_km > $radius ) {
 				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->info( sprintf( 'calculate_shipping: out of zone (distance=%.3f km, radius=%.3f)', $distance_in_km, $radius ), array( 'source' => 'routemile-woocommerce' ) );
+					wc_get_logger()->info( sprintf( 'calculate_shipping: out of zone (distance=%.3f km, radius=%.3f)', $distance_in_km, $radius ), array( 'source' => 'routemile-for-woocommerce' ) );
 				}
 				return; // Outside delivery zone
 			}
@@ -196,7 +196,7 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 				$min_error = ROUTEW_Pricing::minimum_order_error();
 				if ( null !== $min_error ) {
 					if ( function_exists( 'wc_get_logger' ) ) {
-						wc_get_logger()->info( 'calculate_shipping: below minimum order — no rate', array( 'source' => 'routemile-woocommerce' ) );
+						wc_get_logger()->info( 'calculate_shipping: below minimum order — no rate', array( 'source' => 'routemile-for-woocommerce' ) );
 					}
 					return;
 				}
@@ -211,7 +211,7 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 				$tier_fee = ROUTEW_Pricing::fee_for_distance( $distance_in_km, $options );
 				if ( false === $tier_fee ) {
 					if ( function_exists( 'wc_get_logger' ) ) {
-						wc_get_logger()->info( sprintf( 'calculate_shipping: distance %.2f km beyond all tiers — no rate', $distance_in_km ), array( 'source' => 'routemile-woocommerce' ) );
+						wc_get_logger()->info( sprintf( 'calculate_shipping: distance %.2f km beyond all tiers — no rate', $distance_in_km ), array( 'source' => 'routemile-for-woocommerce' ) );
 					}
 					return;
 				}
@@ -225,7 +225,7 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 			}
 
 			if ( function_exists( 'wc_get_logger' ) ) {
-				wc_get_logger()->debug( sprintf( 'calculate_shipping: adding rate cost=%.2f (distance=%.3f km, base=%.2f, per_km=%.2f)', $cost, $distance_in_km, $base_fee, $fee_per_km ), array( 'source' => 'routemile-woocommerce' ) );
+				wc_get_logger()->debug( sprintf( 'calculate_shipping: adding rate cost=%.2f (distance=%.3f km, base=%.2f, per_km=%.2f)', $cost, $distance_in_km, $base_fee, $fee_per_km ), array( 'source' => 'routemile-for-woocommerce' ) );
 			}
 
 			$rate_id = $this->id . ( $this->instance_id ? ':' . $this->instance_id : '' );
@@ -235,7 +235,11 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 			// shipping row with a blank/zero amount and customers read that
 			// as a broken order rather than a discount (1.3.9).
 			$label = $is_free
-				? sprintf( __( '%s (Free delivery)', 'routemile-woocommerce' ), $this->title )
+				? sprintf(
+					/* translators: %s: shipping method title shown to the customer. */
+					__( '%s (Free delivery)', 'routemile-for-woocommerce' ),
+					$this->title
+				)
 				: $this->title;
 
 			$this->add_rate( array(

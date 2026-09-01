@@ -81,7 +81,7 @@ class ROUTEW_Privacy
     public function register_exporter($exporters)
     {
         $exporters['routemile-delivery-profile'] = array(
-            'exporter_friendly_name' => __('RouteMile Delivery Profile', 'routemile-woocommerce'),
+            'exporter_friendly_name' => __('RouteMile Delivery Profile', 'routemile-for-woocommerce'),
             'callback' => array($this, 'export_profile'),
         );
         return $exporters;
@@ -97,7 +97,7 @@ class ROUTEW_Privacy
     public function register_eraser($erasers)
     {
         $erasers['routemile-delivery-profile'] = array(
-            'eraser_friendly_name' => __('RouteMile Delivery Profile', 'routemile-woocommerce'),
+            'eraser_friendly_name' => __('RouteMile Delivery Profile', 'routemile-for-woocommerce'),
             'callback' => array($this, 'erase_profile'),
         );
         return $erasers;
@@ -131,7 +131,7 @@ class ROUTEW_Privacy
                 if (!empty($rows)) {
                     $data[] = array(
                         'group_id' => 'routemile-delivery-profile',
-                        'group_label' => __('RouteMile Delivery Profile', 'routemile-woocommerce'),
+                        'group_label' => __('RouteMile Delivery Profile', 'routemile-for-woocommerce'),
                         'item_id' => 'user-' . $user->ID,
                         'data' => $rows,
                     );

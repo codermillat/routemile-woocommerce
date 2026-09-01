@@ -40,14 +40,14 @@ class ROUTEW_Address_Validator
         if (empty($address)) {
             return array(
                 'is_complete' => false,
-                'message' => __('address field is empty', 'routemile-woocommerce')
+                'message' => __('address field is empty', 'routemile-for-woocommerce')
             );
         }
 
         if (strlen($address) < 20) {
             return array(
                 'is_complete' => false,
-                'message' => __('address is too short - please provide more details', 'routemile-woocommerce')
+                'message' => __('address is too short - please provide more details', 'routemile-for-woocommerce')
             );
         }
 
@@ -82,14 +82,14 @@ class ROUTEW_Address_Validator
         if (!$has_numbers) {
             return array(
                 'is_complete' => false,
-                'message' => __('please include building/house/flat number', 'routemile-woocommerce')
+                'message' => __('please include building/house/flat number', 'routemile-for-woocommerce')
             );
         }
 
         if (!$has_building_info && !$has_location_info) {
             return array(
                 'is_complete' => false,
-                'message' => __('please add building name, street name, or nearby landmark', 'routemile-woocommerce')
+                'message' => __('please add building name, street name, or nearby landmark', 'routemile-for-woocommerce')
             );
         }
 
@@ -108,7 +108,7 @@ class ROUTEW_Address_Validator
         if (strlen($address) > 30 && $has_building_info && $has_numbers) {
             return array(
                 'is_complete' => true,
-                'message' => __('address looks complete', 'routemile-woocommerce')
+                'message' => __('address looks complete', 'routemile-for-woocommerce')
             );
         }
 
@@ -116,14 +116,14 @@ class ROUTEW_Address_Validator
         if ($has_building_info && $has_numbers) {
             return array(
                 'is_complete' => true,
-                'message' => __('address is acceptable but could use more detail', 'routemile-woocommerce')
+                'message' => __('address is acceptable but could use more detail', 'routemile-for-woocommerce')
             );
         }
 
         // Fallback - minimal requirements met
         return array(
             'is_complete' => ($has_building_info || $has_location_info) && $has_numbers,
-            'message' => __('please add more specific delivery details like floor, gate number, or landmarks', 'routemile-woocommerce')
+            'message' => __('please add more specific delivery details like floor, gate number, or landmarks', 'routemile-for-woocommerce')
         );
     }
 }

@@ -67,7 +67,7 @@ class ROUTEW_Blocks_Checkout
 		add_action('woocommerce_store_api_checkout_update_order_from_request', array($this, 'apply_delivery_data'), 10, 2);
 
 		// Register the `routemile` extension namespace with the Cart/Checkout
-		// Store API so client-side `extensionCartUpdate({ namespace: 'routemile-woocommerce',
+		// Store API so client-side `extensionCartUpdate({ namespace: 'routemile-for-woocommerce',
 		// data: { lat, lng } })` does not throw "There is no such namespace
 		// registered: routemile." The callback persists the pinned coordinates
 		// to the WC session and re-runs shipping + totals so the Shipping
@@ -100,7 +100,7 @@ class ROUTEW_Blocks_Checkout
 		}
 
 		woocommerce_store_api_register_update_callback(array(
-			'namespace' => 'routemile-woocommerce',
+			'namespace' => 'routemile-for-woocommerce',
 			'callback'  => array($this, 'store_api_update_callback'),
 		));
 	}
@@ -181,23 +181,23 @@ class ROUTEW_Blocks_Checkout
 			'id' => 'routemile/landmark',
 			// The block checkout appends its own "(optional)" suffix to
 			// non-required fields, so the label must not repeat it.
-			'label' => __('Nearby Landmark', 'routemile-woocommerce'),
+			'label' => __('Nearby Landmark', 'routemile-for-woocommerce'),
 			'location' => 'address',
 			'type' => 'text',
 			'required' => false,
 			'attributes' => array(
-				'placeholder' => __('e.g., Near City Mall, Opposite Park', 'routemile-woocommerce'),
+				'placeholder' => __('e.g., Near City Mall, Opposite Park', 'routemile-for-woocommerce'),
 			),
 		));
 
 		woocommerce_register_additional_checkout_field(array(
 			'id' => 'routemile/delivery-instructions',
-			'label' => __('Delivery Instructions', 'routemile-woocommerce'),
+			'label' => __('Delivery Instructions', 'routemile-for-woocommerce'),
 			'location' => 'order',
 			'type' => 'text',
 			'required' => false,
 			'attributes' => array(
-				'placeholder' => __('e.g., Ring the bell twice, call before arriving...', 'routemile-woocommerce'),
+				'placeholder' => __('e.g., Ring the bell twice, call before arriving...', 'routemile-for-woocommerce'),
 			),
 		));
 	}
@@ -264,7 +264,7 @@ class ROUTEW_Blocks_Checkout
 		// say so clearly on the blocks checkout too (the field validation
 		// blocks placement server-side).
 		if (!ROUTEW_Checkout::is_store_open()) {
-			$closed_message = __('We are currently closed for deliveries. You can browse and fill your cart — ordering will be available as soon as we reopen.', 'routemile-woocommerce');
+			$closed_message = __('We are currently closed for deliveries. You can browse and fill your cart — ordering will be available as soon as we reopen.', 'routemile-for-woocommerce');
 			if (class_exists('ROUTEW_Store_Hours')) {
 				$hint = ROUTEW_Store_Hours::reopen_hint();
 				if ('' !== $hint) {
@@ -353,7 +353,7 @@ class ROUTEW_Blocks_Checkout
 				}
 			} catch (\Throwable $e) {
 				if (function_exists('wc_get_logger')) {
-					wc_get_logger()->debug('blocks checkout field read failed: ' . $e->getMessage(), array('source' => 'routemile-woocommerce'));
+					wc_get_logger()->debug('blocks checkout field read failed: ' . $e->getMessage(), array('source' => 'routemile-for-woocommerce'));
 				}
 			}
 		}

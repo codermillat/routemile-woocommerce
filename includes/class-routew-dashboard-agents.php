@@ -33,18 +33,18 @@ class ROUTEW_Dashboard_Agents
 		}
 		?>
 		<div class="routew-dashboard-section">
-			<h2><?php esc_html_e('Delivery Agents — Work Tracking', 'routemile-woocommerce'); ?></h2>
+			<h2><?php esc_html_e('Delivery Agents — Work Tracking', 'routemile-for-woocommerce'); ?></h2>
 			<table class="wp-list-table widefat fixed striped routew-agent-performance">
 				<thead>
 					<tr>
-						<th><?php esc_html_e('Agent', 'routemile-woocommerce'); ?></th>
-						<th><?php esc_html_e('Mobile', 'routemile-woocommerce'); ?></th>
-						<th><?php esc_html_e('Active now', 'routemile-woocommerce'); ?></th>
-						<th><?php esc_html_e('Delivered today', 'routemile-woocommerce'); ?></th>
-						<th><?php esc_html_e('Cash collected today', 'routemile-woocommerce'); ?></th>
-						<th><?php esc_html_e('Cash to hand over', 'routemile-woocommerce'); ?></th>
-						<th><?php esc_html_e('All-time delivered', 'routemile-woocommerce'); ?></th>
-						<th><?php esc_html_e('Settle cash', 'routemile-woocommerce'); ?></th>
+						<th><?php esc_html_e('Agent', 'routemile-for-woocommerce'); ?></th>
+						<th><?php esc_html_e('Mobile', 'routemile-for-woocommerce'); ?></th>
+						<th><?php esc_html_e('Active now', 'routemile-for-woocommerce'); ?></th>
+						<th><?php esc_html_e('Delivered today', 'routemile-for-woocommerce'); ?></th>
+						<th><?php esc_html_e('Cash collected today', 'routemile-for-woocommerce'); ?></th>
+						<th><?php esc_html_e('Cash to hand over', 'routemile-for-woocommerce'); ?></th>
+						<th><?php esc_html_e('All-time delivered', 'routemile-for-woocommerce'); ?></th>
+						<th><?php esc_html_e('Settle cash', 'routemile-for-woocommerce'); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -66,7 +66,7 @@ class ROUTEW_Dashboard_Agents
 								<?php if ($mobile): ?>
 									<a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $mobile)); ?>"><?php echo esc_html($mobile); ?></a>
 								<?php else: ?>
-									<span class="routew-muted"><?php esc_html_e('Not set', 'routemile-woocommerce'); ?></span>
+									<span class="routew-muted"><?php esc_html_e('Not set', 'routemile-for-woocommerce'); ?></span>
 								<?php endif; ?>
 							</td>
 							<td><?php echo esc_html($active); ?></td>
@@ -79,7 +79,7 @@ class ROUTEW_Dashboard_Agents
 										<summary>
 											<?php
 											// translators: %d = number of orders.
-											printf(esc_html__('%d order(s) in this balance', 'routemile-woocommerce'), count($cash['unsettled_orders']));
+											printf(esc_html__('%d order(s) in this balance', 'routemile-for-woocommerce'), count($cash['unsettled_orders']));
 											?>
 										</summary>
 										<ul class="routew-settle-orders">
@@ -97,12 +97,12 @@ class ROUTEW_Dashboard_Agents
 							<td><?php echo esc_html($state['counts']['delivered']); ?></td>
 							<td>
 								<?php if ($cash['pending']): ?>
-									<em class="routew-muted"><?php esc_html_e('Hand-over pending approval', 'routemile-woocommerce'); ?></em>
+									<em class="routew-muted"><?php esc_html_e('Hand-over pending approval', 'routemile-for-woocommerce'); ?></em>
 								<?php elseif ($cash['unsettled'] > 0): ?>
 									<span class="routew-muted">
 										<?php
 										// translators: %s = formatted amount.
-										printf(esc_html__('Agent holds %s — awaiting their request', 'routemile-woocommerce'), wp_kses_post(wc_price($cash['unsettled'], array('currency' => get_woocommerce_currency()))));
+										printf(esc_html__('Agent holds %s — awaiting their request', 'routemile-for-woocommerce'), wp_kses_post(wc_price($cash['unsettled'], array('currency' => get_woocommerce_currency()))));
 										?>
 									</span>
 								<?php elseif ($cash['last_accepted']): ?>
@@ -110,9 +110,9 @@ class ROUTEW_Dashboard_Agents
 										<?php
 										$approver = get_user_by('id', absint($cash['last_accepted']['reviewed_by']));
 										/* translators: 1: date/time, 2: approver name. */
-										printf(esc_html__('Settled %1$s (by %2$s)', 'routemile-woocommerce'),
+										printf(esc_html__('Settled %1$s (by %2$s)', 'routemile-for-woocommerce'),
 											esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), (int) $cash['last_accepted']['reviewed_at'])),
-											esc_html($approver ? $approver->display_name : __('manager', 'routemile-woocommerce'))
+											esc_html($approver ? $approver->display_name : __('manager', 'routemile-for-woocommerce'))
 										);
 										?>
 									</span>
@@ -125,7 +125,7 @@ class ROUTEW_Dashboard_Agents
 				</tbody>
 			</table>
 			<p class="description">
-				<?php esc_html_e('Active = assigned + picked up. Agents see the same numbers for themselves on their dashboard and can self-report a handover there.', 'routemile-woocommerce'); ?>
+				<?php esc_html_e('Active = assigned + picked up. Agents see the same numbers for themselves on their dashboard and can self-report a handover there.', 'routemile-for-woocommerce'); ?>
 			</p>
 
 			<?php self::render_recent_settlements(); ?>
@@ -147,21 +147,21 @@ class ROUTEW_Dashboard_Agents
 
 		$settlements = array_slice(ROUTEW_Agent_Cash::get_settlements(), 0, 15);
 		?>
-		<h3><?php esc_html_e('Cash hand-overs — requests & history', 'routemile-woocommerce'); ?></h3>
+		<h3><?php esc_html_e('Cash hand-overs — requests & history', 'routemile-for-woocommerce'); ?></h3>
 		<table class="wp-list-table widefat fixed striped routew-settlements">
 			<thead>
 				<tr>
-					<th><?php esc_html_e('Requested', 'routemile-woocommerce'); ?></th>
-					<th><?php esc_html_e('Agent', 'routemile-woocommerce'); ?></th>
-					<th><?php esc_html_e('Amount', 'routemile-woocommerce'); ?></th>
-					<th><?php esc_html_e('Status', 'routemile-woocommerce'); ?></th>
-					<th><?php esc_html_e('Reviewed by', 'routemile-woocommerce'); ?></th>
-					<th><?php esc_html_e('Actions', 'routemile-woocommerce'); ?></th>
+					<th><?php esc_html_e('Requested', 'routemile-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Agent', 'routemile-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Amount', 'routemile-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Status', 'routemile-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Reviewed by', 'routemile-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Actions', 'routemile-for-woocommerce'); ?></th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php if (empty($settlements)): ?>
-					<tr><td colspan="6"><?php esc_html_e('No hand-over requests yet. Agents send these from their dashboard when they hand cash to the store.', 'routemile-woocommerce'); ?></td></tr>
+					<tr><td colspan="6"><?php esc_html_e('No hand-over requests yet. Agents send these from their dashboard when they hand cash to the store.', 'routemile-for-woocommerce'); ?></td></tr>
 				<?php endif; ?>
 				<?php foreach ($settlements as $entry): ?>
 					<?php
@@ -178,11 +178,11 @@ class ROUTEW_Dashboard_Agents
 							<span class="routew-settle-status routew-settle-status--<?php echo esc_attr($entry['status']); ?>">
 								<?php
 								if (ROUTEW_Agent_Cash::STATUS_PENDING === $entry['status']) {
-									esc_html_e('Pending approval', 'routemile-woocommerce');
+									esc_html_e('Pending approval', 'routemile-for-woocommerce');
 								} elseif (ROUTEW_Agent_Cash::STATUS_ACCEPTED === $entry['status']) {
-									esc_html_e('Accepted', 'routemile-woocommerce');
+									esc_html_e('Accepted', 'routemile-for-woocommerce');
 								} else {
-									esc_html_e('Rejected', 'routemile-woocommerce');
+									esc_html_e('Rejected', 'routemile-for-woocommerce');
 								}
 								?>
 							</span>
@@ -202,17 +202,17 @@ class ROUTEW_Dashboard_Agents
 									<input type="hidden" name="action" value="routew_review_settlement" />
 									<input type="hidden" name="settlement_id" value="<?php echo esc_attr($entry['id']); ?>" />
 									<input type="hidden" name="decision" value="accepted" />
-									<button type="submit" class="button button-small button-primary"><?php esc_html_e('Accept', 'routemile-woocommerce'); ?></button>
+									<button type="submit" class="button button-small button-primary"><?php esc_html_e('Accept', 'routemile-for-woocommerce'); ?></button>
 								</form>
 								<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline-block;">
 									<?php wp_nonce_field('routew_review_cash_' . $entry['id']); ?>
 									<input type="hidden" name="action" value="routew_review_settlement" />
 									<input type="hidden" name="settlement_id" value="<?php echo esc_attr($entry['id']); ?>" />
 									<input type="hidden" name="decision" value="rejected" />
-									<button type="submit" class="button button-small routew-reject-btn"><?php esc_html_e('Reject', 'routemile-woocommerce'); ?></button>
+									<button type="submit" class="button button-small routew-reject-btn"><?php esc_html_e('Reject', 'routemile-for-woocommerce'); ?></button>
 								</form>
 							<?php elseif ($is_pending): ?>
-								<span class="routew-muted"><?php esc_html_e('Awaiting a manager', 'routemile-woocommerce'); ?></span>
+								<span class="routew-muted"><?php esc_html_e('Awaiting a manager', 'routemile-for-woocommerce'); ?></span>
 							<?php else: ?>
 								<span class="routew-muted">—</span>
 							<?php endif; ?>
@@ -222,7 +222,7 @@ class ROUTEW_Dashboard_Agents
 			</tbody>
 		</table>
 		<p class="description">
-			<?php esc_html_e('Agents request a hand-over of their collected cash; accepting clears it from their balance. Rejecting keeps the amount on the agent\'s balance.', 'routemile-woocommerce'); ?>
+			<?php esc_html_e('Agents request a hand-over of their collected cash; accepting clears it from their balance. Rejecting keeps the amount on the agent\'s balance.', 'routemile-for-woocommerce'); ?>
 		</p>
 		<?php
 	}

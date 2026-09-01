@@ -48,7 +48,7 @@ class ROUTEW_Core
 	public function __construct()
 	{
 		$this->version = ROUTEW_VERSION;
-		$this->plugin_name = 'routemile-woocommerce';
+		$this->plugin_name = 'routemile-for-woocommerce';
 
 		$this->load_dependencies();
 		$this->define_hooks();
@@ -142,8 +142,8 @@ class ROUTEW_Core
 		wp_localize_script($this->plugin_name, 'routew_admin_params', array(
 			'nonce' => wp_create_nonce('routew-admin-nonce'),
 			'i18n'  => array(
-				'updating' => __('Updating...', 'routemile-woocommerce'),
-				'error'    => __('Error!', 'routemile-woocommerce'),
+				'updating' => __('Updating...', 'routemile-for-woocommerce'),
+				'error'    => __('Error!', 'routemile-for-woocommerce'),
 			),
 		));
 	}
@@ -165,9 +165,9 @@ class ROUTEW_Core
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('routew_print_receipt'),
 			'i18n' => array(
-				'new_tab' => __('New', 'routemile-woocommerce'),
-				'in_progress_tab' => __('In Progress', 'routemile-woocommerce'),
-				'no_orders' => __('No orders in this section.', 'routemile-woocommerce'),
+				'new_tab' => __('New', 'routemile-for-woocommerce'),
+				'in_progress_tab' => __('In Progress', 'routemile-for-woocommerce'),
+				'no_orders' => __('No orders in this section.', 'routemile-for-woocommerce'),
 			),
 		));
 		// Agent PWA config: heartbeat polling and service-worker
@@ -179,13 +179,13 @@ class ROUTEW_Core
 			'swUrl' => add_query_arg('routew_agent_sw', '1', home_url('/')),
 			'pollIntervalMs' => 30000,
 			'i18n' => array(
-				'offline' => __('You are offline — orders will refresh when the connection returns', 'routemile-woocommerce'),
-				'online' => __('Back online', 'routemile-woocommerce'),
-				'picked_up_toast' => __('Order picked up', 'routemile-woocommerce'),
-				'delivered_toast' => __('Order delivered. Great job!', 'routemile-woocommerce'),
-				'settled_toast' => __('Hand-over request sent — waiting for manager approval', 'routemile-woocommerce'),
-				'settle_confirm' => __('Send this cash hand-over to the manager for approval?', 'routemile-woocommerce'),
-				'settle_confirm_amount' => __('Send {amount} hand-over request to the manager for approval?', 'routemile-woocommerce'),
+				'offline' => __('You are offline — orders will refresh when the connection returns', 'routemile-for-woocommerce'),
+				'online' => __('Back online', 'routemile-for-woocommerce'),
+				'picked_up_toast' => __('Order picked up', 'routemile-for-woocommerce'),
+				'delivered_toast' => __('Order delivered. Great job!', 'routemile-for-woocommerce'),
+				'settled_toast' => __('Hand-over request sent — waiting for manager approval', 'routemile-for-woocommerce'),
+				'settle_confirm' => __('Send this cash hand-over to the manager for approval?', 'routemile-for-woocommerce'),
+				'settle_confirm_amount' => __('Send {amount} hand-over request to the manager for approval?', 'routemile-for-woocommerce'),
 			),
 		));
 	}
@@ -312,7 +312,7 @@ class ROUTEW_Core
 		foreach ($available_methods as $rate_id => $rate) {
 			if (is_string($rate_id) && strpos($rate_id, 'routemile_delivery') === 0) {
 				if (function_exists('wc_get_logger')) {
-					wc_get_logger()->debug('prefer_routew_shipping: selecting ' . $rate_id, array('source' => 'routemile-woocommerce'));
+					wc_get_logger()->debug('prefer_routew_shipping: selecting ' . $rate_id, array('source' => 'routemile-for-woocommerce'));
 				}
 				return $rate_id;
 			}
@@ -350,7 +350,7 @@ class ROUTEW_Core
 			$provider = ROUTEW_Map_Providers::active($options);
 			$problems[] = sprintf(
 				/* translators: %s: map provider name. */
-				__('the %s API key is missing', 'routemile-woocommerce'),
+				__('the %s API key is missing', 'routemile-for-woocommerce'),
 				$provider['label']
 			);
 		}
@@ -358,7 +358,7 @@ class ROUTEW_Core
 		$latlng = isset($options['routew_restaurant_latlng']) ? trim((string) $options['routew_restaurant_latlng']) : '';
 		$address = isset($options['routew_restaurant_address']) ? trim((string) $options['routew_restaurant_address']) : '';
 		if ('' === $latlng && '' === $address) {
-			$problems[] = __('the restaurant location (coordinates or address) is missing', 'routemile-woocommerce');
+			$problems[] = __('the restaurant location (coordinates or address) is missing', 'routemile-for-woocommerce');
 		}
 
 		if (empty($problems)) {
@@ -369,13 +369,13 @@ class ROUTEW_Core
 		?>
 		<div class="notice notice-error">
 			<p>
-				<strong><?php esc_html_e('RouteMile:', 'routemile-woocommerce'); ?></strong>
+				<strong><?php esc_html_e('RouteMile:', 'routemile-for-woocommerce'); ?></strong>
 				<?php
 				printf(
 					/* translators: 1: list of missing configuration, 2: link to settings */
-					esc_html__('delivery is not configured — %1$s. Customers cannot place delivery orders until this is fixed. %2$s', 'routemile-woocommerce'),
-					esc_html(implode(__(' and ', 'routemile-woocommerce'), $problems)),
-					'<a href="' . esc_url($settings_url) . '">' . esc_html__('Open RouteMile settings', 'routemile-woocommerce') . '</a>'
+					esc_html__('delivery is not configured — %1$s. Customers cannot place delivery orders until this is fixed. %2$s', 'routemile-for-woocommerce'),
+					esc_html(implode(__(' and ', 'routemile-for-woocommerce'), $problems)),
+					'<a href="' . esc_url($settings_url) . '">' . esc_html__('Open RouteMile settings', 'routemile-for-woocommerce') . '</a>'
 				);
 				?>
 			</p>

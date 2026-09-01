@@ -45,7 +45,7 @@ class ROUTEW_Map_Provider_Client
 	private function get($url)
 	{
 		if (!$this->is_allowed_url($url)) {
-			return new WP_Error('invalid_endpoint', __('Map provider endpoint is not allowed.', 'routemile-woocommerce'));
+			return new WP_Error('invalid_endpoint', __('Map provider endpoint is not allowed.', 'routemile-for-woocommerce'));
 		}
 
 		$args = array(
@@ -74,14 +74,14 @@ class ROUTEW_Map_Provider_Client
 		if (200 !== $code) {
 			return new WP_Error('provider_http_error', sprintf(
 				/* translators: %d: HTTP status code. */
-				__('Map provider returned HTTP %d.', 'routemile-woocommerce'),
+				__('Map provider returned HTTP %d.', 'routemile-for-woocommerce'),
 				$code
 			));
 		}
 
 		$data = json_decode(wp_remote_retrieve_body($response), true);
 		if (!is_array($data)) {
-			return new WP_Error('provider_bad_body', __('Map provider returned an unreadable response.', 'routemile-woocommerce'));
+			return new WP_Error('provider_bad_body', __('Map provider returned an unreadable response.', 'routemile-for-woocommerce'));
 		}
 
 		return $data;
@@ -152,7 +152,7 @@ class ROUTEW_Map_Provider_Client
 		$lock = 'routew_provider_slot_' . (isset($this->provider['id']) ? $this->provider['id'] : 'x');
 
 		if (false !== get_transient($lock)) {
-			return new WP_Error('provider_busy', __('Address lookups are busy for a moment — please try again, or drag the map pin instead.', 'routemile-woocommerce'));
+			return new WP_Error('provider_busy', __('Address lookups are busy for a moment — please try again, or drag the map pin instead.', 'routemile-for-woocommerce'));
 		}
 
 		set_transient($lock, time(), $interval);
@@ -236,7 +236,7 @@ class ROUTEW_Map_Provider_Client
 				return $this->coords($data['results'][0]['lat'], $data['results'][0]['lon']);
 		}
 
-		return new WP_Error('provider_unsupported', __('The configured map provider cannot geocode addresses.', 'routemile-woocommerce'));
+		return new WP_Error('provider_unsupported', __('The configured map provider cannot geocode addresses.', 'routemile-for-woocommerce'));
 	}
 
 	/**
@@ -257,7 +257,7 @@ class ROUTEW_Map_Provider_Client
 		$key = isset($this->provider['key']) ? $this->provider['key'] : '';
 
 		if (!in_array('routing', (array) $this->provider['capabilities'], true)) {
-			return new WP_Error('routing_unsupported', __('Provider has no road routing.', 'routemile-woocommerce'));
+			return new WP_Error('routing_unsupported', __('Provider has no road routing.', 'routemile-for-woocommerce'));
 		}
 
 		switch ($id) {
@@ -327,7 +327,7 @@ class ROUTEW_Map_Provider_Client
 				);
 		}
 
-		return new WP_Error('routing_unsupported', __('Provider has no road routing.', 'routemile-woocommerce'));
+		return new WP_Error('routing_unsupported', __('Provider has no road routing.', 'routemile-for-woocommerce'));
 	}
 
 	/**
@@ -371,7 +371,7 @@ class ROUTEW_Map_Provider_Client
 	 */
 	private function no_result()
 	{
-		return new WP_Error('no_results', __('Could not find that location. Please try a different address or move the map pin.', 'routemile-woocommerce'));
+		return new WP_Error('no_results', __('Could not find that location. Please try a different address or move the map pin.', 'routemile-for-woocommerce'));
 	}
 
 	/**

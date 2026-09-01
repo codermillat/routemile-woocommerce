@@ -129,28 +129,28 @@ class ROUTEW_My_Account
 		$last_completed = $this->find_last_completed_order($customer_id);
 
 		?>
-		<section class="routew-dashboard" aria-label="<?php esc_attr_e('Account overview', 'routemile-woocommerce'); ?>">
+		<section class="routew-dashboard" aria-label="<?php esc_attr_e('Account overview', 'routemile-for-woocommerce'); ?>">
 
 			<header class="routew-dashboard__welcome">
 				<div class="routew-dashboard__welcome-text">
 					<span class="routew-dashboard__greeting-eyebrow">
-						<?php esc_html_e('Welcome back', 'routemile-woocommerce'); ?>
+						<?php esc_html_e('Welcome back', 'routemile-for-woocommerce'); ?>
 					</span>
 					<h2 class="routew-dashboard__greeting">
 						<?php
 						/* translators: %s: customer first name */
-						printf(esc_html__('Hi, %s 👋', 'routemile-woocommerce'), esc_html($this->first_name($user)));
+						printf(esc_html__('Hi, %s 👋', 'routemile-for-woocommerce'), esc_html($this->first_name($user)));
 						?>
 					</h2>
 					<p class="routew-dashboard__subgreeting">
 						<?php
 						if ($stats['active'] > 0) {
 							/* translators: %d: number of in-flight orders */
-							printf(esc_html(_n('You have %d order on the way.', 'You have %d orders on the way.', (int) $stats['active'], 'routemile-woocommerce')), (int) $stats['active']);
+							printf(esc_html(_n('You have %d order on the way.', 'You have %d orders on the way.', (int) $stats['active'], 'routemile-for-woocommerce')), (int) $stats['active']);
 						} elseif ($stats['total'] > 0) {
-							esc_html_e('Hungry again? Reorder your favourites in a tap.', 'routemile-woocommerce');
+							esc_html_e('Hungry again? Reorder your favourites in a tap.', 'routemile-for-woocommerce');
 						} else {
-							esc_html_e('Browse the menu and your first order is on the way to your door.', 'routemile-woocommerce');
+							esc_html_e('Browse the menu and your first order is on the way to your door.', 'routemile-for-woocommerce');
 						}
 						?>
 					</p>
@@ -159,13 +159,13 @@ class ROUTEW_My_Account
 					<a class="routew-dashboard__reorder"
 					   href="<?php echo esc_url(wp_nonce_url(add_query_arg('routew_reorder', $last_completed->get_id()), 'routew_reorder')); ?>">
 						<span class="routew-dashboard__reorder-icon" aria-hidden="true">↻</span>
-						<?php esc_html_e('Reorder last order', 'routemile-woocommerce'); ?>
+						<?php esc_html_e('Reorder last order', 'routemile-for-woocommerce'); ?>
 					</a>
 				<?php else : ?>
 					<a class="routew-dashboard__reorder routew-dashboard__reorder--ghost"
 					   href="<?php echo esc_url(function_exists('wc_get_page_id') ? get_permalink(wc_get_page_id('shop')) : home_url('/shop')); ?>">
 						<span class="routew-dashboard__reorder-icon" aria-hidden="true">→</span>
-						<?php esc_html_e('Browse menu', 'routemile-woocommerce'); ?>
+						<?php esc_html_e('Browse menu', 'routemile-for-woocommerce'); ?>
 					</a>
 				<?php endif; ?>
 			</header>
@@ -173,19 +173,19 @@ class ROUTEW_My_Account
 			<ul class="routew-dashboard__stats" role="list">
 				<li class="routew-stat routew-stat--active">
 					<span class="routew-stat__value"><?php echo esc_html((string) $stats['active']); ?></span>
-					<span class="routew-stat__label"><?php esc_html_e('On the way', 'routemile-woocommerce'); ?></span>
+					<span class="routew-stat__label"><?php esc_html_e('On the way', 'routemile-for-woocommerce'); ?></span>
 				</li>
 				<li class="routew-stat routew-stat--completed">
 					<span class="routew-stat__value"><?php echo esc_html((string) $stats['completed']); ?></span>
-					<span class="routew-stat__label"><?php esc_html_e('Delivered', 'routemile-woocommerce'); ?></span>
+					<span class="routew-stat__label"><?php esc_html_e('Delivered', 'routemile-for-woocommerce'); ?></span>
 				</li>
 				<li class="routew-stat routew-stat--total">
 					<span class="routew-stat__value"><?php echo esc_html((string) $stats['total']); ?></span>
-					<span class="routew-stat__label"><?php esc_html_e('All orders', 'routemile-woocommerce'); ?></span>
+					<span class="routew-stat__label"><?php esc_html_e('All orders', 'routemile-for-woocommerce'); ?></span>
 				</li>
 				<li class="routew-stat routew-stat--addresses">
 					<span class="routew-stat__value"><?php echo esc_html((string) $stats['addresses']); ?></span>
-					<span class="routew-stat__label"><?php esc_html_e('Addresses', 'routemile-woocommerce'); ?></span>
+					<span class="routew-stat__label"><?php esc_html_e('Addresses', 'routemile-for-woocommerce'); ?></span>
 				</li>
 			</ul>
 
@@ -194,11 +194,11 @@ class ROUTEW_My_Account
 				<section class="routew-dashboard__panel routew-dashboard__panel--orders" aria-labelledby="routew-dashboard-recent-heading">
 					<header class="routew-dashboard__panel-header">
 						<h3 class="routew-dashboard__panel-title" id="routew-dashboard-recent-heading">
-							<?php esc_html_e('Recent orders', 'routemile-woocommerce'); ?>
+							<?php esc_html_e('Recent orders', 'routemile-for-woocommerce'); ?>
 						</h3>
 						<a class="routew-dashboard__panel-link"
 						   href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('orders') : home_url('/my-account/orders/')); ?>">
-							<?php esc_html_e('View all', 'routemile-woocommerce'); ?>
+							<?php esc_html_e('View all', 'routemile-for-woocommerce'); ?>
 							<span aria-hidden="true">→</span>
 						</a>
 					</header>
@@ -206,9 +206,9 @@ class ROUTEW_My_Account
 					<?php if (empty($recent_orders)) : ?>
 						<div class="routew-dashboard__empty">
 							<span class="routew-dashboard__empty-icon" aria-hidden="true">🛒</span>
-							<p class="routew-dashboard__empty-title"><?php esc_html_e('No orders yet', 'routemile-woocommerce'); ?></p>
+							<p class="routew-dashboard__empty-title"><?php esc_html_e('No orders yet', 'routemile-for-woocommerce'); ?></p>
 							<p class="routew-dashboard__empty-text">
-								<?php esc_html_e('Your first order will appear here. Tap "Browse menu" to get started.', 'routemile-woocommerce'); ?>
+								<?php esc_html_e('Your first order will appear here. Tap "Browse menu" to get started.', 'routemile-for-woocommerce'); ?>
 							</p>
 						</div>
 					<?php else : ?>
@@ -223,11 +223,11 @@ class ROUTEW_My_Account
 				<aside class="routew-dashboard__panel routew-dashboard__panel--address" aria-labelledby="routew-dashboard-address-heading">
 					<header class="routew-dashboard__panel-header">
 						<h3 class="routew-dashboard__panel-title" id="routew-dashboard-address-heading">
-							<?php esc_html_e('Default delivery address', 'routemile-woocommerce'); ?>
+							<?php esc_html_e('Default delivery address', 'routemile-for-woocommerce'); ?>
 						</h3>
 						<a class="routew-dashboard__panel-link"
 						   href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>">
-							<?php esc_html_e('Manage', 'routemile-woocommerce'); ?>
+							<?php esc_html_e('Manage', 'routemile-for-woocommerce'); ?>
 							<span aria-hidden="true">→</span>
 						</a>
 					</header>
@@ -235,13 +235,13 @@ class ROUTEW_My_Account
 					<?php if (empty($default_address)) : ?>
 						<div class="routew-dashboard__empty routew-dashboard__empty--compact">
 							<span class="routew-dashboard__empty-icon" aria-hidden="true">📍</span>
-							<p class="routew-dashboard__empty-title"><?php esc_html_e('No address saved', 'routemile-woocommerce'); ?></p>
+							<p class="routew-dashboard__empty-title"><?php esc_html_e('No address saved', 'routemile-for-woocommerce'); ?></p>
 							<p class="routew-dashboard__empty-text">
-								<?php esc_html_e('Add a delivery address to speed up your next order.', 'routemile-woocommerce'); ?>
+								<?php esc_html_e('Add a delivery address to speed up your next order.', 'routemile-for-woocommerce'); ?>
 							</p>
 							<a class="routew-dashboard__empty-cta"
 							   href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>">
-								<?php esc_html_e('Add address', 'routemile-woocommerce'); ?>
+								<?php esc_html_e('Add address', 'routemile-for-woocommerce'); ?>
 							</a>
 						</div>
 					<?php else : ?>
@@ -289,7 +289,7 @@ class ROUTEW_My_Account
 				<a class="routew-order-item__number" href="<?php echo esc_url($order_url); ?>">
 					<?php
 					/* translators: %d: order number */
-					printf(esc_html__('#%d', 'routemile-woocommerce'), (int) $order->get_order_number());
+					printf(esc_html__('#%d', 'routemile-for-woocommerce'), (int) $order->get_order_number());
 					?>
 				</a>
 				<span class="routew-order-item__date"><?php echo esc_html($date_str); ?></span>
@@ -304,7 +304,7 @@ class ROUTEW_My_Account
 						<span class="routew-order-item__count">
 							<?php
 							/* translators: %d: item count */
-							printf(esc_html(_n('· %d item', '· %d items', (int) $item_count, 'routemile-woocommerce')), (int) $item_count);
+							printf(esc_html(_n('· %d item', '· %d items', (int) $item_count, 'routemile-for-woocommerce')), (int) $item_count);
 							?>
 						</span>
 					<?php endif; ?>
@@ -313,9 +313,9 @@ class ROUTEW_My_Account
 			<div class="routew-order-item__action">
 				<a class="routew-order-item__view" href="<?php echo esc_url($order_url); ?>" aria-label="<?php
 					/* translators: %d: order number */
-					printf(esc_attr__('View order %d', 'routemile-woocommerce'), (int) $order->get_order_number());
+					printf(esc_attr__('View order %d', 'routemile-for-woocommerce'), (int) $order->get_order_number());
 					?>">
-					<?php esc_html_e('View', 'routemile-woocommerce'); ?>
+					<?php esc_html_e('View', 'routemile-for-woocommerce'); ?>
 				</a>
 			</div>
 		</li>
@@ -367,7 +367,7 @@ class ROUTEW_My_Account
 			$parts = preg_split('/\s+/', $display, 2);
 			return $parts[0];
 		}
-		return __('there', 'routemile-woocommerce');
+		return __('there', 'routemile-for-woocommerce');
 	}
 
 	/**
@@ -531,10 +531,10 @@ class ROUTEW_My_Account
 		$label  = '';
 		if (!empty($shipping['line1'])) {
 			$chosen = $shipping;
-			$label  = __('Shipping', 'routemile-woocommerce');
+			$label  = __('Shipping', 'routemile-for-woocommerce');
 		} elseif (!empty($billing['line1'])) {
 			$chosen = $billing;
-			$label  = __('Billing', 'routemile-woocommerce');
+			$label  = __('Billing', 'routemile-for-woocommerce');
 		} else {
 			return array();
 		}

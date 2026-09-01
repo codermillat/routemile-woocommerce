@@ -101,7 +101,7 @@ class ROUTEW_Checkout
         }
 
         if (function_exists('wc_print_notice')) {
-            $message = __('We are currently closed for deliveries. You can browse and fill your cart — ordering will be available as soon as we reopen.', 'routemile-woocommerce');
+            $message = __('We are currently closed for deliveries. You can browse and fill your cart — ordering will be available as soon as we reopen.', 'routemile-for-woocommerce');
             if (class_exists('ROUTEW_Store_Hours')) {
                 $hint = ROUTEW_Store_Hours::reopen_hint();
                 if ('' !== $hint) {
@@ -141,7 +141,7 @@ class ROUTEW_Checkout
         // doesn't render duplicates.
         $notices_html = '';
         if (!self::is_store_open()) {
-            $message = __('We are currently closed for deliveries. You can browse and fill your cart — ordering will be available as soon as we reopen.', 'routemile-woocommerce');
+            $message = __('We are currently closed for deliveries. You can browse and fill your cart — ordering will be available as soon as we reopen.', 'routemile-for-woocommerce');
             if (class_exists('ROUTEW_Store_Hours')) {
                 $hint = ROUTEW_Store_Hours::reopen_hint();
                 if ('' !== $hint) {
@@ -185,8 +185,8 @@ class ROUTEW_Checkout
         self::render_location_picker();
         ?>
         <div id="routew-delivery-details-container" style="margin-top: 20px;">
-            <h3><?php esc_html_e('Step 2: Enter Your Delivery Details', 'routemile-woocommerce'); ?></h3>
-            <p><?php esc_html_e('Please provide complete details to help our delivery agent find you easily.', 'routemile-woocommerce'); ?>
+            <h3><?php esc_html_e('Step 2: Enter Your Delivery Details', 'routemile-for-woocommerce'); ?></h3>
+            <p><?php esc_html_e('Please provide complete details to help our delivery agent find you easily.', 'routemile-for-woocommerce'); ?>
             </p>
 
             <?php
@@ -196,8 +196,8 @@ class ROUTEW_Checkout
             woocommerce_form_field('routew_address_details', array(
                 'type' => 'text',
                 'class' => array('form-row-wide'),
-                'label' => __('House / Flat / Building No.', 'routemile-woocommerce'),
-                'placeholder' => __('e.g., Flat 4B, House 25, Tower A, Block 2', 'routemile-woocommerce'),
+                'label' => __('House / Flat / Building No.', 'routemile-for-woocommerce'),
+                'placeholder' => __('e.g., Flat 4B, House 25, Tower A, Block 2', 'routemile-for-woocommerce'),
                 'required' => true,
             ), isset($saved_profile['address_details']) ? $saved_profile['address_details'] : WC()->checkout->get_value('routew_address_details'));
 
@@ -205,8 +205,8 @@ class ROUTEW_Checkout
             woocommerce_form_field('routew_landmark', array(
                 'type' => 'text',
                 'class' => array('form-row-wide'),
-                'label' => __('Nearby Landmark (optional)', 'routemile-woocommerce'),
-                'placeholder' => __('e.g., Near City Mall, Opposite Park', 'routemile-woocommerce'),
+                'label' => __('Nearby Landmark (optional)', 'routemile-for-woocommerce'),
+                'placeholder' => __('e.g., Near City Mall, Opposite Park', 'routemile-for-woocommerce'),
                 'required' => false,
             ), isset($saved_profile['landmark']) ? $saved_profile['landmark'] : WC()->checkout->get_value('routew_landmark'));
 
@@ -214,8 +214,8 @@ class ROUTEW_Checkout
             woocommerce_form_field('routew_delivery_instructions', array(
                 'type' => 'textarea',
                 'class' => array('form-row-wide'),
-                'label' => __('Delivery Instructions', 'routemile-woocommerce'),
-                'placeholder' => __('e.g., Ring the bell twice, Leave at the door, Call before arriving...', 'routemile-woocommerce'),
+                'label' => __('Delivery Instructions', 'routemile-for-woocommerce'),
+                'placeholder' => __('e.g., Ring the bell twice, Leave at the door, Call before arriving...', 'routemile-for-woocommerce'),
                 'required' => false,
                 'custom_attributes' => array(
                     'rows' => 2,
@@ -242,15 +242,15 @@ class ROUTEW_Checkout
         ob_start();
         ?>
         <div id="routew-location-picker-container">
-            <h3><?php esc_html_e('Step 1: Select Your Location on Map', 'routemile-woocommerce'); ?></h3>
-            <p><?php esc_html_e('Search for your area, use current location, or drag the marker to set your exact delivery point.', 'routemile-woocommerce'); ?>
+            <h3><?php esc_html_e('Step 1: Select Your Location on Map', 'routemile-for-woocommerce'); ?></h3>
+            <p><?php esc_html_e('Search for your area, use current location, or drag the marker to set your exact delivery point.', 'routemile-for-woocommerce'); ?>
             </p>
 
             <div class="routew-location-search-wrapper">
                 <input id="routew-location-search-input" type="text"
-                    placeholder="<?php esc_attr_e('Search for your area or landmark...', 'routemile-woocommerce'); ?>" class="input-text"
+                    placeholder="<?php esc_attr_e('Search for your area or landmark...', 'routemile-for-woocommerce'); ?>" class="input-text"
                     value="" />
-                <a href="#" id="routew-get-location" class="button"><?php esc_html_e('Use My Location', 'routemile-woocommerce'); ?></a>
+                <a href="#" id="routew-get-location" class="button"><?php esc_html_e('Use My Location', 'routemile-for-woocommerce'); ?></a>
             </div>
 
             <div id="routew-map" style="height: 300px; margin: 20px 0;"></div>
@@ -258,7 +258,7 @@ class ROUTEW_Checkout
             <!-- Display selected location (read-only, from map) -->
             <div id="routew-selected-location" class="routew-selected-location"
                 style="display:none; padding: 10px; background: #f8f9fa; border-left: 3px solid #28a745; margin-bottom: 20px;">
-                <strong><?php esc_html_e('Selected Location:', 'routemile-woocommerce'); ?></strong>
+                <strong><?php esc_html_e('Selected Location:', 'routemile-for-woocommerce'); ?></strong>
                 <span id="routew-selected-address"></span>
             </div>
 

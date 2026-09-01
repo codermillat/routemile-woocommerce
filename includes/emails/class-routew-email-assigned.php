@@ -22,10 +22,10 @@ class ROUTEW_Email_Assigned extends WC_Email
     {
         $this->id = 'routew_order_assigned';
         $this->customer_email = true;
-        $this->title = __('Driver Assigned', 'routemile-woocommerce');
-        $this->description = __('This email is sent when a delivery driver is assigned to the order.', 'routemile-woocommerce');
-        $this->heading = __('A driver has been assigned!', 'routemile-woocommerce');
-        $this->subject = __('[{site_title}]: Driver assigned to your order #{order_number}', 'routemile-woocommerce');
+        $this->title = __('Driver Assigned', 'routemile-for-woocommerce');
+        $this->description = __('This email is sent when a delivery driver is assigned to the order.', 'routemile-for-woocommerce');
+        $this->heading = __('A driver has been assigned!', 'routemile-for-woocommerce');
+        $this->subject = __('[{site_title}]: Driver assigned to your order #{order_number}', 'routemile-for-woocommerce');
 
         $this->template_html = 'emails/routew-order-status.php';
         $this->template_plain = 'emails/plain/routew-order-status.php';
@@ -49,7 +49,7 @@ class ROUTEW_Email_Assigned extends WC_Email
      */
     public function get_default_subject()
     {
-        return __('[{site_title}]: Driver assigned to your order #{order_number}', 'routemile-woocommerce');
+        return __('[{site_title}]: Driver assigned to your order #{order_number}', 'routemile-for-woocommerce');
     }
 
     /**
@@ -59,7 +59,7 @@ class ROUTEW_Email_Assigned extends WC_Email
      */
     public function get_default_heading()
     {
-        return __('A driver is on the way! 🚗', 'routemile-woocommerce');
+        return __('A driver is on the way! 🚗', 'routemile-for-woocommerce');
     }
 
     /**
@@ -103,7 +103,7 @@ class ROUTEW_Email_Assigned extends WC_Email
                 'order' => $this->object,
                 'email_heading' => $this->get_heading(),
                 'additional_content' => $this->get_additional_content(),
-                'status_message' => __('A delivery driver is on their way to pick up your order.', 'routemile-woocommerce'),
+                'status_message' => __('A delivery driver is on their way to pick up your order.', 'routemile-for-woocommerce'),
                 'sent_to_admin' => false,
                 'plain_text' => false,
                 'email' => $this,
@@ -126,7 +126,7 @@ class ROUTEW_Email_Assigned extends WC_Email
                 'order' => $this->object,
                 'email_heading' => $this->get_heading(),
                 'additional_content' => $this->get_additional_content(),
-                'status_message' => __('A delivery driver is on their way to pick up your order.', 'routemile-woocommerce'),
+                'status_message' => __('A delivery driver is on their way to pick up your order.', 'routemile-for-woocommerce'),
                 'sent_to_admin' => false,
                 'plain_text' => true,
                 'email' => $this,
@@ -143,6 +143,6 @@ class ROUTEW_Email_Assigned extends WC_Email
      */
     public function get_default_additional_content()
     {
-        return __('Your order will arrive soon!', 'routemile-woocommerce');
+        return __('Your order will arrive soon!', 'routemile-for-woocommerce');
     }
 }

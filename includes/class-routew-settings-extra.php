@@ -80,7 +80,7 @@ class ROUTEW_Settings_Extra
 			if (preg_match('/^-?\d{1,3}(\.\d+)?\s*,\s*-?\d{1,3}(\.\d+)?$/', $raw) && abs($lat) <= 90 && abs($lng) <= 180) {
 				$sanitized['routew_restaurant_latlng'] = $raw;
 			} else {
-				set_transient('routew_admin_notice', __('Restaurant Coordinates were out of range or malformed; previous value kept.', 'routemile-woocommerce'), 30);
+				set_transient('routew_admin_notice', __('Restaurant Coordinates were out of range or malformed; previous value kept.', 'routemile-for-woocommerce'), 30);
 			}
 		}
 

@@ -8,7 +8,7 @@
  * Author URI:        https://millat.is-a.dev/
  * License:           GPL-3.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain:       routemile-woocommerce
+ * Text Domain:       routemile-for-woocommerce
  * Domain Path:       /languages
  * Requires at least: 6.0
  * Tested up to:      7.1
@@ -41,7 +41,7 @@ if (!function_exists('routew_woocommerce_not_active_notice')) {
     {
         ?>
         <div class="error">
-            <p><?php esc_html_e('RouteMile for WooCommerce requires WooCommerce to be installed and active.', 'routemile-woocommerce'); ?></p>
+            <p><?php esc_html_e('RouteMile for WooCommerce requires WooCommerce to be installed and active.', 'routemile-for-woocommerce'); ?></p>
         </div>
         <?php
     }
@@ -140,6 +140,9 @@ if (!function_exists('routew_migrate_legacy_fxw_data')) {
             '_routew_delivery_profile'     => '_fxw_delivery_profile',
         );
         foreach ($meta_map as $new_key => $old_key) {
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            // One-time FXW→RouteMile meta-key migration; runs once per install
+            // at plugins_loaded priority 1 and never on the request hot path.
             $count = (int) $wpdb->query(
                 $wpdb->prepare(
                     "UPDATE {$wpdb->postmeta} SET meta_key = %s WHERE meta_key = %s",
@@ -154,6 +157,7 @@ if (!function_exists('routew_migrate_legacy_fxw_data')) {
                     $old_key
                 )
             );
+            // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             if ($count > 0 && defined('WP_DEBUG') && WP_DEBUG) {
                 // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
                 error_log(sprintf('routew migration: rewrote %d post meta rows from %s to %s', $count, $old_key, $new_key));
@@ -168,6 +172,7 @@ if (!function_exists('routew_migrate_legacy_fxw_data')) {
             'wc-routew-picked-up'  => 'wc-fxw-picked-up',
         );
         foreach ($status_map as $new_status => $old_status) {
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $wpdb->query(
                 $wpdb->prepare(
                     "UPDATE {$wpdb->posts} SET post_status = %s WHERE post_status = %s",
@@ -183,13 +188,17 @@ if (!function_exists('routew_migrate_legacy_fxw_data')) {
                     $old_status
                 )
             );
+            // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             if (defined('WP_DEBUG') && WP_DEBUG) {
+                // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+                // Debug-only row count; not on the request hot path.
                 $count = (int) $wpdb->get_var(
                     $wpdb->prepare(
                         "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_status = %s",
                         $new_status
                     )
                 );
+                // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                 if ($count > 0) {
                     // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
                     error_log(sprintf('routew migration: %d legacy orders are now on status %s', $count, $new_status));
@@ -213,7 +222,7 @@ if (!function_exists('routew_init_plugin')) {
         if (version_compare(PHP_VERSION, '7.4', '<')) {
             add_action('admin_notices', function () {
                 echo '<div class="error"><p>';
-                esc_html_e('RouteMile for WooCommerce requires PHP 7.4 or higher.', 'routemile-woocommerce');
+                esc_html_e('RouteMile for WooCommerce requires PHP 7.4 or higher.', 'routemile-for-woocommerce');
                 echo '</p></div>';
             });
             return;
@@ -224,7 +233,7 @@ if (!function_exists('routew_init_plugin')) {
         if (version_compare($wp_version, '6.0', '<')) {
             add_action('admin_notices', function () {
                 echo '<div class="error"><p>';
-                esc_html_e('RouteMile for WooCommerce requires WordPress 6.0 or higher.', 'routemile-woocommerce');
+                esc_html_e('RouteMile for WooCommerce requires WordPress 6.0 or higher.', 'routemile-for-woocommerce');
                 echo '</p></div>';
             });
             return;
@@ -240,13 +249,14 @@ if (!function_exists('routew_init_plugin')) {
         if (defined('WC_VERSION') && version_compare(WC_VERSION, '7.0', '<')) {
             add_action('admin_notices', function () {
                 echo '<div class="error"><p>';
-                esc_html_e('RouteMile for WooCommerce requires WooCommerce 7.0 or higher.', 'routemile-woocommerce');
+                esc_html_e('RouteMile for WooCommerce requires WooCommerce 7.0 or higher.', 'routemile-for-woocommerce');
                 echo '</p></div>';
             });
             return;
         }
 
-        load_plugin_textdomain('routemile-woocommerce', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        // Translations are loaded automatically by WordPress.org for plugins
+        // hosted there; no manual load_plugin_textdomain() call needed (since WP 4.6).
 
         require_once ROUTEW_PLUGIN_DIR . 'includes/class-routew-core.php';
 

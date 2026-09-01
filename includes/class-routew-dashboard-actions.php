@@ -40,12 +40,12 @@ class ROUTEW_Dashboard_Actions
 	public function assign_delivery()
 	{
 		if (!current_user_can('edit_shop_orders')) {
-			wp_die(__('Unauthorized.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Unauthorized.', 'routemile-for-woocommerce'));
 		}
 
 		$nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
 		if (!wp_verify_nonce($nonce, 'routew_assign_delivery')) {
-			wp_die(__('Invalid nonce.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Invalid nonce.', 'routemile-for-woocommerce'));
 		}
 
 		$order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
@@ -53,12 +53,12 @@ class ROUTEW_Dashboard_Actions
 
 		$order = wc_get_order($order_id);
 		if (!$order) {
-			wp_die(__('Invalid order.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Invalid order.', 'routemile-for-woocommerce'));
 		}
 
 		// Log before assignment
 		if (function_exists('wc_get_logger')) {
-			wc_get_logger()->debug(sprintf('assign_delivery: Order #%d, delivery_boy_id=%d, current_status=%s', $order_id, $delivery_boy_id, $order->get_status()), array('source' => 'routemile-woocommerce'));
+			wc_get_logger()->debug(sprintf('assign_delivery: Order #%d, delivery_boy_id=%d, current_status=%s', $order_id, $delivery_boy_id, $order->get_status()), array('source' => 'routemile-for-woocommerce'));
 		}
 
 		if ($delivery_boy_id) {
@@ -66,14 +66,16 @@ class ROUTEW_Dashboard_Actions
 			$delivery_boy_name = $delivery_boy ? $delivery_boy->display_name : "ID: {$delivery_boy_id}";
 
 			$order->update_meta_data('_routew_delivery_boy_id', $delivery_boy_id);
-			$order->update_status('routew-assigned', sprintf(__('Order assigned to delivery boy: %s', 'routemile-woocommerce'), $delivery_boy_name));
+			/* translators: %s: delivery agent display name. */
+			$order->update_status('routew-assigned', sprintf(__('Order assigned to delivery boy: %s', 'routemile-for-woocommerce'), $delivery_boy_name));
 			$order->save();
 
 			if (function_exists('wc_get_logger')) {
-				wc_get_logger()->debug(sprintf('assign_delivery: Order #%d saved, new_status=%s, delivery_boy_id=%d', $order_id, $order->get_status(), $delivery_boy_id), array('source' => 'routemile-woocommerce'));
+				wc_get_logger()->debug(sprintf('assign_delivery: Order #%d saved, new_status=%s, delivery_boy_id=%d', $order_id, $order->get_status(), $delivery_boy_id), array('source' => 'routemile-for-woocommerce'));
 			}
 
-			set_transient('routew_admin_notice', sprintf(__('Order #%s successfully assigned to %s', 'routemile-woocommerce'), $order->get_order_number(), $delivery_boy_name), 30);
+			/* translators: 1: order number, 2: delivery agent display name. */
+			set_transient('routew_admin_notice', sprintf(__('Order #%1$s successfully assigned to %2$s', 'routemile-for-woocommerce'), $order->get_order_number(), $delivery_boy_name), 30);
 		} else {
 			// Unassign: drop the rider meta AND revert the order to a
 			// pre-assignment status so it stops showing on the assigned
@@ -84,10 +86,11 @@ class ROUTEW_Dashboard_Actions
 			// safety.
 			$order->delete_meta_data('_routew_delivery_boy_id');
 			$revert_to = get_post_status_object('wc-routew-in-kitchen') ? 'routew-in-kitchen' : 'processing';
-			$order->update_status($revert_to, __('Delivery boy unassigned — order returned to kitchen.', 'routemile-woocommerce'));
+			$order->update_status($revert_to, __('Delivery boy unassigned — order returned to kitchen.', 'routemile-for-woocommerce'));
 			$order->save();
 
-			set_transient('routew_admin_notice', sprintf(__('Order #%s unassigned from delivery boy', 'routemile-woocommerce'), $order->get_order_number()), 30);
+			/* translators: %s: order number. */
+			set_transient('routew_admin_notice', sprintf(__('Order #%s unassigned from delivery boy', 'routemile-for-woocommerce'), $order->get_order_number()), 30);
 		}
 
 		// Clear WooCommerce caches for this order
@@ -108,12 +111,12 @@ class ROUTEW_Dashboard_Actions
 	public function update_order_status()
 	{
 		if (!current_user_can('edit_shop_orders')) {
-			wp_die(__('Unauthorized.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Unauthorized.', 'routemile-for-woocommerce'));
 		}
 
 		$nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
 		if (!wp_verify_nonce($nonce, 'routew_update_status')) {
-			wp_die(__('Invalid nonce.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Invalid nonce.', 'routemile-for-woocommerce'));
 		}
 
 		$order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
@@ -121,12 +124,12 @@ class ROUTEW_Dashboard_Actions
 
 		$order = wc_get_order($order_id);
 		if (!$order) {
-			wp_die(__('Invalid order.', 'routemile-woocommerce'));
+			wp_die(esc_html__('Invalid order.', 'routemile-for-woocommerce'));
 		}
 
 		$valid_statuses = array('routew-in-kitchen', 'routew-assigned', 'routew-picked-up', 'completed', 'cancelled');
 		if (in_array($new_status, $valid_statuses, true)) {
-			$order->update_status($new_status, __('Status updated from dashboard.', 'routemile-woocommerce'));
+			$order->update_status($new_status, __('Status updated from dashboard.', 'routemile-for-woocommerce'));
 		}
 
 		$referer = wp_get_referer();
@@ -143,12 +146,12 @@ class ROUTEW_Dashboard_Actions
 	{
 		// Security checks
 		if (!current_user_can('edit_shop_orders')) {
-			wp_send_json_error(array('message' => __('Unauthorized.', 'routemile-woocommerce')), 403);
+			wp_send_json_error(array('message' => __('Unauthorized.', 'routemile-for-woocommerce')), 403);
 		}
 
 		$nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
 		if (!wp_verify_nonce($nonce, 'routew_dashboard_nonce')) {
-			wp_send_json_error(array('message' => __('Security check failed.', 'routemile-woocommerce')), 403);
+			wp_send_json_error(array('message' => __('Security check failed.', 'routemile-for-woocommerce')), 403);
 		}
 
 		$order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
@@ -156,7 +159,7 @@ class ROUTEW_Dashboard_Actions
 
 		$order = wc_get_order($order_id);
 		if (!$order) {
-			wp_send_json_error(array('message' => __('Invalid order.', 'routemile-woocommerce')), 400);
+			wp_send_json_error(array('message' => __('Invalid order.', 'routemile-for-woocommerce')), 400);
 		}
 
 		if ($delivery_boy_id) {
@@ -164,7 +167,8 @@ class ROUTEW_Dashboard_Actions
 			$delivery_boy_name = $delivery_boy ? $delivery_boy->display_name : "ID: {$delivery_boy_id}";
 
 			$order->update_meta_data('_routew_delivery_boy_id', $delivery_boy_id);
-			$order->update_status('routew-assigned', sprintf(__('Order assigned to delivery boy: %s', 'routemile-woocommerce'), $delivery_boy_name));
+			/* translators: %s: delivery agent display name. */
+			$order->update_status('routew-assigned', sprintf(__('Order assigned to delivery boy: %s', 'routemile-for-woocommerce'), $delivery_boy_name));
 			$order->save();
 
 			if (function_exists('wc_delete_shop_order_transients')) {
@@ -172,7 +176,8 @@ class ROUTEW_Dashboard_Actions
 			}
 
 			wp_send_json_success(array(
-				'message' => sprintf(__('Order #%s assigned to %s', 'routemile-woocommerce'), $order->get_order_number(), $delivery_boy_name),
+				/* translators: 1: order number, 2: delivery agent display name. */
+				'message' => sprintf(__('Order #%1$s assigned to %2$s', 'routemile-for-woocommerce'), $order->get_order_number(), $delivery_boy_name),
 				'order_id' => $order_id,
 				'delivery_boy_id' => $delivery_boy_id,
 				'delivery_boy_name' => $delivery_boy_name,
@@ -184,7 +189,7 @@ class ROUTEW_Dashboard_Actions
 			// routew-assigned with no rider (1.2.16).
 			$order->delete_meta_data('_routew_delivery_boy_id');
 			$revert_to = get_post_status_object('wc-routew-in-kitchen') ? 'routew-in-kitchen' : 'processing';
-			$order->update_status($revert_to, __('Delivery boy unassigned — order returned to kitchen.', 'routemile-woocommerce'));
+			$order->update_status($revert_to, __('Delivery boy unassigned — order returned to kitchen.', 'routemile-for-woocommerce'));
 			$order->save();
 
 			if (function_exists('wc_delete_shop_order_transients')) {
@@ -192,7 +197,8 @@ class ROUTEW_Dashboard_Actions
 			}
 
 			wp_send_json_success(array(
-				'message' => sprintf(__('Order #%s unassigned', 'routemile-woocommerce'), $order->get_order_number()),
+				/* translators: %s: order number. */
+				'message' => sprintf(__('Order #%s unassigned', 'routemile-for-woocommerce'), $order->get_order_number()),
 				'order_id' => $order_id,
 				'delivery_boy_id' => 0,
 				'delivery_boy_name' => '',
@@ -211,12 +217,12 @@ class ROUTEW_Dashboard_Actions
 	{
 		// Security checks
 		if (!current_user_can('edit_shop_orders')) {
-			wp_send_json_error(array('message' => __('Unauthorized.', 'routemile-woocommerce')), 403);
+			wp_send_json_error(array('message' => __('Unauthorized.', 'routemile-for-woocommerce')), 403);
 		}
 
 		$nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
 		if (!wp_verify_nonce($nonce, 'routew_dashboard_nonce')) {
-			wp_send_json_error(array('message' => __('Security check failed.', 'routemile-woocommerce')), 403);
+			wp_send_json_error(array('message' => __('Security check failed.', 'routemile-for-woocommerce')), 403);
 		}
 
 		$order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
@@ -224,18 +230,19 @@ class ROUTEW_Dashboard_Actions
 
 		$order = wc_get_order($order_id);
 		if (!$order) {
-			wp_send_json_error(array('message' => __('Invalid order.', 'routemile-woocommerce')), 400);
+			wp_send_json_error(array('message' => __('Invalid order.', 'routemile-for-woocommerce')), 400);
 		}
 
 		$valid_statuses = array('routew-in-kitchen', 'routew-assigned', 'routew-picked-up', 'completed', 'cancelled');
 		if (!in_array($new_status, $valid_statuses, true)) {
-			wp_send_json_error(array('message' => __('Invalid status.', 'routemile-woocommerce')), 400);
+			wp_send_json_error(array('message' => __('Invalid status.', 'routemile-for-woocommerce')), 400);
 		}
 
-		$order->update_status($new_status, __('Status updated from dashboard.', 'routemile-woocommerce'));
+		$order->update_status($new_status, __('Status updated from dashboard.', 'routemile-for-woocommerce'));
 
 		wp_send_json_success(array(
-			'message' => sprintf(__('Order #%s updated to %s', 'routemile-woocommerce'), $order->get_order_number(), wc_get_order_status_name($new_status)),
+			/* translators: 1: order number, 2: new order status label. */
+			'message' => sprintf(__('Order #%1$s updated to %2$s', 'routemile-for-woocommerce'), $order->get_order_number(), wc_get_order_status_name($new_status)),
 			'order_id' => $order_id,
 			'new_status' => $new_status,
 			'status_label' => wc_get_order_status_name($new_status),
