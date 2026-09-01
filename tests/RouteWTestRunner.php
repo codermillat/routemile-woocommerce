@@ -936,6 +936,93 @@ class ROUTEWTestRunner
             $this->fail('UI4 edit account page missing styles for .woocommerce-EditAccountForm fieldset');
         }
 
+        // UI5 — DoorDash-style View Order upgrade.
+        // Verifies the tracking block has the new hero header, the stepper
+        // has timestamp + body structure, the driver card has avatar + call
+        // + message actions, and the view-order page has item-card styling
+        // for product line items.
+
+        // Tracking block — hero header with status badge + placed date.
+        $shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+        $hero_signals = array(
+            'routew-order-tracking__hero' => 'hero header',
+            'routew-order-tracking__hero-eyebrow' => 'hero eyebrow',
+            'routew-order-tracking__hero-title' => 'hero title',
+            'routew-order-tracking__hero-subtitle' => 'hero subtitle with placed date',
+            'routew-order-tracking__hero-badge' => 'hero status badge',
+        );
+        $missing_hero = array();
+        foreach ($hero_signals as $needle => $label) {
+            if (false === strpos($shortcodes_php, $needle)) {
+                $missing_hero[] = $label;
+            }
+        }
+        if (empty($missing_hero)) {
+            $this->pass('UI5 tracking block has DoorDash-style hero header');
+        } else {
+            $this->fail('UI5 tracking hero missing signals: ' . implode(', ', $missing_hero));
+        }
+
+        // Stepper — step bodies with label + timestamp.
+        $step_signals = array(
+            'routew-status-step__body' => 'step body wrapper',
+            'routew-status-step__time' => 'timestamp',
+            'routew-status-step--current' => 'current-step pulse class',
+        );
+        $missing_step = array();
+        foreach ($step_signals as $needle => $label) {
+            if (false === strpos($shortcodes_php, $needle)) {
+                $missing_step[] = $label;
+            }
+        }
+        if (empty($missing_step)) {
+            $this->pass('UI5 stepper has body + timestamp + current-step pulse');
+        } else {
+            $this->fail('UI5 stepper missing signals: ' . implode(', ', $missing_step));
+        }
+
+        // Driver card — avatar circle + call + message actions.
+        $driver_signals = array(
+            'routew-delivery-contact__avatar' => 'avatar circle',
+            'routew-delivery-contact__actions' => 'action buttons row',
+            'routew-delivery-contact__btn' => 'primary call/message button',
+            'href="sms:' => 'SMS / message link',
+            'href="tel:' => 'tel / call link',
+        );
+        $missing_driver = array();
+        foreach ($driver_signals as $needle => $label) {
+            if (false === strpos($shortcodes_php, $needle)) {
+                $missing_driver[] = $label;
+            }
+        }
+        if (empty($missing_driver)) {
+            $this->pass('UI5 driver card has avatar + Call + Message actions');
+        } else {
+            $this->fail('UI5 driver card missing signals: ' . implode(', ', $missing_driver));
+        }
+
+        // CSS — hero header, product card thumbs, sticky bar, pulse animation.
+        $my_account_css = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
+        $css_signals = array(
+            'routew-order-tracking__hero' => 'hero header CSS',
+            'product-thumbnail img' => 'product thumbnail styling',
+            'routew-status-step__body' => 'step body CSS',
+            '@keyframes routew-step-pulse' => 'current-step pulse animation',
+            'routew-delivery-contact__avatar' => 'driver avatar CSS',
+            'routew-delivery-contact__btn' => 'driver action button CSS',
+        );
+        $missing_css = array();
+        foreach ($css_signals as $needle => $label) {
+            if (false === strpos($my_account_css, $needle)) {
+                $missing_css[] = $label;
+            }
+        }
+        if (empty($missing_css)) {
+            $this->pass('UI5 my-account.css has all DoorDash-style CSS signals');
+        } else {
+            $this->fail('UI5 my-account.css missing CSS signals: ' . implode(', ', $missing_css));
+        }
+
         echo "\n";
     }
 

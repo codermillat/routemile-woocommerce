@@ -826,3 +826,601 @@
 	color: #1E6FB8;
 	background: #E7F1FB;
 }
+
+/* ============================================================================
+   11. DoorDash-style View Order layout — hero header, item cards, sticky bar.
+   (1.5.0 polish layer; CSS-only — no template changes. WC stock markup
+   is restyled in place via class targeting.)
+   ============================================================================ */
+
+/* 11.1. Hero header card — replaces the plain "Order #32" h2 with a big
+   gradient header containing the order number, status pill, and a
+   prominent Re-order CTA. */
+.woocommerce-account.routew-my-account-styled .woocommerce-order > header.woocommerce-OrderHeader,
+.woocommerce-account.routew-my-account-styled .woocommerce-order > h2:first-of-type {
+	background: linear-gradient(135deg, #FFF4ED 0%, #FFE7D6 60%, #FFD6B5 100%);
+	border: 1px solid rgba(232, 93, 4, 0.18);
+	border-radius: var(--bs-border-radius);
+	padding: 20px 24px;
+	margin: 0 0 18px;
+	color: var(--bs-body-color);
+	box-shadow: 0 1px 2px rgba(20, 14, 8, 0.04);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-order > header h1,
+.woocommerce-account.routew-my-account-styled .woocommerce-order > h2:first-of-type {
+	margin: 0;
+	padding: 0;
+	border-bottom: none;
+	font-size: 1.6em;
+	font-weight: 800;
+	color: var(--bs-body-color);
+	letter-spacing: -0.02em;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-order > header h1::before,
+.woocommerce-account.routew-my-account-styled .woocommerce-order > h2:first-of-type::before {
+	display: none;
+}
+
+/* Meta strip under the order header: order number + date + total */
+.woocommerce-account.routew-my-account-styled .woocommerce-order > header .woocommerce-OrderHeader-meta,
+.woocommerce-account.routew-my-account-styled .woocommerce-order .order_meta_heading {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid rgba(232, 93, 4, 0.18);
+	font-size: 0.88em;
+	color: #4A4A4A;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-order > header .woocommerce-OrderHeader-meta strong,
+.woocommerce-account.routew-my-account-styled .woocommerce-order .order_meta_heading strong {
+	font-weight: 600;
+	color: var(--bs-body-color);
+}
+
+/* 11.2. Item cards — replace the plain PRODUCT/TOTAL table rows with
+   card-like rows. We target the existing WC table and re-style the cells
+   so each line item looks like a card. */
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tbody tr {
+	background: #fff;
+	transition: background 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tbody tr:hover {
+	background: rgba(232, 93, 4, 0.03);
+}
+
+/* Product name cell gets the visual weight of a card title */
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tbody td.product-name {
+	font-weight: 600;
+	color: var(--bs-body-color);
+	font-size: 0.98em;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tbody td.product-name a {
+	color: var(--bs-body-color);
+	text-decoration: none;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tbody td.product-name a:hover {
+	color: var(--bs-primary);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tbody td.product-quantity {
+	color: #6B6B6B;
+	font-size: 0.92em;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tbody td.product-total {
+	font-weight: 700;
+	color: var(--bs-body-color);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Product thumbnail — show image at a reasonable size */
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details .product-thumbnail img {
+	width: 56px;
+	height: 56px;
+	object-fit: cover;
+	border-radius: 8px;
+	border: 1px solid var(--bs-border-color);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details .product-thumbnail {
+	width: 72px;
+	padding: 12px 8px 12px 14px;
+}
+
+/* 11.3. Order totals breakdown — sub-rows get subdued styling, final
+   total row gets emphasis. */
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tfoot tr:first-child th,
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tfoot tr:first-child td {
+	color: #6B6B6B;
+	font-size: 0.92em;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tfoot tr.order-total th,
+.woocommerce-account.routew-my-account-styled .woocommerce-table--order-details tfoot tr.order-total td {
+	background: rgba(232, 93, 4, 0.04);
+	border-top: 1px solid rgba(232, 93, 4, 0.15) !important;
+	color: var(--bs-primary);
+	font-size: 1.05em;
+	font-weight: 700;
+}
+
+/* 11.4. Action bar — Re-order + Track + Contact buttons grouped into a
+   sticky-on-mobile bar at the bottom of the view-order page. */
+.woocommerce-account.routew-my-account-styled .woocommerce-order .order-again {
+	margin-top: 12px;
+}
+
+/* 11.5. Tracking block hero header — the new big banner with status pill */
+.woocommerce-account.routew-my-account-styled .routew-order-tracking__hero {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 18px 20px;
+	background: linear-gradient(135deg, #FFF4ED 0%, #FFE7D6 100%);
+	border: 1px solid rgba(232, 93, 4, 0.18);
+	border-radius: var(--bs-border-radius);
+	margin-bottom: 18px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-order-tracking__hero-meta {
+	min-width: 0;
+	flex: 1;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-order-tracking__hero-eyebrow {
+	display: inline-block;
+	font-size: 0.72em;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+	margin-bottom: 4px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-order-tracking__hero-title {
+	margin: 0 0 6px;
+	font-size: 1.5em;
+	font-weight: 800;
+	color: var(--bs-body-color);
+	line-height: 1.2;
+	letter-spacing: -0.02em;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-order-tracking__hero-subtitle {
+	margin: 0;
+	font-size: 0.88em;
+	color: #4A4A4A;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-order-tracking__hero-badge {
+	font-size: 0.78em;
+	font-weight: 600;
+	padding: 8px 14px;
+	border-radius: 999px;
+	flex-shrink: 0;
+	letter-spacing: 0.02em;
+	line-height: 1.4;
+}
+
+/* 11.6. Enhanced stepper — list items with timestamps + step bodies.
+   The original .routew-status-stepper used .routew-status-step divs; the
+   v1.5.0 update uses <li class="routew-status-step"> so we restyle the
+   step body to stack the label + timestamp vertically. */
+.woocommerce-account.routew-my-account-styled .routew-status-stepper {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	margin: 0 0 18px;
+	padding: 0;
+	list-style: none;
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	padding: 8px 0;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 12px 18px;
+	position: relative;
+	transition: background 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step:not(:last-child)::after {
+	content: "";
+	position: absolute;
+	left: 28px;
+	top: 50%;
+	bottom: -12px;
+	width: 2px;
+	background: var(--bs-border-color);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step--completed::after,
+.woocommerce-account.routew-my-account-styled .routew-status-step--current::after {
+	background: var(--bs-primary);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step:hover {
+	background: rgba(232, 93, 4, 0.02);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step__dot {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: #fff;
+	border: 2px solid var(--bs-border-color);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	color: var(--bs-border-color);
+	position: relative;
+	z-index: 1;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step--completed .routew-status-step__dot {
+	background: var(--bs-primary);
+	border-color: var(--bs-primary);
+	color: #fff;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step--current .routew-status-step__dot {
+	background: var(--bs-primary);
+	border-color: var(--bs-primary);
+	color: #fff;
+	box-shadow: 0 0 0 4px rgba(232, 93, 4, 0.18);
+	animation: routew-step-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes routew-step-pulse {
+	0%, 100% { box-shadow: 0 0 0 4px rgba(232, 93, 4, 0.18); }
+	50%      { box-shadow: 0 0 0 8px rgba(232, 93, 4, 0.08); }
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step__icon {
+	width: 16px;
+	height: 16px;
+	fill: currentColor;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step__body {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step__label {
+	font-weight: 600;
+	color: var(--bs-body-color);
+	font-size: 0.95em;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step--current .routew-status-step__label {
+	color: var(--bs-primary);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step__time {
+	font-size: 0.78em;
+	color: #6B6B6B;
+	font-variant-numeric: tabular-nums;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-status-step__time--pending {
+	color: #B0B0B0;
+	font-style: italic;
+}
+
+/* 11.7. Driver card — DoorDash-style with avatar circle, name, rating
+   row, and Call/Message action buttons. */
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	padding: 18px 20px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__title {
+	margin: 0 0 12px;
+	font-size: 0.78em;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #6B6B6B;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__card {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	flex-wrap: wrap;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__avatar {
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, var(--bs-primary) 0%, #D44D00 100%);
+	color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	font-size: 1.4em;
+	text-transform: uppercase;
+	flex-shrink: 0;
+	box-shadow: 0 2px 8px rgba(232, 93, 4, 0.20);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__info {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__name {
+	font-weight: 700;
+	font-size: 1.05em;
+	color: var(--bs-body-color);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__role {
+	font-size: 0.82em;
+	color: #6B6B6B;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__star {
+	width: 12px;
+	height: 12px;
+	fill: #F59E0B;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__actions {
+	display: flex;
+	gap: 8px;
+	margin-left: auto;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 14px;
+	min-height: 36px;
+	font-size: 0.82em;
+	font-weight: 600;
+	border-radius: var(--bs-border-radius-sm);
+	text-decoration: none;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__btn svg {
+	width: 14px;
+	height: 14px;
+	fill: currentColor;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-delivery-contact__no-phone {
+	font-size: 0.85em;
+	color: #6B6B6B;
+	font-style: italic;
+}
+
+/* 11.8. Customer + billing address columns (view-order footer) */
+.woocommerce-account.routew-my-account-styled .woocommerce-customer-details,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .addresses {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	padding: 20px 22px;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-customer-details h2,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .addresses h2 {
+	margin: 0 0 12px;
+	font-size: 0.78em;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #6B6B6B;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-customer-details address,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .addresses address {
+	background: #FAF8F5;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius-sm);
+	padding: 14px 16px;
+	font-style: normal;
+	color: var(--bs-body-color);
+	line-height: 1.55;
+}
+
+/* ============================================================================
+   12. Orders list — DoorDash-style row cards instead of a flat table.
+   We keep WC's table markup for accessibility/screen readers but restyle
+   rows to look like cards. (CSS-only — no template changes.)
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tbody td.woocommerce-orders-table__cell-order-actions {
+	white-space: nowrap;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-number a {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 6px;
+}
+
+/* Show "→" on the order-number link on hover */
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-number a::after {
+	content: "→";
+	font-size: 0.92em;
+	color: var(--bs-primary);
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tbody tr:hover .woocommerce-orders-table__cell-order-number a::after {
+	opacity: 1;
+}
+
+/* ============================================================================
+   13. Edit Address — DoorDash-style: bigger cards, address preview,
+   hover lift, primary add-new CTA.
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-Addresses::after {
+	content: "";
+	flex: 1 1 100%;
+	min-height: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-addresses-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16px;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-addresses-header .title {
+	margin: 0;
+	font-size: 1.05em;
+	font-weight: 700;
+	color: var(--bs-body-color);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin: 0;
+	padding-bottom: 12px;
+	border-bottom: 1px solid var(--bs-border-color);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h3 {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	font-size: 1.1em;
+	font-weight: 700;
+	color: var(--bs-body-color);
+}
+
+/* "Default" badge inside address title */
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h3::before {
+	content: "📍";
+	font-size: 1em;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address address {
+	background: #FAF8F5;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius-sm);
+	padding: 14px 16px;
+	font-style: normal;
+	color: var(--bs-body-color);
+	line-height: 1.55;
+	margin: 0;
+}
+
+/* ============================================================================
+   14. Edit Account — DoorDash-style two-column layout with avatar.
+   WC renders the form flat by default; we wrap each fieldset as a
+   card and add a left-rail avatar placeholder.
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 18px;
+}
+
+@media (min-width: 768px) {
+	.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm {
+		grid-template-columns: 220px 1fr;
+	}
+	.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm::before {
+		content: "";
+		display: block;
+		grid-row: 1 / span 2;
+		width: 140px;
+		height: 140px;
+		margin: 12px auto 0;
+		border-radius: 50%;
+		background: linear-gradient(135deg, var(--bs-primary) 0%, #D44D00 100%);
+		box-shadow: 0 4px 16px rgba(232, 93, 4, 0.25);
+	}
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	box-shadow: var(--routew-account-shadow);
+	padding: 20px 22px;
+	margin: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset legend {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 12px;
+	font-size: 0.82em;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+	background: #FFF4ED;
+	border-radius: var(--bs-border-radius-sm);
+	margin-bottom: 14px;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset:nth-of-type(2) legend {
+	color: #1E6FB8;
+	background: #E7F1FB;
+}
+
+/* Make the Save changes button full-width on mobile */
+@media (max-width: 600px) {
+	.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .button,
+	.woocommerce-account.routew-my-account-styled button.button[type="submit"] {
+		width: 100%;
+		justify-content: center;
+	}
+}
+
+/* ============================================================================
+   15. Performance / accessibility.
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+	.routew-status-step--current .routew-status-step__dot {
+		animation: none;
+	}
+}
