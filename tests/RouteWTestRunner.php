@@ -857,12 +857,17 @@ class ROUTEWTestRunner
         // agent PWA adds KPI tile icons, the page-wrapper has a max-width
         // for proper viewport use, and the mobile bottom-tab nav uses
         // safe-area-inset-bottom for iPhone notch support.
-        // My-account dashboard icons — 4 SVG icons, one per stat tile.
-        $icon_count = substr_count($my_account_php, 'routew-dashboard__stat-icon');
-        if ($icon_count >= 4) {
-            $this->pass('UI3 my-account dashboard emits stat icons (count=' . $icon_count . ' — 4 stat tiles + selector)');
+        // My-account dashboard icons — UI6 replaced stat tiles with quick-action
+        // tiles (same visual role: at-a-glance dashboard numbers). Count both
+        // stat icons (legacy) and quick-action icons (current) so the assertion
+        // survives the dashboard widget rebuild.
+        $stat_icon_count = substr_count($my_account_php, 'routew-dashboard__stat-icon');
+        $quick_action_icon_count = substr_count($my_account_php, 'routew-dashboard__quick-action__icon');
+        $combined_icons = $stat_icon_count + $quick_action_icon_count;
+        if ($combined_icons >= 4) {
+            $this->pass('UI3 my-account dashboard emits >=4 icons (stat=' . $stat_icon_count . ' + quick-action=' . $quick_action_icon_count . ')');
         } else {
-            $this->fail('UI3 my-account dashboard missing stat icons — expected >= 4 occurrences of routew-dashboard__stat-icon');
+            $this->fail('UI3 my-account dashboard missing icons — expected >= 4 (stat + quick-action combined)');
         }
 
         // Agent PWA KPI icons — 5 SVG icons (Delivered today / Active now /
@@ -1021,6 +1026,77 @@ class ROUTEWTestRunner
             $this->pass('UI5 my-account.css has all DoorDash-style CSS signals');
         } else {
             $this->fail('UI5 my-account.css missing CSS signals: ' . implode(', ', $missing_css));
+        }
+
+        // UI6 — Native mobile-app polish (Batch 6): redesign dashboard
+        // widgets + spacing rhythm + iOS-style list rows + press feedback.
+        $shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
+
+        // Dashboard render emits 5+ unconditional sections (profile, quick
+        // actions, recent orders, settings, signout). The welcome banner and
+        // default address sections are conditional, so we count what the
+        // static markup guarantees.
+        $section_count = substr_count($shortcodes_php, '<section class="routew-section">');
+        if ($section_count >= 4) {
+            $this->pass('UI6 dashboard emits >=4 unconditional routew-section blocks (found ' . $section_count . '; 2 more conditional)');
+        } else {
+            $this->fail('UI6 dashboard missing routew-section blocks — found only ' . $section_count);
+        }
+
+        // Profile card with avatar + name + email + Edit button.
+        if (false !== strpos($shortcodes_php, 'routew-profile-card__avatar')
+            && false !== strpos($shortcodes_php, 'routew-profile-card__name')
+            && false !== strpos($shortcodes_php, 'routew-profile-card__email')) {
+            $this->pass('UI6 profile card renders avatar + name + email');
+        } else {
+            $this->fail('UI6 profile card markup missing expected hooks');
+        }
+
+        // Quick actions grid (4 tiles).
+        $quick_action_count = substr_count($shortcodes_php, 'routew-dashboard__quick-action"');
+        if ($quick_action_count >= 4) {
+            $this->pass('UI6 quick actions grid renders >=4 tiles (found ' . $quick_action_count . ')');
+        } else {
+            $this->fail('UI6 quick actions grid missing — found only ' . $quick_action_count . ' tiles');
+        }
+
+        // Settings list (iOS-style link rows).
+        $settings_list_count = substr_count($shortcodes_php, 'class="routew-list-item"');
+        if ($settings_list_count >= 4) {
+            $this->pass('UI6 settings list has >=4 iOS-style link rows (found ' . $settings_list_count . ')');
+        } else {
+            $this->fail('UI6 settings list missing — found ' . $settings_list_count . ' rows');
+        }
+
+        // Sign-out button (full-width pill).
+        if (false !== strpos($shortcodes_php, 'routew-signout')
+            && preg_match('/class="routew-signout"/', $shortcodes_php)) {
+            $this->pass('UI6 sign-out button styled as full-width pill');
+        } else {
+            $this->fail('UI6 sign-out button missing or not styled');
+        }
+
+        // CSS — 8px spacing scale, iOS list rows, press feedback, fade cascade.
+        $css_native_signals = array(
+            '--routew-spacing-4: 16px' => '8px spacing scale tokens',
+            '.routew-list ' => 'iOS-style list container',
+            '.routew-list-item' => 'iOS-style list row',
+            '.routew-dashboard__quick-action' => 'quick action tile',
+            '.routew-profile-card' => 'profile card',
+            ':active' => 'press feedback hooks',
+            '@keyframes routew-fade-up' => 'fade-up cascade',
+            'prefers-reduced-transparency' => 'reduced-transparency handlers',
+        );
+        $missing_native_css = array();
+        foreach ($css_native_signals as $needle => $label) {
+            if (false === strpos($my_account_css, $needle)) {
+                $missing_native_css[] = $label;
+            }
+        }
+        if (empty($missing_native_css)) {
+            $this->pass('UI6 my-account.css has all native-app CSS signals');
+        } else {
+            $this->fail('UI6 my-account.css missing CSS: ' . implode(', ', $missing_native_css));
         }
 
         echo "\n";

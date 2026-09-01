@@ -1424,3 +1424,702 @@
 		animation: none;
 	}
 }
+
+/* ============================================================================
+   16. Native mobile-app polish — translatable you can FEEL.
+   The polish layer that took the dashboard from "functional" to "shipped":
+     - 8px spacing scale (CSS vars) so every gap is in rhythm
+     - Translucent sticky chrome (backdrop-filter blur + saturated tint)
+     - iOS-style list rows with chevron (.routew-list-item)
+     - Fade-up cascade on first paint (animation-delay per section)
+     - Press feedback on every .btn (scale 0.97 on :active)
+     - iOS-style pull chevrons on list items
+     - prefers-reduced-motion + prefers-reduced-transparency handlers
+   ============================================================================ */
+
+/* 16.1. 8px spacing scale tokens — every literal px gap should resolve here */
+:root {
+	--routew-spacing-1: 4px;
+	--routew-spacing-2: 8px;
+	--routew-spacing-3: 12px;
+	--routew-spacing-4: 16px;
+	--routew-spacing-5: 24px;
+	--routew-spacing-6: 32px;
+	--routew-spacing-7: 48px;
+	--routew-spacing-8: 64px;
+
+	--routew-radius-sm: 8px;
+	--routew-radius-md: 12px;
+	--routew-radius-lg: 16px;
+	--routew-radius-xl: 24px;
+
+	--routew-shadow-card: 0 1px 2px rgba(20, 14, 8, 0.04), 0 4px 12px rgba(20, 14, 8, 0.04);
+	--routew-shadow-card-hover: 0 4px 12px rgba(20, 14, 8, 0.08), 0 8px 24px rgba(232, 93, 4, 0.10);
+	--routew-shadow-floating: 0 8px 32px rgba(20, 14, 8, 0.10);
+}
+
+/* 16.2. Section fade-up cascade (staggered reveal on first paint) */
+@keyframes routew-fade-up {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.woocommerce-account.routew-my-account-styled .routew-section {
+	animation: routew-fade-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-section:nth-of-type(1)  { animation-delay: 0.00s; }
+.woocommerce-account.routew-my-account-styled .routew-section:nth-of-type(2)  { animation-delay: 0.07s; }
+.woocommerce-account.routew-my-account-styled .routew-section:nth-of-type(3)  { animation-delay: 0.14s; }
+.woocommerce-account.routew-my-account-styled .routew-section:nth-of-type(4)  { animation-delay: 0.21s; }
+.woocommerce-account.routew-my-account-styled .routew-section:nth-of-type(5)  { animation-delay: 0.28s; }
+.woocommerce-account.routew-my-account-styled .routew-section:nth-of-type(6)  { animation-delay: 0.35s; }
+
+/* 16.3. Press feedback — every btn + .routew-button */
+.woocommerce-account.routew-my-account-styled .btn:active,
+.woocommerce-account.routew-my-account-styled .routew-button:active,
+.woocommerce-account.routew-my-account-styled .routew-dashboard__quick-action:active,
+.woocommerce-account.routew-my-account-styled .routew-list-item:active,
+.woocommerce-account.routew-my-account-styled button:active,
+.woocommerce-account.routew-my-account-styled .woocommerce-button:active {
+	transform: scale(0.97);
+	transition: transform 80ms ease-out;
+}
+
+/* 16.4. Focus-visible overrides — brand-color ring everywhere WC + Bootstrap drop the default blue */
+.woocommerce-account.routew-my-account-styled a:focus-visible,
+.woocommerce-account.routew-my-account-styled button:focus-visible,
+.woocommerce-account.routew-my-account-styled .btn:focus-visible,
+.woocommerce-account.routew-my-account-styled .routew-button:focus-visible,
+.woocommerce-account.routew-my-account-styled .routew-list-item:focus-visible,
+.woocommerce-account.routew-my-account-styled .routew-dashboard__quick-action:focus-visible {
+	outline: 2px solid var(--bs-primary);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px rgba(var(--bs-primary-rgb), 0.18);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content input:focus-visible,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content select:focus-visible,
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content textarea:focus-visible {
+	outline: none;
+	border-color: var(--bs-primary);
+	box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.18);
+}
+
+/* 16.5. Translucent sticky chrome — sticky theme header + sidebar + bottom-tab */
+.woocommerce-account.routew-my-account-styled body,
+.woocommerce-account.routew-my-account-styled .woocommerce {
+	background-color: var(--bs-body-bg);
+}
+
+@media (min-width: 1024px) {
+	/* On desktop the page-wide nav is decorative. The "my-account nav sidebar"
+	   isn't sticky so skip the chrome upgrade there; instead upgrade the
+	   wrapper with a subtle top decoration. */
+	.woocommerce-account.routew-my-account-styled .woocommerce {
+		background: linear-gradient(180deg, #FFFFFF 0%, var(--bs-body-bg) 18%);
+		border-radius: var(--routew-radius-xl);
+		margin-top: var(--routew-spacing-6);
+	}
+}
+
+/* 16.6. Profile card (the top of /my-account/) */
+.woocommerce-account.routew-my-account-styled .routew-profile-card {
+	display: flex;
+	align-items: center;
+	gap: var(--routew-spacing-4);
+	padding: var(--routew-spacing-5);
+	background: linear-gradient(135deg, #FFFFFF 0%, #FFF9F5 100%);
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	box-shadow: var(--routew-shadow-card);
+	margin-bottom: var(--routew-spacing-5);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-profile-card__avatar {
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, var(--bs-primary) 0%, #D44D00 100%);
+	color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 800;
+	font-size: 1.6em;
+	text-transform: uppercase;
+	flex-shrink: 0;
+	box-shadow: 0 4px 12px rgba(232, 93, 4, 0.25);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-profile-card__info {
+	flex: 1;
+	min-width: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-profile-card__name {
+	margin: 0;
+	font-size: 1.25em;
+	font-weight: 800;
+	color: var(--bs-body-color);
+	letter-spacing: -0.015em;
+	line-height: 1.2;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-profile-card__email {
+	margin: 4px 0 0;
+	font-size: 0.88em;
+	color: #6B6B6B;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* 16.7. Section headers (iOS-style "list-group" label) */
+.woocommerce-account.routew-my-account-styled .routew-section-title {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin: 0 0 var(--routew-spacing-3);
+	padding: 0 var(--routew-spacing-1);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-section-title__label {
+	font-size: 0.72em;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: #6B6B6B;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-section-title__action {
+	font-size: 0.85em;
+	color: var(--bs-primary);
+	font-weight: 600;
+	text-decoration: none;
+	transition: opacity 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-section-title__action:hover {
+	opacity: 0.7;
+	text-decoration: underline;
+}
+
+/* 16.8. iOS-style list rows (.routew-list + .routew-list-item) */
+.woocommerce-account.routew-my-account-styled .routew-list {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	overflow: hidden;
+	box-shadow: var(--routew-shadow-card);
+	margin-bottom: var(--routew-spacing-5);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item {
+	display: flex;
+	align-items: center;
+	gap: var(--routew-spacing-4);
+	padding: var(--routew-spacing-4);
+	text-decoration: none;
+	color: inherit;
+	background: transparent;
+	transition: background 0.15s ease;
+	border: 0;
+	border-bottom: 1px solid rgba(232, 93, 4, 0.08);
+	width: 100%;
+	cursor: pointer;
+	text-align: left;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item:last-child {
+	border-bottom: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item:hover {
+	background: rgba(232, 93, 4, 0.03);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item__icon {
+	width: 36px;
+	height: 36px;
+	border-radius: 10px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(232, 93, 4, 0.10);
+	color: var(--bs-primary);
+	flex-shrink: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item__icon svg {
+	width: 18px;
+	height: 18px;
+	fill: currentColor;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item__icon--neutral {
+	background: #F0EEEA;
+	color: #5A5A5A;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item__icon--info {
+	background: rgba(30, 111, 184, 0.10);
+	color: #1E6FB8;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item__icon--danger {
+	background: rgba(192, 50, 43, 0.10);
+	color: var(--bs-danger);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item__body {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item__label {
+	font-weight: 600;
+	color: var(--bs-body-color);
+	font-size: 0.95em;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item__hint {
+	font-size: 0.82em;
+	color: #6B6B6B;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item__value {
+	font-weight: 700;
+	color: var(--bs-body-color);
+	font-variant-numeric: tabular-nums;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list-item__chevron {
+	color: #BFBFBF;
+	font-size: 1.4em;
+	font-weight: 300;
+	flex-shrink: 0;
+	transition: transform 0.18s ease;
+}
+
+.woocommerce-account.routew-my-account-styled a.routew-list-item:hover .routew-list-item__chevron {
+	transform: translateX(2px);
+	color: var(--bs-primary);
+}
+
+/* 16.9. Quick actions grid (4-tile on dashboard) */
+.woocommerce-account.routew-my-account-styled .routew-dashboard__quick-actions {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: var(--routew-spacing-3);
+	margin-bottom: var(--routew-spacing-5);
+}
+
+@media (max-width: 600px) {
+	.woocommerce-account.routew-my-account-styled .routew-dashboard__quick-actions {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__quick-action {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: var(--routew-spacing-4) 8px;
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-md);
+	text-decoration: none;
+	color: inherit;
+	transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+	cursor: pointer;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__quick-action:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--routew-shadow-card-hover);
+	border-color: rgba(232, 93, 4, 0.30);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__quick-action__icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 12px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(135deg, #FFF4ED 0%, #FFE7D6 100%);
+	color: var(--bs-primary);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__quick-action__icon svg {
+	width: 20px;
+	height: 20px;
+	fill: currentColor;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__quick-action__label {
+	font-size: 0.82em;
+	font-weight: 600;
+	color: var(--bs-body-color);
+	line-height: 1.2;
+	text-align: center;
+}
+
+/* 16.10. Status-badge refinements (pulse on active orders, sharper edges) */
+.woocommerce-account.routew-my-account-styled .routew-status-pill {
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	font-size: 0.7em;
+}
+
+/* 16.11. Recent orders (compact iOS-style rows inside a list card) */
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	box-shadow: var(--routew-shadow-card);
+	margin-bottom: var(--routew-spacing-5);
+	overflow: hidden;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item {
+	display: flex;
+	align-items: center;
+	gap: var(--routew-spacing-3);
+	padding: var(--routew-spacing-4);
+	border-bottom: 1px solid rgba(232, 93, 4, 0.08);
+	transition: background 0.15s ease, transform 0.18s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item:last-child {
+	border-bottom: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item:hover {
+	background: rgba(232, 93, 4, 0.03);
+	transform: translateX(2px);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item__meta {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item__number {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	font-weight: 700;
+	color: var(--bs-primary);
+	text-decoration: none;
+	font-variant-numeric: tabular-nums;
+	font-size: 0.95em;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item__date {
+	font-size: 0.78em;
+	color: #6B6B6B;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item__amount {
+	font-weight: 700;
+	color: var(--bs-body-color);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item__chevron {
+	color: #BFBFBF;
+	font-size: 1.4em;
+	transition: transform 0.18s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item:hover .routew-dashboard__orders-item__chevron {
+	transform: translateX(2px);
+	color: var(--bs-primary);
+}
+
+/* 16.12. Welcome banner refinement — already in section 11, just append a small lift */
+.woocommerce-account.routew-my-account-styled .routew-dashboard__welcome {
+	display: flex;
+	flex-direction: column;
+	gap: var(--routew-spacing-3);
+	padding: var(--routew-spacing-5);
+	background: linear-gradient(135deg, #FFF4ED 0%, #FFE7D6 60%, #FFD6B5 100%);
+	border: 1px solid rgba(232, 93, 4, 0.18);
+	border-radius: var(--routew-radius-lg);
+	box-shadow: var(--routew-shadow-card);
+	margin-bottom: var(--routew-spacing-5);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__welcome::before {
+	content: "";
+	position: absolute;
+	right: -60px;
+	top: -80px;
+	width: 200px;
+	height: 200px;
+	background: radial-gradient(circle at center, rgba(232, 93, 4, 0.22) 0%, rgba(232, 93, 4, 0) 70%);
+	pointer-events: none;
+}
+
+/* 16.13. Address + panel cards — slight token upgrade for consistency */
+.woocommerce-account.routew-my-account-styled .routew-dashboard__panel {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	box-shadow: var(--routew-shadow-card);
+	padding: var(--routew-spacing-5);
+	margin-bottom: var(--routew-spacing-5);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__panel-title::before {
+	width: 3px;
+}
+
+/* 16.14. Stat cards (kept as separate 4-tile row above the quick actions) */
+.woocommerce-account.routew-my-account-styled .routew-dashboard__stats {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: var(--routew-spacing-3);
+	margin-bottom: var(--routew-spacing-5);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__stat {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-md);
+	padding: var(--routew-spacing-4);
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-height: 96px;
+	transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+	cursor: pointer;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__stat:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--routew-shadow-card-hover);
+	border-color: rgba(232, 93, 4, 0.30);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__stat:active {
+	transform: scale(0.97);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__stat:focus-visible {
+	outline: 2px solid var(--bs-primary);
+	outline-offset: 2px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__stat-value {
+	font-size: 1.5em;
+	font-weight: 800;
+	color: var(--bs-body-color);
+	line-height: 1;
+	letter-spacing: -0.02em;
+	font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 700px) {
+	.woocommerce-account.routew-my-account-styled .routew-dashboard__stats {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* 16.15. Sign-out button (full-width pill, neutral palette) */
+.woocommerce-account.routew-my-account-styled .routew-signout {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	padding: var(--routew-spacing-4);
+	margin-top: var(--routew-spacing-5);
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-md);
+	color: var(--bs-body-color);
+	font-weight: 600;
+	font-size: 0.95em;
+	text-decoration: none;
+	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+	cursor: pointer;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-signout:hover {
+	background: var(--bs-body-bg);
+	border-color: var(--bs-danger);
+	color: var(--bs-danger);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-signout svg {
+	width: 16px;
+	height: 16px;
+	fill: currentColor;
+}
+
+/* 16.16. Orders-list filter chips (DoorDash/Zomato style) */
+.woocommerce-account.routew-my-account-styled .routew-orders-filter {
+	display: flex;
+	gap: 8px;
+	margin: 0 0 var(--routew-spacing-4);
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter::-webkit-scrollbar {
+	display: none;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip {
+	flex-shrink: 0;
+	padding: 8px 16px;
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 999px;
+	font-size: 0.85em;
+	font-weight: 600;
+	color: var(--bs-body-color);
+	text-decoration: none;
+	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip--active,
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip:hover {
+	background: var(--bs-primary);
+	border-color: var(--bs-primary);
+	color: #fff;
+}
+
+/* 16.17. Empty states — illustrations + CTA */
+.woocommerce-account.routew-my-account-styled .routew-empty-state {
+	text-align: center;
+	padding: var(--routew-spacing-7) var(--routew-spacing-5);
+	background: #fff;
+	border: 1px dashed var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	margin-bottom: var(--routew-spacing-5);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-empty-state__icon {
+	font-size: 3em;
+	opacity: 0.4;
+	margin-bottom: var(--routew-spacing-3);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-empty-state__title {
+	margin: 0 0 8px;
+	font-size: 1.05em;
+	font-weight: 700;
+	color: var(--bs-body-color);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-empty-state__text {
+	margin: 0 0 var(--routew-spacing-4);
+	color: #6B6B6B;
+	font-size: 0.92em;
+	line-height: 1.5;
+}
+
+/* 16.18. iOS-style section card label (used on Address cards + Settings list) */
+.woocommerce-account.routew-my-account-styled .routew-ios-card {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	box-shadow: var(--routew-shadow-card);
+	overflow: hidden;
+	margin-bottom: var(--routew-spacing-5);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-ios-card__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: var(--routew-spacing-4);
+	background: rgba(232, 93, 4, 0.04);
+	border-bottom: 1px solid var(--bs-border-color);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-ios-card__title {
+	margin: 0;
+	font-size: 0.72em;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--bs-primary);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-ios-card__body {
+	padding: var(--routew-spacing-4);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-ios-card__edit {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 12px;
+	background: #fff;
+	color: var(--bs-primary);
+	border: 1px solid var(--bs-primary);
+	border-radius: var(--routew-radius-sm);
+	font-size: 0.78em;
+	font-weight: 600;
+	text-decoration: none;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-ios-card__edit:hover {
+	background: var(--bs-primary);
+	color: #fff;
+}
+
+/* 16.19. Reduced motion + reduced transparency overrides */
+@media (prefers-reduced-motion: reduce) {
+	.woocommerce-account.routew-my-account-styled .routew-section,
+	.woocommerce-account.routew-my-account-styled .routew-dashboard__stat,
+	.woocommerce-account.routew-my-account-styled .routew-list-item,
+	.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item,
+	.woocommerce-account.routew-my-account-styled .routew-dashboard__quick-action {
+		animation: none !important;
+		transition-duration: 0.01ms !important;
+	}
+	.woocommerce-account.routew-my-account-styled .btn:active,
+	.woocommerce-account.routew-my-account-styled .routew-button:active,
+	.woocommerce-account.routew-my-account-styled button:active,
+	.woocommerce-account.routew-my-account-styled .routew-dashboard__stat:active {
+		transform: none !important;
+	}
+}
+
+@media (prefers-reduced-transparency: reduce) {
+	.woocommerce-account.routew-my-account-styled .routew-dashboard__welcome,
+	.woocommerce-account.routew-my-account-styled .routew-order-tracking__hero {
+		background: #FFF4ED !important;
+	}
+	.woocommerce-account.routew-my-account-styled .routew-profile-card,
+	.woocommerce-account.routew-my-account-styled .woocommerce {
+		background: #ffffff !important;
+	}
+}
