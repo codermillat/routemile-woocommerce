@@ -267,7 +267,7 @@
             if (this.isBlocksCheckout()) {
                 try {
                     window.wc.blocksCheckout.extensionCartUpdate({
-                        namespace: 'routemile-woocommerce',
+                        namespace: 'routemile-for-woocommerce',
                         data: { lat, lng }
                     });
                     return;

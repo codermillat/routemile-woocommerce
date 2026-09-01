@@ -16,7 +16,11 @@
 
 const CACHE_VERSION = 'routew-agent-v1';
 const DASHBOARD_URL = self.registration.scope;
-const PLUGIN_ASSETS = '/wp-content/plugins/routemile-woocommerce/assets/';
+// WP install sees the plugin as `routemile-for-woocommerce` (matches the
+// post-rename plugin slug). The folder path is hardcoded here because the
+// service worker runs outside any WP context; renaming the slug means
+// updating this string too. (REGRESSION-FIX R2)
+const PLUGIN_ASSETS = '/wp-content/plugins/routemile-for-woocommerce/assets/';
 
 self.addEventListener('install', (event) => {
 	event.waitUntil(

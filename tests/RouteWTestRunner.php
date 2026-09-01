@@ -573,6 +573,67 @@ class ROUTEWTestRunner
             $this->fail('R1 stale WC settings hooks found (do not match tab id ' . $tab_id . '): ' . implode('; ', $bad_hooks));
         }
 
+        // R2 — JS↔PHP namespace parity for WC Blocks extension.
+        // The Store API extension namespace must match on both sides:
+        //   PHP:  woocommerce_blocks_loaded → registerStoreAutomation
+        //         (or ExtendRestApi::register_endpoint_data) with namespace=X
+        //   JS:   window.wc.blocksCheckout.extensionCartUpdate({ namespace: X })
+        // When they diverge, WC Blocks throws "There is no such namespace
+        // registered: X" on the checkout, the cart-update POST fails, and
+        // the customer sees "Sorry, this order requires a shipping option"
+        // because no shipping rates were recalculated. (This is exactly
+        // what happened after the v1.5.0 slug rename.)
+        $php_ns = null;
+        $blocks_php = $this->plugin_dir . '/includes/class-routew-blocks-checkout.php';
+        if (file_exists($blocks_php) && preg_match("/'namespace'\s*=>\s*'([^']+)'/", file_get_contents($blocks_php), $m)) {
+            $php_ns = $m[1];
+            $this->pass('R2 PHP namespace registered: ' . $php_ns);
+        } else {
+            $this->fail('R2 could not locate PHP namespace in class-routew-blocks-checkout.php');
+        }
+        $mismatched_ns = array();
+        $js_files = array('assets/js/checkout.js', 'assets/js/checkout-leaflet.js');
+        foreach ($js_files as $rel) {
+            $path = $this->plugin_dir . '/' . $rel;
+            if (!file_exists($path)) {
+                continue;
+            }
+            $body = file_get_contents($path);
+            // Find every extensionCartUpdate({ namespace: 'X' }) call.
+            if (preg_match_all("/extensionCartUpdate\s*\(\s*\{[^}]*namespace\s*:\s*'([^']+)'/s", $body, $hits)) {
+                foreach ($hits[1] as $ns) {
+                    if ($php_ns && $ns !== $php_ns) {
+                        $mismatched_ns[] = $rel . ': ' . $ns;
+                    }
+                }
+            }
+        }
+        if (empty($mismatched_ns)) {
+            $this->pass('R2 JS extensionCartUpdate namespaces match PHP (' . $php_ns . ')');
+        } else {
+            $this->fail('R2 stale JS namespace(s) — checkout will throw "There is no such namespace registered": ' . implode('; ', $mismatched_ns));
+        }
+
+        // R2 (SW) — the rider PWA service worker hardcodes the plugin folder
+        // path. It must match the slug WP exposes (lowercased). Catching
+        // drift here means a future rename of the slug surfaces in the
+        // test runner, not as "PWA icons 404" in the rider dashboard.
+        $sw_path = $this->plugin_dir . '/assets/js/routew-agent-sw.js';
+        if (file_exists($sw_path)) {
+            $sw_body = file_get_contents($sw_path);
+            $expected_sw_path = '/wp-content/plugins/' . $php_ns . '/assets/';
+            if (false !== strpos($sw_body, $expected_sw_path)) {
+                $this->pass('R2 SW PLUGIN_ASSETS path matches PHP namespace (' . $expected_sw_path . ')');
+            } else {
+                // Surface the actual value for debugging.
+                if (preg_match("/PLUGIN_ASSETS\s*=\s*'([^']+)'/", $sw_body, $swm)) {
+                    $this->fail('R2 SW PLUGIN_ASSETS="' . $swm[1] . '" does not match PHP namespace (expected "' . $expected_sw_path . '")');
+                } else {
+                    $this->fail('R2 SW PLUGIN_ASSETS not found; expected "' . $expected_sw_path . '"');
+                }
+            }
+        }
+
         echo "\n";
     }
 
