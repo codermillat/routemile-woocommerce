@@ -131,25 +131,27 @@ class ROUTEW_My_Account
 		?>
 		<section class="routew-dashboard routew-native" aria-label="<?php esc_attr_e('Account overview', 'routemile-for-woocommerce'); ?>">
 
-			<?php /* ----- Section 1: profile card (top of dashboard) ----- */ ?>
+			<?php /* ----- Section 1: profile card (Bootstrap card) ----- */ ?>
 			<section class="routew-section">
-				<div class="routew-profile-card">
-					<span class="routew-profile-card__avatar" aria-hidden="true">
-						<?php echo esc_html(mb_substr($this->first_name($user) ?: ($user->display_name ?: '?'), 0, 1)); ?>
-					</span>
-					<div class="routew-profile-card__info">
-						<h2 class="routew-profile-card__name">
-							<?php
-							/* translators: %s: customer first name */
-							printf(esc_html__('%s', 'routemile-for-woocommerce'), esc_html($this->first_name($user)));
-							?>
-						</h2>
-						<p class="routew-profile-card__email"><?php echo esc_html($user->user_email); ?></p>
+				<div class="card routew-profile-card">
+					<div class="card-body d-flex align-items-center gap-3 py-4">
+						<span class="routew-profile-card__avatar flex-shrink-0" aria-hidden="true">
+							<?php echo esc_html(mb_substr($this->first_name($user) ?: ($user->display_name ?: '?'), 0, 1)); ?>
+						</span>
+						<div class="routew-profile-card__info flex-grow-1 min-w-0">
+							<h2 class="routew-profile-card__name h5 mb-1">
+								<?php
+								/* translators: %s: customer first name */
+								printf(esc_html__('%s', 'routemile-for-woocommerce'), esc_html($this->first_name($user)));
+								?>
+							</h2>
+							<p class="routew-profile-card__email mb-0 small text-secondary"><?php echo esc_html($user->user_email); ?></p>
+						</div>
+						<a class="btn btn-sm btn-outline-primary flex-shrink-0"
+						   href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>">
+							<?php esc_html_e('Edit', 'routemile-for-woocommerce'); ?>
+						</a>
 					</div>
-					<a class="routew-ios-card__edit"
-					   href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>">
-						<?php esc_html_e('Edit', 'routemile-for-woocommerce'); ?>
-					</a>
 				</div>
 			</section>
 
@@ -196,28 +198,28 @@ class ROUTEW_My_Account
 				</section>
 			<?php endif; ?>
 
-			<?php /* ----- Section 3: quick actions grid ----- */ ?>
+			<?php /* ----- Section 3: quick actions grid (Bootstrap row + btn-light) ----- */ ?>
 			<section class="routew-section">
-				<div class="routew-dashboard__quick-actions">
-					<a class="routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('orders') : home_url('/my-account/orders/')); ?>">
+				<div class="row g-3 routew-dashboard__quick-actions">
+					<a class="col-6 col-md-3 btn btn-light routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('orders') : home_url('/my-account/orders/')); ?>">
 						<span class="routew-dashboard__quick-action__icon" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M5 4h14v3H5zm0 5h14v3H5zm0 5h14v3H5zm0 5h14v3H5z"/></svg>
 						</span>
 						<span class="routew-dashboard__quick-action__label"><?php esc_html_e('Orders', 'routemile-for-woocommerce'); ?></span>
 					</a>
-					<a class="routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>">
+					<a class="col-6 col-md-3 btn btn-light routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>">
 						<span class="routew-dashboard__quick-action__icon" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7Zm0 9.6A2.6 2.6 0 1 0 12 6.4a2.6 2.6 0 0 0 0 5.2Z"/></svg>
 						</span>
 						<span class="routew-dashboard__quick-action__label"><?php esc_html_e('Addresses', 'routemile-for-woocommerce'); ?></span>
 					</a>
-					<a class="routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>">
+					<a class="col-6 col-md-3 btn btn-light routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>">
 						<span class="routew-dashboard__quick-action__icon" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-8 1.7-8 5v2h16v-2c0-3.3-4.7-5-8-5Z"/></svg>
 						</span>
 						<span class="routew-dashboard__quick-action__label"><?php esc_html_e('Profile', 'routemile-for-woocommerce'); ?></span>
 					</a>
-					<a class="routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('payment-methods') : home_url('/my-account/payment-methods/')); ?>">
+					<a class="col-6 col-md-3 btn btn-light routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('payment-methods') : home_url('/my-account/payment-methods/')); ?>">
 						<span class="routew-dashboard__quick-action__icon" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v3H3V6a1 1 0 0 1 1-1Zm-1 6h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7Z"/></svg>
 						</span>
@@ -238,13 +240,15 @@ class ROUTEW_My_Account
 					</a>
 				</div>
 				<?php if (empty($recent_orders)) : ?>
-					<div class="routew-empty-state">
-						<div class="routew-empty-state__icon" aria-hidden="true">🛒</div>
-						<p class="routew-empty-state__title"><?php esc_html_e('No orders yet', 'routemile-for-woocommerce'); ?></p>
-						<p class="routew-empty-state__text"><?php esc_html_e('Browse the menu and your first order will appear here.', 'routemile-for-woocommerce'); ?></p>
+					<div class="card border-0 shadow-sm routew-empty-state">
+						<div class="card-body text-center py-5">
+							<div class="routew-empty-state__icon" aria-hidden="true">🛒</div>
+							<p class="routew-empty-state__title h5 mb-1"><?php esc_html_e('No orders yet', 'routemile-for-woocommerce'); ?></p>
+							<p class="routew-empty-state__text small text-secondary mb-0"><?php esc_html_e('Browse the menu and your first order will appear here.', 'routemile-for-woocommerce'); ?></p>
+						</div>
 					</div>
 				<?php else : ?>
-					<div class="routew-ios-card routew-dashboard__orders">
+					<div class="card routew-ios-card routew-dashboard__orders">
 						<?php foreach ($recent_orders as $order) : ?>
 							<?php $this->render_recent_order_item($order); ?>
 						<?php endforeach; ?>
@@ -264,16 +268,16 @@ class ROUTEW_My_Account
 							<?php esc_html_e('Manage →', 'routemile-for-woocommerce'); ?>
 						</a>
 					</div>
-					<div class="routew-ios-card">
-						<div class="routew-ios-card__body">
-							<address class="routew-dashboard__address">
+					<div class="card routew-ios-card">
+						<div class="card-body routew-ios-card__body">
+							<address class="routew-dashboard__address mb-0">
 								<span class="routew-dashboard__address-name"><?php echo esc_html($default_address['label']); ?> · <?php echo esc_html($default_address['name']); ?></span>
-								<span class="routew-dashboard__address-line"><?php echo esc_html($default_address['line1']); ?></span>
+								<span class="routew-dashboard__address-line d-block"><?php echo esc_html($default_address['line1']); ?></span>
 								<?php if (!empty($default_address['line2'])) : ?>
-									<span class="routew-dashboard__address-line"><?php echo esc_html($default_address['line2']); ?></span>
+									<span class="routew-dashboard__address-line d-block"><?php echo esc_html($default_address['line2']); ?></span>
 								<?php endif; ?>
 								<?php if (!empty($default_address['city'])) : ?>
-									<span class="routew-dashboard__address-line"><?php echo esc_html($default_address['city']); ?></span>
+									<span class="routew-dashboard__address-line d-block"><?php echo esc_html($default_address['city']); ?></span>
 								<?php endif; ?>
 							</address>
 						</div>
@@ -288,8 +292,8 @@ class ROUTEW_My_Account
 						<?php esc_html_e('Settings', 'routemile-for-woocommerce'); ?>
 					</span>
 				</h2>
-				<div class="routew-list" role="list">
-					<a class="routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('orders') : home_url('/my-account/orders/')); ?>" role="listitem">
+				<div class="list-group list-group-flush routew-list" role="list">
+					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('orders') : home_url('/my-account/orders/')); ?>" role="listitem">
 						<span class="routew-list-item__icon" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M5 4h14v3H5zm0 5h14v3H5zm0 5h14v3H5zm0 5h14v3H5z"/></svg>
 						</span>
@@ -299,7 +303,7 @@ class ROUTEW_My_Account
 						</div>
 						<span class="routew-list-item__chevron" aria-hidden="true">›</span>
 					</a>
-					<a class="routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>" role="listitem">
+					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>" role="listitem">
 						<span class="routew-list-item__icon" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7Zm0 9.6A2.6 2.6 0 1 0 12 6.4a2.6 2.6 0 0 0 0 5.2Z"/></svg>
 						</span>
@@ -309,7 +313,7 @@ class ROUTEW_My_Account
 						</div>
 						<span class="routew-list-item__chevron" aria-hidden="true">›</span>
 					</a>
-					<a class="routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>" role="listitem">
+					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>" role="listitem">
 						<span class="routew-list-item__icon" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-8 1.7-8 5v2h16v-2c0-3.3-4.7-5-8-5Z"/></svg>
 						</span>
@@ -319,7 +323,7 @@ class ROUTEW_My_Account
 						</div>
 						<span class="routew-list-item__chevron" aria-hidden="true">›</span>
 					</a>
-					<a class="routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('payment-methods') : home_url('/my-account/payment-methods/')); ?>" role="listitem">
+					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('payment-methods') : home_url('/my-account/payment-methods/')); ?>" role="listitem">
 						<span class="routew-list-item__icon" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v3H3V6a1 1 0 0 1 1-1Zm-1 6h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7Z"/></svg>
 						</span>
@@ -334,7 +338,7 @@ class ROUTEW_My_Account
 
 			<?php /* ----- Section 7: sign out ----- */ ?>
 			<section class="routew-section">
-				<a class="routew-signout" href="<?php echo esc_url(wp_logout_url(get_permalink())); ?>">
+				<a class="btn btn-lg btn-light w-100 d-inline-flex align-items-center justify-content-center gap-2 routew-signout" href="<?php echo esc_url(wp_logout_url(get_permalink())); ?>">
 					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17v-2H5V9h5V7l-6 5Zm5-13h-6v2h6v12h-6v2h6a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z"/></svg>
 					<?php esc_html_e('Sign out', 'routemile-for-woocommerce'); ?>
 				</a>

@@ -59,12 +59,12 @@ class ROUTEW_Shortcodes
 			);
 			$title = isset($titles[$endpoint]) ? $titles[$endpoint] : __('My account', 'routemile-for-woocommerce');
 			?>
-			<header class="routew-subpage-header" data-endpoint="<?php echo esc_attr($endpoint); ?>">
+			<nav class="navbar routew-subpage-header bg-body-tertiary" data-endpoint="<?php echo esc_attr($endpoint); ?>">
 				<a class="routew-subpage-header__back" href="<?php echo esc_url(wc_get_page_permalink('myaccount')); ?>" aria-label="<?php esc_attr_e('Back to My account', 'routemile-for-woocommerce'); ?>">
 					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>
 				</a>
-				<h1 class="routew-subpage-header__title"><?php echo esc_html($title); ?></h1>
-			</header>
+				<span class="navbar-brand mb-0 routew-subpage-header__title"><?php echo esc_html($title); ?></span>
+			</nav>
 			<?php
 		}
 	}
@@ -84,11 +84,13 @@ class ROUTEW_Shortcodes
 		$name = $user->first_name ?: $user->display_name;
 		$initial = mb_substr($name, 0, 1) ?: '?';
 		?>
-		<div class="routew-subpage-profile" data-routew-section>
-			<span class="routew-subpage-profile__avatar" aria-hidden="true"><?php echo esc_html($initial); ?></span>
-			<div class="routew-subpage-profile__info">
-				<span class="routew-subpage-profile__name"><?php echo esc_html($name); ?></span>
-				<span class="routew-subpage-profile__email"><?php echo esc_html($user->user_email); ?></span>
+		<div class="card routew-subpage-profile" data-routew-section>
+			<div class="card-body d-flex align-items-center gap-3 py-4">
+				<span class="routew-subpage-profile__avatar flex-shrink-0" aria-hidden="true"><?php echo esc_html($initial); ?></span>
+				<div class="routew-subpage-profile__info flex-grow-1 min-w-0">
+					<span class="routew-subpage-profile__name d-block"><?php echo esc_html($name); ?></span>
+					<span class="routew-subpage-profile__email d-block small text-secondary"><?php echo esc_html($user->user_email); ?></span>
+				</div>
 			</div>
 		</div>
 		<?php
@@ -118,9 +120,9 @@ class ROUTEW_Shortcodes
 			<?php foreach ($chips as $slug => $label) : ?>
 				<?php
 				$href = ('' === $slug) ? $endpoint : add_query_arg('status', $slug, $endpoint);
-				$is_active = ($current === $slug) ? ' routew-orders-filter__chip--active' : '';
+				$is_active = ($current === $slug) ? ' btn-primary routew-orders-filter__chip--active' : '';
 				?>
-				<a class="routew-orders-filter__chip<?php echo esc_attr($is_active); ?>"
+				<a class="btn btn-sm routew-orders-filter__chip<?php echo esc_attr($is_active); ?>"
 				   href="<?php echo esc_url($href); ?>"
 				   <?php echo ('' === $current && '' === $slug) ? 'aria-current="page"' : ($current === $slug ? 'aria-current="page"' : ''); ?>>
 					<?php echo esc_html($label); ?>
@@ -434,7 +436,7 @@ foreach ($order->get_items() as $item) {
 				<span class="badge routew-order-tracking__hero-badge <?php echo esc_attr($hero_status_class); ?>">
 					<?php echo esc_html($hero_status_label); ?>
 				</span>
-			</header>
+			</nav>
 
 			<ol class="routew-status-stepper">
 				<?php

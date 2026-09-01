@@ -1060,18 +1060,19 @@ class ROUTEWTestRunner
             $this->fail('UI6 quick actions grid missing — found only ' . $quick_action_count . ' tiles');
         }
 
-        // Settings list (iOS-style link rows).
-        $settings_list_count = substr_count($shortcodes_php, 'class="routew-list-item"');
+        // Settings list (iOS-style link rows). UI9 renamed to Bootstrap
+        // .list-group-item + .list-group-item-action.
+        $settings_list_count = substr_count($shortcodes_php, 'class="list-group-item list-group-item-action routew-list-item"');
         if ($settings_list_count >= 4) {
-            $this->pass('UI6 settings list has >=4 iOS-style link rows (found ' . $settings_list_count . ')');
+            $this->pass('UI6 settings list has >=4 list-group-item rows (found ' . $settings_list_count . ')');
         } else {
             $this->fail('UI6 settings list missing — found ' . $settings_list_count . ' rows');
         }
 
-        // Sign-out button (full-width pill).
-        if (false !== strpos($shortcodes_php, 'routew-signout')
-            && preg_match('/class="routew-signout"/', $shortcodes_php)) {
-            $this->pass('UI6 sign-out button styled as full-width pill');
+        // Sign-out button (Bootstrap .btn .btn-lg). UI9 added btn classes.
+        if (false !== strpos($shortcodes_php, 'btn btn-lg btn-light')
+            && false !== strpos($shortcodes_php, 'routew-signout')) {
+            $this->pass('UI6 sign-out button styled as full-width pill (.btn .btn-lg)');
         } else {
             $this->fail('UI6 sign-out button missing or not styled');
         }
@@ -1185,6 +1186,47 @@ class ROUTEWTestRunner
             $this->pass('UI8 my-account.css has all native-app subpage polish signals');
         } else {
             $this->fail('UI8 my-account.css missing CSS: ' . implode(', ', $missing_css_ui8));
+        }
+
+        // UI9 — Bootstrap framework composition. Verify the PHP templates
+        // emit Bootstrap 5.3 component classes (card, list-group, btn, btn-*)
+        // instead of bespoke modifier names. This locks the contract that
+        // the visual system uses the framework primitives, not custom
+        // hand-rolled classes that Bootstrap already provides.
+        $ma_php = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
+        $sc_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+
+        $framework_signals = array(
+            // Dashboard widgets
+            'class="card routew-profile-card"'           => 'profile card uses Bootstrap .card',
+            'class="card-body d-flex align-items-center' => 'profile card body uses Bootstrap flex utilities',
+            'card routew-ios-card'                       => 'orders + address cards use .card',
+            'card-body routew-ios-card__body'             => 'card body uses Bootstrap .card-body',
+            'btn btn-sm btn-outline-primary'              => 'Edit button uses .btn .btn-outline-primary',
+            'row g-3 routew-dashboard__quick-actions'    => 'quick actions use Bootstrap .row .g-3',
+            'col-6 col-md-3 btn btn-light'               => 'quick action tiles use .btn .btn-light + .col-*',
+            'card border-0 shadow-sm routew-empty-state' => 'empty state uses .card .border-0 .shadow-sm',
+            'list-group list-group-flush routew-list'     => 'settings list uses Bootstrap .list-group',
+            'list-group-item list-group-item-action'      => 'list rows use .list-group-item-action',
+            'btn btn-lg btn-light'                        => 'sign-out uses Bootstrap .btn .btn-lg',
+            // Sub-page header
+            'navbar routew-subpage-header'                => 'sub-page header uses Bootstrap .navbar',
+            'navbar-brand mb-0'                           => 'sub-page title uses .navbar-brand',
+            // Filter chips
+            'btn btn-sm routew-orders-filter__chip'      => 'filter chips use .btn .btn-sm',
+            'btn-primary routew-orders-filter__chip--active' => 'active filter chip includes btn-primary class',
+        );
+
+        $missing_framework = array();
+        foreach ($framework_signals as $needle => $label) {
+            if (false === strpos($ma_php . $sc_php, $needle)) {
+                $missing_framework[] = $label;
+            }
+        }
+        if (empty($missing_framework)) {
+            $this->pass('UI9 dashboard + sub-page templates compose Bootstrap framework classes (card, list-group, btn, navbar) — found all 14');
+        } else {
+            $this->fail('UI9 missing framework class compositions: ' . implode(', ', $missing_framework));
         }
 
         echo "\n";
