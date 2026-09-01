@@ -35,6 +35,16 @@ class ROUTEW_Agent_Cash
 	const STATUS_REJECTED = 'rejected';
 
 	/**
+	 * Maximum entries kept in the per-store settlement ledger before
+	 * older rows are dropped on the next write. Interim cap; the proper
+	 * fix is a CPT (one row per settlement) — see v1.6.0 plans.
+	 *
+	 * 2 000 covers ~5 years of one-per-business-day entries per agent.
+	 * (AUDIT-FIXES M7)
+	 */
+	const SETTLEMENT_LEDGER_CAP = 2000;
+
+	/**
 	 * Cash-settlement ledger option name.
 	 *
 	 * @since 1.4.0
@@ -217,7 +227,14 @@ class ROUTEW_Agent_Cash
 				'reviewed_by' => 0,
 				'reviewed_at' => 0,
 			));
-			update_option(self::settlements_option(), array_slice($settlements, 0, 200), false);
+			// TODO(m7): settle ledger is currently a single wp_options entry
+			// capped at SETTLEMENT_LEDGER_CAP. Long-tenured agents were
+			// seeing wrong "Cash to hand over" balances because the cap
+			// dropped older entries on every write. Bumped from 200 to
+			// SETTLEMENT_LEDGER_CAP entries (interim fix for v1.5.0); the
+			// proper fix is a custom post type (routew_cash_settlement) per
+			// agent, planned for v1.6.0. (AUDIT-FIXES M7)
+			update_option(self::settlements_option(), array_slice($settlements, 0, self::SETTLEMENT_LEDGER_CAP), false);
 
 			return (float) $summary['unsettled'];
 		} finally {

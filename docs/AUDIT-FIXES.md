@@ -260,7 +260,7 @@ Run live on `foodxpress-for-woocommerce.local` after each fix batch.
 | M2+M3 | [x] | 2026-09-01 | Round 2 batch D |
 | M4 | [x] | 2026-09-01 | Round 2 batch F |
 | M5+M6 | [x] | 2026-09-01 | Round 2 batch E |
-| M7 | [ ] | | |
+| M7 | [x] | 2026-09-01 | Round 2 batch G (interim cap bump) |
 | M8 | [x] | 2026-09-01 | Round 2 batch E |
 | M9 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | M10 | [x] | 2026-09-01 | Round 2 batch F |

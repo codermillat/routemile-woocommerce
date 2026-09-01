@@ -471,6 +471,26 @@ class ROUTEWTestRunner
             $this->fail('M10 legacy admin_init GET handler still registered');
         }
 
+        // M7 (ledger cap): create_request must use the SETTLEMENT_LEDGER_CAP
+        // constant (not a hardcoded 200), the constant must exist, and its
+        // value must be > 200 so we are strictly increasing the cap.
+        $cash = file_get_contents($this->plugin_dir . '/includes/class-routew-agent-cash.php');
+        if (false !== strpos($cash, 'const SETTLEMENT_LEDGER_CAP')) {
+            $this->pass('M7 SETTLEMENT_LEDGER_CAP constant defined');
+        } else {
+            $this->fail('M7 SETTLEMENT_LEDGER_CAP constant missing');
+        }
+        if (false !== strpos($cash, 'array_slice($settlements, 0, self::SETTLEMENT_LEDGER_CAP)')) {
+            $this->pass('M7 create_request uses SETTLEMENT_LEDGER_CAP');
+        } else {
+            $this->fail('M7 create_request still uses hardcoded cap');
+        }
+        if (preg_match('/const\s+SETTLEMENT_LEDGER_CAP\s*=\s*(\d+)/', $cash, $m) && (int) $m[1] > 200) {
+            $this->pass('M7 SETTLEMENT_LEDGER_CAP > 200 (value=' . $m[1] . ')');
+        } else {
+            $this->fail('M7 SETTLEMENT_LEDGER_CAP <= 200');
+        }
+
         // Check order statuses registration
         $statuses_file = $this->plugin_dir . '/includes/class-routew-order-statuses.php';
         $content = file_get_contents($statuses_file);
