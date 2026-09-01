@@ -62,6 +62,10 @@ case 'reassign':
 						$revert_to = get_post_status_object('wc-routew-in-kitchen') ? 'routew-in-kitchen' : 'processing';
 						$order->update_status($revert_to, __('Delivery boy has been unassigned — order returned to kitchen.', 'routemile-for-woocommerce'));
 						$order->save();
+						// Wipe the now-stale location PII. (AUDIT-FIXES M2)
+						if (class_exists('ROUTEW_Order_Lifecycle')) {
+							ROUTEW_Order_Lifecycle::clear_delivery_location_meta($order_id);
+						}
 						break;
 			}
 

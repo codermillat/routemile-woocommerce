@@ -412,6 +412,34 @@ class ROUTEWTestRunner
             }
         }
 
+        // M2+M3 (location-meta lifecycle): ensure every unassign path and the
+        // terminal-status hooks reach the helper.
+        $lifecycle_helper = $this->plugin_dir . '/includes/services/class-routew-order-lifecycle.php';
+        $lifecycle_content = file_exists($lifecycle_helper) ? file_get_contents($lifecycle_helper) : '';
+        foreach (array(
+            'woocommerce_order_status_completed',
+            'woocommerce_order_status_cancelled',
+        ) as $hook) {
+            if (false !== strpos($lifecycle_content, "'" . $hook . "'")) {
+                $this->pass("M2+M3 hook registered: $hook");
+            } else {
+                $this->fail("M2+M3 missing hook: $hook");
+            }
+        }
+        $unassign_caller_files = array(
+            'includes/class-routew-dashboard-actions.php' => 2, // form unassign + AJAX unassign
+            'includes/class-routew-order-admin.php'      => 1, // legacy ?routew_action=reassign
+        );
+        foreach ($unassign_caller_files as $rel => $expected_calls) {
+            $content = file_get_contents($this->plugin_dir . '/' . $rel);
+            $actual = substr_count($content, 'ROUTEW_Order_Lifecycle::clear_delivery_location_meta');
+            if ($actual >= $expected_calls) {
+                $this->pass(sprintf('M2 caller present in %s (×%d)', $rel, $actual));
+            } else {
+                $this->fail(sprintf('M2 caller missing from %s (found %d, expected ≥%d)', $rel, $actual, $expected_calls));
+            }
+        }
+
         // Check order statuses registration
         $statuses_file = $this->plugin_dir . '/includes/class-routew-order-statuses.php';
         $content = file_get_contents($statuses_file);

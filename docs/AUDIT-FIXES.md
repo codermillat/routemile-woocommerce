@@ -257,7 +257,7 @@ Run live on `foodxpress-for-woocommerce.local` after each fix batch.
 | H4 | [x] | 2026-09-01 | Round 2 batch B |
 | H5 | [x] | 2026-09-01 | Round 2 batch C |
 | M1 | [ ] | | |
-| M2+M3 | [ ] | | |
+| M2+M3 | [x] | 2026-09-01 | Round 2 batch D |
 | M4 | [ ] | | |
 | M5+M6 | [ ] | | |
 | M7 | [ ] | | |

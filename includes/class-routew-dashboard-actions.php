@@ -88,6 +88,11 @@ class ROUTEW_Dashboard_Actions
 			$revert_to = get_post_status_object('wc-routew-in-kitchen') ? 'routew-in-kitchen' : 'processing';
 			$order->update_status($revert_to, __('Delivery boy unassigned — order returned to kitchen.', 'routemile-for-woocommerce'));
 			$order->save();
+			// Wipe the now-stale location PII so a future re-assignment
+			// starts clean and so we don't hold the previous rider's PII
+			// against a customer that may go to a different rider next.
+			// (AUDIT-FIXES M2)
+			ROUTEW_Order_Lifecycle::clear_delivery_location_meta($order_id);
 
 			/* translators: %s: order number. */
 			set_transient('routew_admin_notice', sprintf(__('Order #%s unassigned from delivery boy', 'routemile-for-woocommerce'), $order->get_order_number()), 30);
@@ -191,6 +196,8 @@ class ROUTEW_Dashboard_Actions
 			$revert_to = get_post_status_object('wc-routew-in-kitchen') ? 'routew-in-kitchen' : 'processing';
 			$order->update_status($revert_to, __('Delivery boy unassigned — order returned to kitchen.', 'routemile-for-woocommerce'));
 			$order->save();
+			// Wipe the now-stale location PII. (AUDIT-FIXES M2)
+			ROUTEW_Order_Lifecycle::clear_delivery_location_meta($order_id);
 
 			if (function_exists('wc_delete_shop_order_transients')) {
 				wc_delete_shop_order_transients($order_id);
