@@ -5,6 +5,12 @@
  * the welcome banner, stats row, recent-orders list, and default-address
  * card with Bootstrap primitives where they fit.
  *
+ * Visual polish layer (v1.5.0):
+ *  - Inline SVG icons in every stat card.
+ *  - Welcome banner with stronger gradient + larger greeting typography.
+ *  - Subtle hover lift on stat cards.
+ *  - Better spacing and rhythm across the dashboard widgets.
+ *
  * @since 1.5.0
  */
 
@@ -15,6 +21,7 @@
 	--routew-dash-shadow-sm: 0 1px 2px rgba(20, 14, 8, 0.04), 0 1px 6px rgba(20, 14, 8, 0.04);
 	--routew-dash-shadow-md: 0 4px 16px rgba(20, 14, 8, 0.06);
 	--routew-dash-shadow-accent: 0 8px 24px rgba(232, 93, 4, 0.18);
+	--routew-dash-shadow-hover: 0 8px 28px rgba(20, 14, 8, 0.10), 0 2px 8px rgba(232, 93, 4, 0.10);
 	--routew-dash-neutral: #5A5A5A;
 	--routew-dash-neutral-bg: #F0EEEA;
 }
@@ -31,19 +38,18 @@
 }
 
 /* ----------------------------------------------------------------------------
-   Welcome banner — gradient + decorative radial-gradient blob via ::before.
-   Bootstrap's `.card` doesn't ship the gradient blob pattern, so this stays
-   bespoke.
+   Welcome banner — gradient + decorative radial blob. Bigger greeting
+   typography than the v1.4.0 version.
    ---------------------------------------------------------------------------- */
 .routew-dashboard__welcome {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
-	padding: 14px 16px;
-	margin-bottom: 12px;
-	background: linear-gradient(135deg, #FFF4ED 0%, #FFE7D6 100%);
+	gap: 14px;
+	padding: 22px 24px;
+	margin-bottom: 18px;
+	background: linear-gradient(135deg, #FFF4ED 0%, #FFE7D6 60%, #FFD6B5 100%);
 	border: 1px solid rgba(232, 93, 4, 0.18);
-	border-radius: 1.125rem;
+	border-radius: 1.25rem;
 	box-shadow: var(--routew-dash-shadow-sm);
 	position: relative;
 	overflow: hidden;
@@ -52,82 +58,94 @@
 .routew-dashboard__welcome::before {
 	content: "";
 	position: absolute;
-	right: -40px;
-	top: -40px;
-	width: 160px;
-	height: 160px;
-	background: radial-gradient(circle at center, rgba(232, 93, 4, 0.18) 0%, rgba(232, 93, 4, 0) 70%);
+	right: -60px;
+	top: -80px;
+	width: 200px;
+	height: 200px;
+	background: radial-gradient(circle at center, rgba(232, 93, 4, 0.22) 0%, rgba(232, 93, 4, 0) 70%);
+	pointer-events: none;
+}
+
+.routew-dashboard__welcome::after {
+	content: "";
+	position: absolute;
+	left: -40px;
+	bottom: -40px;
+	width: 120px;
+	height: 120px;
+	background: radial-gradient(circle at center, rgba(232, 93, 4, 0.10) 0%, rgba(232, 93, 4, 0) 70%);
 	pointer-events: none;
 }
 
 .routew-dashboard__welcome-text {
 	position: relative;
 	min-width: 0;
+	flex: 1;
 }
 
 .routew-dashboard__greeting-eyebrow {
 	display: inline-block;
 	font-size: 0.78em;
-	font-weight: 600;
-	letter-spacing: 0.06em;
+	font-weight: 700;
+	letter-spacing: 0.08em;
 	text-transform: uppercase;
 	color: var(--bs-primary);
 	margin-bottom: 6px;
 }
 
 .routew-dashboard__greeting {
-	margin: 0 0 6px;
-	font-size: 1.35em;
-	font-weight: 700;
+	margin: 0 0 8px;
+	font-size: 1.85em;
+	font-weight: 800;
 	color: var(--bs-body-color);
-	line-height: 1.2;
-	letter-spacing: -0.01em;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
 }
 
 .routew-dashboard__subgreeting {
 	margin: 0;
-	font-size: 0.88em;
-	color: #6B6B6B;
+	font-size: 0.95em;
+	color: #4A4A4A;
 	line-height: 1.5;
-	max-width: 52ch;
+	max-width: 56ch;
 }
 
-/* Reorder CTA — uses .btn .btn-primary semantics but keeps the custom
-   shadow + scale-on-hover from the original delivery-app aesthetic. */
+/* Reorder CTA — Bootstrap .btn semantics with custom shadow + scale-on-hover */
 .routew-dashboard__reorder {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
-	padding: 10px 18px;
-	min-height: 40px;
+	padding: 12px 22px;
+	min-height: 48px;
 	background-color: var(--bs-primary);
 	border-color: var(--bs-primary);
 	color: #fff !important;
-	font-weight: 600;
-	font-size: 0.9em;
+	font-weight: 700;
+	font-size: 0.95em;
 	border-radius: var(--bs-border-radius);
 	text-decoration: none !important;
 	box-shadow: var(--routew-dash-shadow-accent);
-	transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+	transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 	white-space: nowrap;
 	flex-shrink: 0;
 	align-self: flex-start;
+	font-variant-numeric: tabular-nums;
 }
 
 .routew-dashboard__reorder:hover,
 .routew-dashboard__reorder:focus-visible {
 	background-color: #D44D00;
 	border-color: #D44D00;
-	transform: translateY(-1px);
-	box-shadow: 0 10px 28px rgba(232, 93, 4, 0.24);
+	transform: translateY(-2px);
+	box-shadow: 0 12px 32px rgba(232, 93, 4, 0.30);
 	color: #fff;
 }
 
 .routew-dashboard__reorder--ghost {
 	background: #fff;
 	color: var(--bs-primary) !important;
-	border: 1.5px solid var(--bs-primary);
+	border: 2px solid var(--bs-primary);
 	box-shadow: none;
 }
 
@@ -135,33 +153,35 @@
 .routew-dashboard__reorder--ghost:focus-visible {
 	background: #FFF4ED;
 	color: var(--bs-primary) !important;
+	box-shadow: none;
+	transform: translateY(-1px);
 }
 
 .routew-dashboard__reorder-icon {
-	font-size: 1.1em;
+	font-size: 1.15em;
+	font-weight: 700;
 }
 
+/* Mobile (<700px): lay the welcome banner inline so the CTA sits next
+   to the greeting. Halves the banner height from stacked to inline. */
 @media (max-width: 699px) {
 	.routew-dashboard__welcome {
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
 		gap: 12px;
-		padding: 10px 14px;
+		padding: 14px 16px;
 	}
 	.routew-dashboard__welcome-text {
 		flex: 1;
 		min-width: 0;
 	}
-	.routew-dashboard__greeting-eyebrow {
-		margin-bottom: 2px;
-	}
 	.routew-dashboard__greeting {
-		font-size: 1.05em;
-		margin: 0 0 2px;
+		font-size: 1.25em;
+		margin: 0 0 4px;
 	}
 	.routew-dashboard__subgreeting {
-		font-size: 0.8em;
+		font-size: 0.82em;
 		max-width: none;
 		display: -webkit-box;
 		-webkit-line-clamp: 1;
@@ -169,9 +189,9 @@
 		overflow: hidden;
 	}
 	.routew-dashboard__reorder {
-		flex-shrink: 0;
-		padding: 8px 14px;
-		font-size: 0.82em;
+		padding: 10px 16px;
+		font-size: 0.85em;
+		min-height: 40px;
 	}
 }
 
@@ -180,45 +200,85 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		padding: 22px 24px;
 	}
 }
 
 /* ----------------------------------------------------------------------------
-   Stats row — uses Bootstrap .row.g-3 + .col-6.col-md-3 in markup.
-   CSS just provides the per-card polish.
+   Stats row — Bootstrap .row.g-3 + .col-6.col-md-3 in markup.
+   Each card has an inline SVG icon, a colored number, and a hover lift.
    ---------------------------------------------------------------------------- */
 .routew-dashboard__stats {
-	margin-bottom: 14px;
+	margin-bottom: 18px;
 }
 
 .routew-dashboard__stat {
 	background: #fff;
 	border-radius: var(--bs-border-radius);
-	padding: 14px 12px;
+	padding: 16px 14px;
 	text-align: left;
 	box-shadow: var(--routew-dash-shadow-sm);
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
-	min-height: 76px;
-	justify-content: center;
+	gap: 8px;
+	min-height: 96px;
+	justify-content: flex-start;
 	border: 1px solid var(--bs-border-color);
+	transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.routew-dashboard__stat:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--routew-dash-shadow-hover);
+	border-color: rgba(232, 93, 4, 0.25);
+}
+
+.routew-dashboard__stat-icon {
+	width: 32px;
+	height: 32px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 8px;
+	background: rgba(232, 93, 4, 0.10);
+	color: var(--bs-primary);
+	flex-shrink: 0;
+}
+
+.routew-dashboard__stat-icon svg {
+	width: 18px;
+	height: 18px;
+	fill: currentColor;
+}
+
+.routew-dashboard__stat--info .routew-dashboard__stat-icon {
+	background: rgba(30, 111, 184, 0.10);
+	color: #1E6FB8;
+}
+.routew-dashboard__stat--success .routew-dashboard__stat-icon {
+	background: rgba(31, 138, 76, 0.10);
+	color: #1F8A4C;
+}
+.routew-dashboard__stat--accent .routew-dashboard__stat-icon {
+	background: rgba(232, 93, 4, 0.10);
+	color: var(--bs-primary);
 }
 
 .routew-dashboard__stat-value {
-	font-size: 1.5em;
-	font-weight: 700;
+	font-size: 1.75em;
+	font-weight: 800;
 	color: var(--bs-body-color);
-	line-height: 1.1;
-	letter-spacing: -0.01em;
+	line-height: 1;
+	letter-spacing: -0.02em;
+	font-variant-numeric: tabular-nums;
 }
 
 .routew-dashboard__stat-label {
 	font-size: 0.74em;
-	font-weight: 500;
+	font-weight: 600;
 	color: #6B6B6B;
-	letter-spacing: 0.02em;
+	letter-spacing: 0.03em;
 	text-transform: uppercase;
 }
 
@@ -237,20 +297,25 @@
 
 /* ----------------------------------------------------------------------------
    Panel grid — 2-column layout on desktop, single column on mobile.
-   Bootstrap .row.g-3 + .col-12.col-md-6 in markup.
+   Bootstrap .row.g-3 + .col-12.col-md-7 + .col-md-5 in markup.
    ---------------------------------------------------------------------------- */
 .routew-dashboard__panels {
-	margin-bottom: 14px;
+	margin-bottom: 18px;
 }
 
 .routew-dashboard__panel {
 	background: #fff;
 	border: 1px solid var(--bs-border-color);
 	border-radius: var(--bs-border-radius);
-	padding: 16px 18px;
+	padding: 18px 20px;
 	box-shadow: var(--routew-dash-shadow-sm);
 	display: flex;
 	flex-direction: column;
+	transition: box-shadow 0.15s ease;
+}
+
+.routew-dashboard__panel:hover {
+	box-shadow: var(--routew-dash-shadow-md);
 }
 
 .routew-dashboard__panel-header {
@@ -258,14 +323,14 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 10px;
-	margin-bottom: 12px;
-	padding-bottom: 10px;
+	margin-bottom: 14px;
+	padding-bottom: 12px;
 	border-bottom: 1px solid var(--bs-border-color);
 }
 
 .routew-dashboard__panel-title {
 	margin: 0;
-	font-size: 1em;
+	font-size: 1.05em;
 	font-weight: 700;
 	color: var(--bs-body-color);
 	display: inline-flex;
@@ -287,13 +352,15 @@
 	color: var(--bs-primary);
 	font-weight: 600;
 	text-decoration: none;
+	transition: opacity 0.15s ease;
 }
 
 .routew-dashboard__panel-link:hover {
+	opacity: 0.7;
 	text-decoration: underline;
 }
 
-/* Status pills — map to Bootstrap .badge .text-bg-* utility classes. */
+/* Status pills — Bootstrap .badge + .text-bg-* utility classes. */
 .routew-dashboard__status-pill {
 	display: inline-flex;
 	align-items: center;
@@ -312,33 +379,40 @@
 	padding: 0;
 }
 
-.routew-dashboard__orders li {
+.routew-dashboard__orders-item {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 10px;
-	padding: 10px 0;
+	padding: 12px 0;
 	border-bottom: 1px solid var(--bs-border-color);
+	transition: background 0.15s ease;
 }
 
-.routew-dashboard__orders li:last-child {
+.routew-dashboard__orders-item:last-child {
 	border-bottom: none;
+}
+
+.routew-dashboard__orders-item:hover {
+	background: rgba(232, 93, 4, 0.03);
+	border-radius: 0.5rem;
 }
 
 .routew-dashboard__order-meta {
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	gap: 4px;
 	min-width: 0;
 	flex: 1;
 }
 
 .routew-dashboard__order-number {
 	font-weight: 600;
-	font-size: 0.92em;
+	font-size: 0.95em;
 	color: var(--bs-body-color);
 	font-variant-numeric: tabular-nums;
 	text-decoration: none;
+	transition: color 0.15s ease;
 }
 
 .routew-dashboard__order-number:hover {
@@ -348,11 +422,13 @@
 .routew-dashboard__order-date {
 	font-size: 0.78em;
 	color: #6B6B6B;
+	display: flex;
+	gap: 6px;
 }
 
 .routew-dashboard__order-total {
 	font-weight: 700;
-	font-size: 0.92em;
+	font-size: 0.95em;
 	color: var(--bs-body-color);
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
@@ -360,26 +436,48 @@
 
 /* Default address card */
 .routew-dashboard__address {
-	font-size: 0.92em;
+	font-size: 0.95em;
 	color: var(--bs-body-color);
-	line-height: 1.5;
+	line-height: 1.55;
 }
 
 .routew-dashboard__address-name {
 	font-weight: 700;
-	margin-bottom: 4px;
+	margin-bottom: 6px;
+	color: var(--bs-body-color);
+	display: block;
 }
 
 .routew-dashboard__address-line {
 	display: block;
+	color: #4A4A4A;
 }
 
 /* Empty state */
 .routew-dashboard__empty {
 	text-align: center;
 	color: #6B6B6B;
-	font-size: 0.9em;
-	padding: 20px 8px;
+	font-size: 0.92em;
+	padding: 24px 8px;
+}
+
+.routew-dashboard__empty-icon {
+	display: block;
+	font-size: 2.2em;
+	margin-bottom: 8px;
+	opacity: 0.6;
+}
+
+.routew-dashboard__empty-title {
+	margin: 0 0 4px;
+	font-weight: 600;
+	color: var(--bs-body-color);
+	font-size: 1em;
+}
+
+.routew-dashboard__empty-text {
+	margin: 0;
+	line-height: 1.5;
 }
 
 /* ----------------------------------------------------------------------------

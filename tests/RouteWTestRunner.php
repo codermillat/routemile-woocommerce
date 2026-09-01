@@ -852,6 +852,45 @@ class ROUTEWTestRunner
             $this->fail('UI-X Bootstrap handle not consistent — agent=' . $agent_count . ', my-account=' . $shortcodes_count . ' (need both >= 1)');
         }
 
+        // UI3 — Visual polish layer (Batch 3).
+        // Verifies the my-account dashboard adds inline SVG stat icons, the
+        // agent PWA adds KPI tile icons, the page-wrapper has a max-width
+        // for proper viewport use, and the mobile bottom-tab nav uses
+        // safe-area-inset-bottom for iPhone notch support.
+        // My-account dashboard icons — 4 SVG icons, one per stat tile.
+        $icon_count = substr_count($my_account_php, 'routew-dashboard__stat-icon');
+        if ($icon_count >= 4) {
+            $this->pass('UI3 my-account dashboard emits stat icons (count=' . $icon_count . ' — 4 stat tiles + selector)');
+        } else {
+            $this->fail('UI3 my-account dashboard missing stat icons — expected >= 4 occurrences of routew-dashboard__stat-icon');
+        }
+
+        // Agent PWA KPI icons — 5 SVG icons (Delivered today / Active now /
+        // Collected today / To hand over / All-time delivered).
+        $tpl = file_get_contents($this->plugin_dir . '/templates/delivery-dashboard-template.php');
+        $kpi_icon_count = substr_count($tpl, 'routew-agent-stat__icon');
+        if ($kpi_icon_count >= 5) {
+            $this->pass('UI3 agent PWA KPI tiles include icons (count=' . $kpi_icon_count . ' — 5 tiles + selector)');
+        } else {
+            $this->fail('UI3 agent PWA KPI tiles missing icons — expected >= 5 occurrences of routew-agent-stat__icon');
+        }
+
+        // Page-wrapper max-width so widgets fill the viewport on desktop
+        // instead of hugging the left edge.
+        $my_account_css = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
+        if (preg_match('/max-width:\s*1200px/i', $my_account_css) || preg_match('/max-width:\s*\d+px/i', $my_account_css)) {
+            $this->pass('UI3 my-account page wrapper has max-width (widgets fill the viewport on desktop)');
+        } else {
+            $this->fail('UI3 my-account page wrapper missing max-width — content hugs left edge');
+        }
+
+        // Mobile bottom-tab uses safe-area-inset-bottom for iPhone notch.
+        if (false !== strpos($my_account_css, 'safe-area-inset-bottom')) {
+            $this->pass('UI3 mobile bottom-tab respects safe-area-inset-bottom (iPhone notch support)');
+        } else {
+            $this->fail('UI3 mobile bottom-tab does not respect safe-area-inset-bottom');
+        }
+
         echo "\n";
     }
 

@@ -172,18 +172,30 @@ class ROUTEW_My_Account
 
 			<ul class="routew-dashboard__stats row g-3 list-unstyled mb-0" role="list">
 				<li class="routew-dashboard__stat routew-dashboard__stat--info col-6 col-md-3">
+					<span class="routew-dashboard__stat-icon" aria-hidden="true">
+						<svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zm0-10v2h14V7H7z"/></svg>
+					</span>
 					<span class="routew-dashboard__stat-value"><?php echo esc_html((string) $stats['active']); ?></span>
 					<span class="routew-dashboard__stat-label"><?php esc_html_e('On the way', 'routemile-for-woocommerce'); ?></span>
 				</li>
 				<li class="routew-dashboard__stat routew-dashboard__stat--success col-6 col-md-3">
+					<span class="routew-dashboard__stat-icon" aria-hidden="true">
+						<svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+					</span>
 					<span class="routew-dashboard__stat-value"><?php echo esc_html((string) $stats['completed']); ?></span>
 					<span class="routew-dashboard__stat-label"><?php esc_html_e('Delivered', 'routemile-for-woocommerce'); ?></span>
 				</li>
 				<li class="routew-dashboard__stat col-6 col-md-3">
+					<span class="routew-dashboard__stat-icon" aria-hidden="true">
+						<svg viewBox="0 0 24 24"><path d="M5 4h14v3H5zm0 5h14v3H5zm0 5h14v3H5zm0 5h14v3H5z"/></svg>
+					</span>
 					<span class="routew-dashboard__stat-value"><?php echo esc_html((string) $stats['total']); ?></span>
 					<span class="routew-dashboard__stat-label"><?php esc_html_e('All orders', 'routemile-for-woocommerce'); ?></span>
 				</li>
 				<li class="routew-dashboard__stat routew-dashboard__stat--accent col-6 col-md-3">
+					<span class="routew-dashboard__stat-icon" aria-hidden="true">
+						<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7Zm0 9.6A2.6 2.6 0 1 0 12 6.4a2.6 2.6 0 0 0 0 5.2Z"/></svg>
+					</span>
 					<span class="routew-dashboard__stat-value"><?php echo esc_html((string) $stats['addresses']); ?></span>
 					<span class="routew-dashboard__stat-label"><?php esc_html_e('Addresses', 'routemile-for-woocommerce'); ?></span>
 				</li>

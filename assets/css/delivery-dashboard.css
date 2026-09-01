@@ -337,7 +337,8 @@
 }
 
 /* ----------------------------------------------------------------------------
-   8. KPI tiles (top-of-screen grid).
+   8. KPI tiles (top-of-screen grid). Inline SVG icons, bigger numbers,
+   subtle gradient accent on the "due" tile.
    ---------------------------------------------------------------------------- */
 .routew-agent-stats {
 	display: grid;
@@ -353,25 +354,54 @@
 	padding: 10px 6px;
 	text-align: center;
 	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+}
+
+.routew-agent-stat__icon {
+	width: 18px;
+	height: 18px;
+	color: var(--bs-primary);
+	opacity: 0.7;
+}
+
+.routew-agent-stat__icon svg {
+	width: 18px;
+	height: 18px;
+	fill: currentColor;
 }
 
 .routew-agent-stat__value {
-	font-size: 1.125rem;
-	font-weight: 700;
+	font-size: 1.25rem;
+	font-weight: 800;
 	color: var(--bs-body-color);
-	line-height: 1.2;
+	line-height: 1;
+	letter-spacing: -0.02em;
+	font-variant-numeric: tabular-nums;
 }
 
 .routew-agent-stat__label {
 	font-size: 0.6875rem;
 	color: #6B6B6B;
 	text-transform: uppercase;
-	letter-spacing: 0.02em;
-	margin-top: 2px;
+	letter-spacing: 0.04em;
+	font-weight: 600;
+}
+
+.routew-agent-stat--due {
+	background: linear-gradient(135deg, #FFF4ED 0%, #FFE7D6 100%);
+	border-color: rgba(232, 93, 4, 0.20);
 }
 
 .routew-agent-stat--due .routew-agent-stat__value {
 	color: var(--bs-primary);
+}
+
+.routew-agent-stat--due .routew-agent-stat__icon {
+	color: var(--bs-primary);
+	opacity: 1;
 }
 
 /* ----------------------------------------------------------------------------

@@ -307,22 +307,37 @@ $delivered_orders = wc_get_orders(array(
             </div>
             <div class="routew-agent-stats" role="status">
                 <div class="routew-agent-stat">
+                    <span class="routew-agent-stat__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+                    </span>
                     <span class="routew-agent-stat__value"><?php echo absint($routew_state['today']['delivered']); ?></span>
                     <span class="routew-agent-stat__label"><?php esc_html_e('Delivered today', 'routemile-for-woocommerce'); ?></span>
                 </div>
                 <div class="routew-agent-stat">
+                    <span class="routew-agent-stat__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 10.6 4 2.3-1 1.7-5-2.9V6h2v6.6Z"/></svg>
+                    </span>
                     <span class="routew-agent-stat__value"><?php echo absint($routew_state['today']['active']); ?></span>
                     <span class="routew-agent-stat__label"><?php esc_html_e('Active now', 'routemile-for-woocommerce'); ?></span>
                 </div>
                 <div class="routew-agent-stat">
+                    <span class="routew-agent-stat__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M3 6h18v12H3V6Zm9 2.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5ZM5 8v2h2V8H5Zm12 6v2h2v-2h-2Z"/></svg>
+                    </span>
                     <span class="routew-agent-stat__value"><?php echo wp_kses_post(wc_price($routew_state['today']['collected'], array('currency' => get_woocommerce_currency()))); ?></span>
                     <span class="routew-agent-stat__label"><?php esc_html_e('Collected today', 'routemile-for-woocommerce'); ?></span>
                 </div>
                 <div class="routew-agent-stat routew-agent-stat--due">
+                    <span class="routew-agent-stat__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M5 3v18h2v-7h10.6l-2.2-4 2.2-4H7V3H5Z"/></svg>
+                    </span>
                     <span class="routew-agent-stat__value"><?php echo wp_kses_post(wc_price($routew_cash['unsettled'], array('currency' => get_woocommerce_currency()))); ?></span>
                     <span class="routew-agent-stat__label"><?php esc_html_e('To hand over', 'routemile-for-woocommerce'); ?></span>
                 </div>
                 <div class="routew-agent-stat">
+                    <span class="routew-agent-stat__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M12 2 3 6.5v11L12 22l9-4.5v-11L12 2Zm0 2.3 6.3 3.2L12 10.7 5.7 7.5 12 4.3Z"/></svg>
+                    </span>
                     <span class="routew-agent-stat__value"><?php echo absint($routew_state['counts']['delivered']); ?></span>
                     <span class="routew-agent-stat__label"><?php esc_html_e('All-time delivered', 'routemile-for-woocommerce'); ?></span>
                 </div>
