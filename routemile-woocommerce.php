@@ -336,8 +336,14 @@ if (!function_exists('routew_ensure_shipping_method_registered')) {
                     $touched_any = true;
                 } catch (\Throwable $e) {
                     // Zone data is transient; admin warning surfaces
-                    // this. Log for diagnosis.
-                    error_log(sprintf('[RouteMile] %s: %s', __METHOD__, $e->getMessage()));
+                    // this. Log for diagnosis via WC's logger so the
+                    // admin can view/filter via WC → Status → Logs.
+                    if (function_exists('wc_get_logger')) {
+                        wc_get_logger()->error(
+                            sprintf('[RouteMile] %s: %s', __METHOD__, $e->getMessage()),
+                            array('source' => 'routew')
+                        );
+                    }
                 }
             } else {
                 $touched_any = true;
@@ -361,8 +367,15 @@ if (!function_exists('routew_ensure_shipping_method_registered')) {
                 $rest->add_shipping_method('routemile_delivery');
                 $touched_any = true;
             } catch (\Throwable $e) {
-                // Same recovery path as above. Log for diagnosis.
-                error_log(sprintf('[RouteMile] %s: %s', __METHOD__, $e->getMessage()));
+                // Same recovery path as above. Log for diagnosis via
+                // WC's logger so the admin can view/filter via
+                // WC → Status → Logs.
+                if (function_exists('wc_get_logger')) {
+                    wc_get_logger()->error(
+                        sprintf('[RouteMile] %s: %s', __METHOD__, $e->getMessage()),
+                        array('source' => 'routew')
+                    );
+                }
             }
         } else {
             $touched_any = true;

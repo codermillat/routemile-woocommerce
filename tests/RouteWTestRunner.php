@@ -504,6 +504,29 @@ class ROUTEWTestRunner
             }
         }
 
+        // L1.1 — shipping-zone catches must log via wc_get_logger() rather
+        // than bare error_log() so Plugin Check (WP coding standard) accepts
+        // the diagnostic logging in production builds.
+        $main = file_get_contents($this->plugin_dir . '/routemile-woocommerce.php');
+        if (preg_match_all('/function\s+routew_ensure_shipping_method_registered[^{]*\{(.*?)(?=\n\}\n|\n\})/s', $main, $m)) {
+            $body = $m[1][0] ?? '';
+            $catch_blocks = preg_match_all('/\}\s*catch\s*\(\s*\\\\?Throwable[^{]*\{(.*?)\}/s', $body, $cb);
+            $wc_logger_count = substr_count($body, "wc_get_logger()->error(");
+            $raw_error_log_count = preg_match_all('/^\s*error_log\s*\(/m', $body);
+            if ($catch_blocks >= 2 && $wc_logger_count >= 2 && 0 === $raw_error_log_count) {
+                $this->pass('L1.1 shipping-zone catches log via wc_get_logger() (no bare error_log)');
+            } else {
+                $this->fail(sprintf(
+                    'L1.1 expected ≥2 catches with wc_get_logger()->error() and no bare error_log(); found %d catches, %d wc_get_logger, %d bare error_log',
+                    $catch_blocks,
+                    $wc_logger_count,
+                    $raw_error_log_count
+                ));
+            }
+        } else {
+            $this->fail('L1.1 could not locate routew_ensure_shipping_method_registered() body');
+        }
+
         echo "\n";
     }
 

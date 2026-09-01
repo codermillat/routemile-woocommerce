@@ -265,6 +265,7 @@ Run live on `foodxpress-for-woocommerce.local` after each fix batch.
 | M9 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | M10 | [x] | 2026-09-01 | Round 2 batch F |
 | L1 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
+| L1.1 | [x] | 2026-09-01 | follow-up: swap error_log → wc_get_logger in shipping-zone catches (clears 2 Plugin Check warnings) |
 | L2 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | L3 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | L4 | [x] | 2026-09-01 | Round 2 batch C |
