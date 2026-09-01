@@ -151,11 +151,12 @@ class ROUTEW_Map_Provider_Client
 
 		$lock = 'routew_provider_slot_' . (isset($this->provider['id']) ? $this->provider['id'] : 'x');
 
-		if (false !== get_transient($lock)) {
+		// Atomic acquire: wp_cache_add() returns false when another
+		// request just inserted the key, so two concurrent callers cannot
+		// both pass the previous get/set race. (AUDIT-FIXES M8)
+		if (!wp_cache_add($lock, time(), 'routew_provider_lock', $interval)) {
 			return new WP_Error('provider_busy', __('Address lookups are busy for a moment — please try again, or drag the map pin instead.', 'routemile-for-woocommerce'));
 		}
-
-		set_transient($lock, time(), $interval);
 
 		return true;
 	}

@@ -129,8 +129,11 @@ class ROUTEW_Mapping_Service
 		// Serve from cache when possible — calculate_shipping() runs on
 		// every cart/checkout render, so an uncached API call here burns
 		// quota and adds latency on each one.
+		// Cache key includes the restaurant pin so that when the operator
+		// moves the store the cache invalidates immediately. (AUDIT-FIXES M1)
+		$restaurant_pin = trim((string) get_option('routew_restaurant_latlng', ''));
 		$cache_key = 'routew_dist_' . md5(
-			$this->provider['id'] . '|' . $this->coord_hash($orig) . '|' . $this->coord_hash($dest)
+			$this->provider['id'] . '|' . $restaurant_pin . '|' . $this->coord_hash($orig) . '|' . $this->coord_hash($dest)
 		);
 		$cached = get_transient($cache_key);
 		if (false !== $cached && is_array($cached) && isset($cached['distance'], $cached['duration'])) {

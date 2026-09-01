@@ -194,20 +194,35 @@ class ROUTEW_Agent_Cash
 			return null;
 		}
 
-		$settlements = self::get_settlements();
-		array_unshift($settlements, array(
-			'id' => uniqid('fxwset_', true),
-			'agent_id' => absint($agent_id),
-			'amount' => (float) $summary['unsettled'],
-			'requested_by' => absint($requested_by),
-			'requested_at' => time(),
-			'status' => self::STATUS_PENDING,
-			'reviewed_by' => 0,
-			'reviewed_at' => 0,
-		));
-		update_option(self::settlements_option(), array_slice($settlements, 0, 200), false);
+		// TOCTOU lock: a double-click on "Request handover" raced against
+		// its own first read-modify-write and inserted two STATUS_PENDING
+		// entries. The transient is short-lived (5s is plenty for this
+		// single read-write) and is dropped on completion or failure.
+		// (AUDIT-FIXES M5)
+		$lock_key = 'routew_settle_lock_' . absint($agent_id);
+		if (false !== get_transient($lock_key)) {
+			return null;
+		}
+		set_transient($lock_key, 1, 5);
 
-		return (float) $summary['unsettled'];
+		try {
+			$settlements = self::get_settlements();
+			array_unshift($settlements, array(
+				'id' => uniqid('fxwset_', true),
+				'agent_id' => absint($agent_id),
+				'amount' => (float) $summary['unsettled'],
+				'requested_by' => absint($requested_by),
+				'requested_at' => time(),
+				'status' => self::STATUS_PENDING,
+				'reviewed_by' => 0,
+				'reviewed_at' => 0,
+			));
+			update_option(self::settlements_option(), array_slice($settlements, 0, 200), false);
+
+			return (float) $summary['unsettled'];
+		} finally {
+			delete_transient($lock_key);
+		}
 	}
 
 	/**
@@ -225,27 +240,42 @@ class ROUTEW_Agent_Cash
 			return null;
 		}
 
-		$settlements = self::get_settlements();
-		$index = -1;
-		foreach ($settlements as $i => $entry) {
-			if ((string) $entry['id'] === (string) $id && self::STATUS_PENDING === $entry['status']) {
-				$index = $i;
-				break;
-			}
-		}
-		if ($index < 0) {
+		// Compare-and-swap: only flip a row that is still PENDING. Concurrent
+		// accept/reject would otherwise lose the second update (the first
+		// writer's delete_meta_data + write, plus the second writer's
+		// independently-read stale copy, leads to one of the status writes
+		// disappearing). (AUDIT-FIXES M6)
+		$lock_key = 'routew_review_lock_' . sanitize_text_field((string) $id);
+		if (false !== get_transient($lock_key)) {
 			return null;
 		}
+		set_transient($lock_key, 1, 5);
 
-		$settlements[$index]['status'] = $decision;
-		$settlements[$index]['reviewed_by'] = absint($reviewed_by);
-		$settlements[$index]['reviewed_at'] = time();
-		update_option(self::settlements_option(), $settlements, false);
+		try {
+			$settlements = self::get_settlements();
+			$index = -1;
+			foreach ($settlements as $i => $entry) {
+				if ((string) $entry['id'] === (string) $id && self::STATUS_PENDING === $entry['status']) {
+					$index = $i;
+					break;
+				}
+			}
+			if ($index < 0) {
+				return null;
+			}
 
-		return array(
-			'agent_id' => absint($settlements[$index]['agent_id']),
-			'amount' => (float) $settlements[$index]['amount'],
-		);
+			$settlements[$index]['status'] = $decision;
+			$settlements[$index]['reviewed_by'] = absint($reviewed_by);
+			$settlements[$index]['reviewed_at'] = time();
+			update_option(self::settlements_option(), $settlements, false);
+
+			return array(
+				'agent_id' => absint($settlements[$index]['agent_id']),
+				'amount' => (float) $settlements[$index]['amount'],
+			);
+		} finally {
+			delete_transient($lock_key);
+		}
 	}
 }
 
