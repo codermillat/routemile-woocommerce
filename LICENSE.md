@@ -1,4 +1,4 @@
-FoodXpress for WooCommerce
+RouteMile for WooCommerce
 Copyright (C) 2026 MD Millat Hosen
 
 This program is free software: you can redistribute it and/or modify

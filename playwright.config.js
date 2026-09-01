@@ -2,16 +2,16 @@
 const { defineConfig, devices } = require('@playwright/test');
 
 /**
- * Playwright configuration for FoodXpress browser tests.
+ * Playwright configuration for RouteMile browser tests.
  *
  * Targets a real WordPress install rather than a mock: the bugs worth
  * catching here (map tiles not painting, hooks firing at the wrong time,
  * block-theme rendering) only appear against real WooCommerce.
  *
- * Point FXW_BASE_URL at your dev site. Defaults to the Local by Flywheel
+ * Point ROUTEW_BASE_URL at your dev site. Defaults to the Local by Flywheel
  * site used during development.
  */
-const baseURL = process.env.FXW_BASE_URL || 'http://foodxpress-for-woocommerce.local';
+const baseURL = process.env.ROUTEW_BASE_URL || 'http://routemile-woocommerce.local';
 
 module.exports = defineConfig({
 	testDir: './tests/e2e',

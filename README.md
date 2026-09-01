@@ -1,4 +1,4 @@
-# FoodXpress for WooCommerce
+# RouteMile for WooCommerce
 
 A complete delivery management system for single-restaurant WooCommerce stores.
 
@@ -58,8 +58,8 @@ The plugin is self-contained except for the map provider you choose:
 
 | Shortcode | Description |
 |-----------|-------------|
-| `[fxw_track_order]` | Live order tracking for customers |
-| `[fxw_reorder]` | Quick reorder previous orders |
+| `[routew_track_order]` | Live order tracking for customers |
+| `[routew_reorder]` | Quick reorder previous orders |
 
 ## Testing
 
@@ -101,8 +101,8 @@ GitHub: [@codermillat](https://github.com/codermillat)
 
 1. Install and activate WooCommerce first.
 2. Upload the plugin ZIP via **Plugins → Add New → Upload Plugin**, or install through the WordPress plugins screen.
-3. Go to **WooCommerce → Settings → FoodXpress**, pick a map provider, and set your restaurant location, delivery radius, and delivery fees.
-4. Enable the FoodXpress Delivery method in your shipping zone(s), or let the plugin add it automatically.
+3. Go to **WooCommerce → Settings → RouteMile**, pick a map provider, and set your restaurant location, delivery radius, and delivery fees.
+4. Enable the RouteMile Delivery method in your shipping zone(s), or let the plugin add it automatically.
 5. Create users with the "Delivery Boy" role — their app lives at their Delivery Dashboard page.
 
 ## Configuration
@@ -123,7 +123,7 @@ Switch providers any time — placed orders are unaffected.
 1. Open [Google Cloud Console](https://console.cloud.google.com/), create or select a project.
 2. Enable **Maps JavaScript API**, **Geocoding API**, and **Distance Matrix API**.
 3. Create an API key under **APIs & Services → Credentials**.
-4. Paste it into **WooCommerce → Settings → FoodXpress → Map Provider**.
+4. Paste it into **WooCommerce → Settings → RouteMile → Map Provider**.
 5. **Recommended:** create a second key, paste it into the "Server-side API Key" field, and restrict both:
    - **Browser key** → HTTP-referrer restriction `https://*.yourdomain.com/*`
    - **Server key** → IP restriction to your server's IP (the plugin automatically uses this one for server-side distance/geocoding calls)
@@ -151,6 +151,6 @@ The plugin handles real orders and real money (including COD). Beyond the code:
 - **Restrict your map keys** — lock browser keys to your domain and the Google server key to your server IP in the provider dashboards. Unrestricted keys can be abused if extracted from page source.
 - **Role hygiene** — managers/admins need `edit_shop_orders` or `manage_woocommerce`; riders only get the "Delivery Boy" role and see only their own assigned orders.
 - **Cash settlement is trust-based by design** — the plugin records exactly who collected, handed over, and approved what and when, but physical cash still needs human reconciliation.
-- **Back up regularly** — all FoodXpress data lives in WordPress/WooCommerce's own tables, so standard backups cover it.
+- **Back up regularly** — all RouteMile data lives in WordPress/WooCommerce's own tables, so standard backups cover it.
 
 ## Privacy & external services

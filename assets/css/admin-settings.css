@@ -1,31 +1,31 @@
 /**
- * FoodXpress settings tab — section cards, anchor nav, conditional rows.
+ * RouteMile settings tab — section cards, anchor nav, conditional rows.
  *
- * Scoped to .fxw-settings-cards (rendered by FXW_Settings_Ui on
- * WooCommerce → Settings → FoodXpress only). No global selectors.
+ * Scoped to .routew-settings-cards (rendered by ROUTEW_Settings_Ui on
+ * WooCommerce → Settings → RouteMile only). No global selectors.
  */
 
-.fxw-settings-cards {
-	--fxw-set-primary: #E85D04;
+.routew-settings-cards {
+	--routew-set-primary: #E85D04;
 	max-width: 960px;
 }
 
 /* --- Section cards -------------------------------------------------------- */
-.fxw-settings-cards > form table.form-table > tbody > tr,
-.fxw-settings-cards table.form-table > tbody > tr {
+.routew-settings-cards > form table.form-table > tbody > tr,
+.routew-settings-cards table.form-table > tbody > tr {
 	/* Card look per field row group: WP prints one <tr> per field with the
 	   section heading as its own row. Group them visually. */
 	background: transparent;
 }
 
-.fxw-settings-cards table.form-table {
+.routew-settings-cards table.form-table {
 	margin-top: 0;
 }
 
 /* Section heading rows become card headers */
-.fxw-settings-cards table.form-table > tbody > tr > th[scope="row"][colspan] h2,
-.fxw-settings-cards table.form-table > tbody > tr[data-wp-lists] h2,
-.fxw-settings-cards table.form-table > tbody > tr > td[colspan="2"] h2 {
+.routew-settings-cards table.form-table > tbody > tr > th[scope="row"][colspan] h2,
+.routew-settings-cards table.form-table > tbody > tr[data-wp-lists] h2,
+.routew-settings-cards table.form-table > tbody > tr > td[colspan="2"] h2 {
 	font-size: 16px;
 	font-weight: 700;
 	color: #1d2327;
@@ -33,60 +33,60 @@
 
 /* Card container effect: wrap each settings-section in visual space.
    WP renders sections sequentially; we style the boundaries via the
-   section-title rows that carry an id like fxw_..._settings_section. */
-.fxw-settings-cards table.form-table > tbody > tr > td[colspan="2"] {
+   section-title rows that carry an id like routew_..._settings_section. */
+.routew-settings-cards table.form-table > tbody > tr > td[colspan="2"] {
 	padding-top: 24px;
 }
 
-.fxw-settings-cards table.form-table > tbody > tr:first-child > td[colspan="2"] {
+.routew-settings-cards table.form-table > tbody > tr:first-child > td[colspan="2"] {
 	padding-top: 0;
 }
 
 /* Field rows */
-.fxw-settings-cards table.form-table > tbody > tr > th[scope="row"] {
+.routew-settings-cards table.form-table > tbody > tr > th[scope="row"] {
 	width: 260px;
 	padding-left: 0;
 }
 
-.fxw-settings-cards table.form-table > tbody > tr > td {
+.routew-settings-cards table.form-table > tbody > tr > td {
 	padding-bottom: 18px;
 	vertical-align: top;
 }
 
-.fxw-settings-cards .description {
+.routew-settings-cards .description {
 	max-width: 520px;
 	margin-top: 4px;
 	color: #50575e;
 }
 
 /* Conditional rows animate out of the way */
-.fxw-settings-cards table.form-table > tbody > tr.fxw-row-hidden {
+.routew-settings-cards table.form-table > tbody > tr.routew-row-hidden {
 	display: none;
 }
 
 /* --- API key fields ------------------------------------------------------- */
-.fxw-key-wrap {
+.routew-key-wrap {
 	display: flex;
 	align-items: center;
 	gap: 6px;
 	flex-wrap: wrap;
 }
 
-.fxw-key-wrap .fxw-key-input {
+.routew-key-wrap .routew-key-input {
 	font-family: Consolas, Monaco, monospace;
 	letter-spacing: 0.5px;
 }
 
-.fxw-key-toggle {
+.routew-key-toggle {
 	min-width: 64px;
 }
 
 /* Provider notes list under the provider select */
-.fxw-provider-notes {
+.routew-provider-notes {
 	margin: 8px 0 0 !important;
 }
 
-.fxw-provider-note {
+.routew-provider-note {
 	margin-bottom: 4px;
 	padding: 8px 12px;
 	background: #f6f7f7;
@@ -95,36 +95,36 @@
 	font-size: 13px;
 }
 
-.fxw-provider-note--osm {
+.routew-provider-note--osm {
 	background: #edfaef;
 }
 
 /* Tiers table */
-.fxw-tiers-table th {
+.routew-tiers-table th {
 	text-align: left;
 	padding-right: 12px;
 	font-weight: 600;
 }
 
 /* --- Weekly hours grid ----------------------------------------------------- */
-.fxw-hours-table {
+.routew-hours-table {
 	border-collapse: collapse;
 }
 
-.fxw-hours-table__head strong {
+.routew-hours-table__head strong {
 	color: #50575e;
 	font-size: 12px;
 	text-transform: uppercase;
 	letter-spacing: 0.3px;
 }
 
-.fxw-hours-table th[scope="row"] {
+.routew-hours-table th[scope="row"] {
 	padding: 6px 14px 6px 0;
 	font-weight: 600;
 	color: #1d2327;
 }
 
-.fxw-hours-day {
+.routew-hours-day {
 	display: flex;
 	align-items: center;
 	gap: 16px;
@@ -133,11 +133,11 @@
 	white-space: nowrap;
 }
 
-.fxw-hours-times input[type="time"] {
+.routew-hours-times input[type="time"] {
 	width: auto;
 }
 
-.fxw-hours-flag {
+.routew-hours-flag {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
@@ -147,7 +147,7 @@
 }
 
 /* Special-occasion override block */
-.fxw-hours-override {
+.routew-hours-override {
 	background: #f0f6fc;
 	border: 1px solid #72aee6;
 	border-radius: 8px;

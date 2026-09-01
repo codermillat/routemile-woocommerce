@@ -1,18 +1,18 @@
-=== FoodXpress for WooCommerce ===
+=== RouteMile for WooCommerce ===
 Contributors: codermillat
 Tags: woocommerce, delivery, food delivery, restaurant, local delivery
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Map-based delivery management for single-restaurant WooCommerce stores: location picker at checkout, distance fees, custom order statuses, and a mobile delivery-agent app.
+Map-based delivery management for single-restaurant WooCommerce stores: pin-drop checkout, distance-based fees, custom order statuses, rider app.
 
 == Description ==
 
-FoodXpress turns a single-restaurant WooCommerce store into a full delivery operation. Customers drop a pin on a map at checkout; the store owner manages orders through a dedicated deliveries dashboard; riders work from an installable mobile web app.
+RouteMile turns a single-restaurant WooCommerce store into a full delivery operation. Customers drop a pin on a map at checkout; the store owner manages orders through a dedicated deliveries dashboard; riders work from an installable mobile web app.
 
 = Checkout =
 
@@ -47,19 +47,26 @@ FoodXpress turns a single-restaurant WooCommerce store into a full delivery oper
 
 = Privacy & external services =
 
-The plugin is self-contained except for the map provider you choose:
+This plugin contacts third-party services only when the map provider you choose requires them. The customer's chosen coordinates (latitude, longitude) and your store address are sent to whichever provider you select. The plugin stores no telemetry and contains no advertising or analytics tracking.
 
-* **Google Maps mode:** the checkout page loads JavaScript from `maps.googleapis.com`, and geocoding/routing requests are sent server-side to `maps.googleapis.com`. The customer's chosen coordinates (latitude/longitude) and your store address are sent to Google. Your Google Maps API key is stored in your own database and never sent anywhere else.
-* **OpenStreetMap (Leaflet) mode:** the browser loads map tiles from `tile.openstreetmap.org` and the plugin sends coordinate lookups to `nominatim.openstreetmap.org`. The customer's chosen coordinates and the store address are sent to those services.
-* No other data leaves your site. The plugin contains no telemetry, analytics, or advertising.
+* **Google Maps** — JavaScript is loaded from `maps.googleapis.com` on the checkout page; geocoding and routing requests are sent server-side to `maps.googleapis.com`. Service: [Google Maps Platform](https://cloud.google.com/maps-platform). Terms: [Google Maps Platform Terms of Service](https://cloud.google.com/maps-platform/terms). Privacy: [Google Privacy Policy](https://policies.google.com/privacy).
+* **OpenStreetMap tiles** — map tiles are loaded from `tile.openstreetmap.org`. Service: [OpenStreetMap](https://www.openstreetmap.org/). Terms / licence: [OpenStreetMap Copyright and License](https://www.openstreetmap.org/copyright). Privacy: [OpenStreetMap Foundation Privacy Policy](https://osmfoundation.org/wiki/Privacy_Policy).
+* **Nominatim geocoding (OpenStreetMap mode only)** — coordinate and address lookups are sent to `nominatim.openstreetmap.org`. Subject to the OpenStreetMap Foundation's [Nominatim Usage Policy](https://operations.osmfoundation.org/policies/nominatim/) (1 request/second application-wide). Privacy: [Nominatim privacy notice](https://nominatim.org/release-notes/latest#privacy).
+* **Project OSRM routing (OpenStreetMap mode only)** — driving-distance and travel-time queries are sent to `router.project-osrm.org`. Service: [Project OSRM](https://project-osrm.org/). Terms: [Project OSRM Terms of Service](https://project-osrm.org/about/). Privacy: the OSRM public router is operated by the OSRM community on a best-effort basis; please review the operator notice linked on the OSRM project page.
+* **MapTiler** — map tiles and geocoding calls go to `api.maptiler.com`. Service: [MapTiler](https://www.maptiler.com/). Terms: [MapTiler Terms of Service](https://www.maptiler.com/terms/). Privacy: [MapTiler Privacy Policy](https://www.maptiler.com/privacy/).
+* **Geoapify** — tiles, geocoding and routing calls go to `api.geoapify.com` and `maps.geoapify.com`. Service: [Geoapify](https://www.geoapify.com/). Terms: [Geoapify Terms of Use](https://www.geoapify.com/terms-of-use/). Privacy: [Geoapify Privacy Policy](https://www.geoapify.com/privacy-policy/).
+
+Each provider's "Powered by ..." attribution string is shown on the customer-facing map only when you tick "Show provider credit" under WooCommerce → Settings → RouteMile → Map Provider. The default is OFF per the WordPress.org Plugin Directory Guideline 10; you should turn it ON whenever your selected provider's licence requires visible credit.
+
+This plugin does not set its own cookies, embed tracking pixels, or otherwise contact the visitor's browser beyond what the chosen provider does directly.
 
 == Installation ==
 
 1. Install and activate WooCommerce first.
-2. Upload the plugin files to `/wp-content/plugins/foodxpress-for-woocommerce`, or install through the WordPress plugins screen.
-3. Go to WooCommerce → Settings → FoodXpress and pick a map provider (see Configuration below for getting API keys).
+2. Upload the plugin files to `/wp-content/plugins/routemile-woocommerce`, or install through the WordPress plugins screen.
+3. Go to WooCommerce → Settings → RouteMile and pick a map provider (see Configuration below for getting API keys).
 4. Set your restaurant location on the map, delivery radius, and delivery fee settings.
-5. Enable the FoodXpress Delivery method in your shipping zone(s), or let the plugin add it automatically.
+5. Enable the RouteMile Delivery method in your shipping zone(s), or let the plugin add it automatically.
 6. Create users with the "Delivery Boy" role — their mobile app lives at the Delivery Dashboard link on their profile menu.
 
 == Configuration ==
@@ -78,7 +85,7 @@ You can switch providers at any time — orders already placed are not affected.
 1. Go to [Google Cloud Console](https://console.cloud.google.com/) and create (or pick) a project.
 2. Enable **Maps JavaScript API**, **Geocoding API**, and **Distance Matrix API**.
 3. Create an API key under APIs & Services → Credentials.
-4. Paste it into WooCommerce → Settings → FoodXpress → Map Provider → "Google Maps JavaScript API Key".
+4. Paste it into WooCommerce → Settings → RouteMile → Map Provider → "Google Maps JavaScript API Key".
 5. **Recommended:** also paste a *second* key into the "Server-side API Key" field and restrict each one:
    * Browser key → restrict to your domain under Application restrictions → HTTP referrers (`https://*.yourdomain.com/*`).
    * Server key → restrict to your server's IP address. The plugin automatically uses this one for behind-the-scenes distance/geocoding calls.
@@ -105,7 +112,7 @@ This plugin handles real orders and real money (including cash on delivery). A f
 * **Restrict your map keys.** Browser-exposed keys (Google JS, MapTiler, Geoapify tiles) should be locked to your domain in the provider's dashboard; the Google server-side key should be locked to your server IP. Keys without restrictions can be abused if extracted from your page source.
 * **Limit who sees what.** Managers/admins need `edit_shop_orders` or `manage_woocommerce`; riders only need the "Delivery Boy" role — they see only their own assigned orders and never other agents' data.
 * **Cash settlement is trust-based by design.** The plugin records exactly how much cash each rider collected and what was handed over (with who approved what, when), but physical cash counts must still be reconciled by a human.
-* **Back up before big changes.** Standard WordPress database backups cover all FoodXpress data (orders stay in WooCommerce's own tables).
+* **Back up before big changes.** Standard WordPress database backups cover all RouteMile data (orders stay in WooCommerce's own tables).
 
 == Frequently Asked Questions ==
 
@@ -119,11 +126,11 @@ From the straight-line (haversine) distance between your restaurant coordinates 
 
 = Does it work with HPOS (high-performance order storage)? =
 
-Yes. FoodXpress declares full HPOS compatibility and reads/writes order data only through WooCommerce CRUD APIs.
+Yes. RouteMile declares full HPOS compatibility and reads/writes order data only through WooCommerce CRUD APIs.
 
 = Which payment methods work? =
 
-All of them. FoodXpress handles fulfilment, not payment. For cash on delivery it additionally tracks how much each rider has collected and pending hand-over.
+All of them. RouteMile handles fulfilment, not payment. For cash on delivery it additionally tracks how much each rider has collected and pending hand-over.
 
 = Are my API keys safe? =
 
@@ -142,9 +149,14 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 1. Map location picker on the checkout with live delivery fee.
 2. Deliveries dashboard for store managers.
 3. Mobile delivery-rider app with cash-on-delivery totals.
-4. FoodXpress settings inside WooCommerce.
+4. RouteMile settings inside WooCommerce.
 
 == Changelog ==
+
+= 1.5.0 =
+* Plugin renamed to "RouteMile for WooCommerce" (plugin slug `routemile-woocommerce`) — distinct from the existing commercial "FoodXpress" food-ordering plugin per the WP.org review feedback.
+* WP.org plugin-directory compliance: text domain unified to the plugin slug; inline script/style extracted to external files; `[order_number]` in the receipt title now escaped (defence against merchant-controlled sequential-order-number formats); explicit capability check added to all admin-side data-migration paths; menu moved under the WooCommerce top-level (was a top-level item at a high position); map-provider "Powered by ..." credit is now an opt-in checkbox; readme's privacy section links each provider's Terms of Service and Privacy Policy and discloses Project OSRM.
+* One-time data migration copies every old `fxw_*` option, transient, post meta, user meta, and `wc-fxw-*` order status to the new `routew_*` keys on upgrade. Existing 1.4.x stores keep their settings, rider assignments, order statuses, and stored delivery addresses.
 
 = 1.4.0 =
 * Customer My Account dashboard overhaul.
@@ -160,5 +172,5 @@ Earlier releases: see CHANGELOG.md in the repository.
 
 == Upgrade Notice ==
 
-= 1.4.0 =
-Adds the rider PWA and settlement workflow, and redesigns settings. Update from any 1.2/1.3 version safely — no manual steps required.
+= 1.5.0 =
+Plugin renamed (display name, slug, folder) and WP.org review-blockers resolved. Settings, rider assignments, and order statuses migrate automatically on update from 1.4.x; no manual steps required.

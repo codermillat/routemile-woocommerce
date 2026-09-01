@@ -1,6 +1,6 @@
-/* global jQuery, google, fxw_checkout_params */
+/* global jQuery, google, routew_checkout_params */
 /**
- * FoodXpress Native Checkout Manager v3
+ * RouteMile Native Checkout Manager v3
  *
  * Coordinates-only map flow: PlaceAutocompleteElement, Promise-based
  * Geocoder (display caption only — never fills form fields), draggable
@@ -34,22 +34,22 @@
             DEFAULT_ZOOM: 2,
             ZONE_ZOOM: 11,
             PIN_ZOOM: 15,
-            SKELETON_CLASS: 'fxw-skeleton-loading',
+            SKELETON_CLASS: 'routew-skeleton-loading',
             NOTIFICATION_DURATION: 4000
         },
 
         // ─── Boot ────────────────────────────────────────────────
         init: function () {
-            if (!$('#fxw-map').length) {
+            if (!$('#routew-map').length) {
                 return;
             }
 
-            this.state.settings = { ...fxw_checkout_params };
+            this.state.settings = { ...routew_checkout_params };
             this.cacheElements();
             this.bindEvents();
 
             // Expose global callback for Google Maps async loading
-            window.fxwInitMap = this.initMap.bind(this);
+            window.routewInitMap = this.initMap.bind(this);
 
             if (typeof google !== 'undefined' && google.maps) {
                 this.initMap();
@@ -58,14 +58,14 @@
 
         cacheElements: function () {
             this.$el = {
-                mapContainer: $('#fxw-map'),
-                searchWrapper: $('.fxw-location-search-wrapper'),
-                searchInput: $('#fxw-location-search-input'),
-                locateBtn: $('#fxw-get-location'),
-                selectedLocation: $('#fxw-selected-location'),
-                selectedAddress: $('#fxw-selected-address'),
-                hiddenLat: $('#fxw_lat'),
-                hiddenLng: $('#fxw_lng')
+                mapContainer: $('#routew-map'),
+                searchWrapper: $('.routew-location-search-wrapper'),
+                searchInput: $('#routew-location-search-input'),
+                locateBtn: $('#routew-get-location'),
+                selectedLocation: $('#routew-selected-location'),
+                selectedAddress: $('#routew-selected-address'),
+                hiddenLat: $('#routew_lat'),
+                hiddenLng: $('#routew_lng')
             };
         },
 
@@ -246,12 +246,12 @@
 
             try {
                 const res = await fetch(
-                    fxw_checkout_params.rest_url + '/validate-location',
+                    routew_checkout_params.rest_url + '/validate-location',
                     {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-WP-Nonce': fxw_checkout_params.rest_nonce
+                            'X-WP-Nonce': routew_checkout_params.rest_nonce
                         },
                         body: JSON.stringify({ lat, lng })
                     }
@@ -280,7 +280,7 @@
                         // decimals, and symbol position); manual fallback only
                         // if formatting was unavailable.
                         const price = data.fee_formatted
-                            || `${fxw_checkout_params.currency_symbol || ''}${data.fee}`;
+                            || `${routew_checkout_params.currency_symbol || ''}${data.fee}`;
                         message = `${this.t('delivery_fee_estimated')} ${price} · ${suffix}`;
                     }
                     this.notify(message, 'success');
@@ -318,7 +318,7 @@
             if (this.isBlocksCheckout()) {
                 try {
                     window.wc.blocksCheckout.extensionCartUpdate({
-                        namespace: 'foodxpress',
+                        namespace: 'routemile-woocommerce',
                         data: { lat, lng }
                     });
                     return;
@@ -446,10 +446,10 @@
         },
 
         notify: function (message, type) {
-            let $n = $('#fxw-map-notification');
+            let $n = $('#routew-map-notification');
             if (!$n.length) {
-                $n = $('<div id="fxw-map-notification" role="status" aria-live="polite"></div>')
-                    .insertAfter('#fxw-location-picker-container');
+                $n = $('<div id="routew-map-notification" role="status" aria-live="polite"></div>')
+                    .insertAfter('#routew-location-picker-container');
             }
 
             // Clear any pending fadeOut
@@ -468,7 +468,7 @@
          * Safe translation getter.
          */
         t: function (key) {
-            return (fxw_checkout_params.translations && fxw_checkout_params.translations[key]) || key;
+            return (routew_checkout_params.translations && routew_checkout_params.translations[key]) || key;
         }
     };
 

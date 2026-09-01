@@ -1,7 +1,7 @@
 jQuery(function ($) {
     // Tab switching - delegated, no passive needed for click
-    $(document).on('click', '[data-fxw-tab]', function () {
-        var tabId = $(this).data('fxw-tab');
+    $(document).on('click', '[data-routew-tab]', function () {
+        var tabId = $(this).data('routew-tab');
         // Sanitise tabId to prevent DOM selector injection
         if (!/^[a-zA-Z0-9_-]+$/.test(tabId)) {
             return;
@@ -12,20 +12,20 @@ jQuery(function ($) {
             return;
         }
 
-        $('.fxw-tab-link').removeClass('active').attr('aria-selected', 'false');
+        $('.routew-tab-link').removeClass('active').attr('aria-selected', 'false');
         $(this).addClass('active').attr('aria-selected', 'true');
-        $('.fxw-tab-content').removeClass('active').hide();
+        $('.routew-tab-content').removeClass('active').hide();
         $($panel).addClass('active').show();
     });
 
-    $(document).on('click', '.fxw-print-receipt', function (e) {
+    $(document).on('click', '.routew-print-receipt', function (e) {
         e.preventDefault();
 
         var $button = $(this);
         var orderId = $button.data('order-id');
 
         // Check if AJAX params are available
-        if (typeof fxw_checkout_params === 'undefined' || !fxw_checkout_params.ajax_url) {
+        if (typeof routew_checkout_params === 'undefined' || !routew_checkout_params.ajax_url) {
             alert('Print receipt functionality is not available. Please contact support.');
             return;
         }
@@ -39,7 +39,7 @@ jQuery(function ($) {
         var originalText = $button.text();
         $button.prop('disabled', true).text('Opening receipt...');
 
-        var printUrl = fxw_checkout_params.ajax_url + '?action=fxw_print_receipt&order_id=' + orderId + '&nonce=' + fxw_checkout_params.nonce;
+        var printUrl = routew_checkout_params.ajax_url + '?action=routew_print_receipt&order_id=' + orderId + '&nonce=' + routew_checkout_params.nonce;
 
         try {
             var printWindow = window.open(printUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
@@ -79,7 +79,7 @@ jQuery(function ($) {
     });
 
     // Also handle receipt printing from admin order pages
-    $(document).on('click', 'a[href*="fxw_print_receipt"]', function (e) {
+    $(document).on('click', 'a[href*="routew_print_receipt"]', function (e) {
         var $link = $(this);
         var originalText = $link.text();
 
@@ -93,7 +93,7 @@ jQuery(function ($) {
         }
     });
     // AJAX handler for delivery status updates
-    $(document).on('click', '.fxw-action-btn', function (e) {
+    $(document).on('click', '.routew-action-btn', function (e) {
         e.preventDefault();
 
         var $button = $(this);
@@ -111,31 +111,31 @@ jQuery(function ($) {
             return;
         }
 
-        $(document).trigger('fxw:action-start');
+        $(document).trigger('routew:action-start');
         $button.prop('disabled', true).text('Updating...');
 
-        if (typeof fxw_checkout_params === 'undefined' || !fxw_checkout_params.ajax_url) {
+        if (typeof routew_checkout_params === 'undefined' || !routew_checkout_params.ajax_url) {
             alert('Session expired. Please reload the page.');
             $button.prop('disabled', false).html(originalText);
             return;
         }
 
         $.ajax({
-            url: fxw_checkout_params.ajax_url,
+            url: routew_checkout_params.ajax_url,
             type: 'POST',
             data: {
-                action: 'fxw_update_delivery_status',
+                action: 'routew_update_delivery_status',
                 order_id: orderId,
                 status: actionStatus,
                 nonce: nonce
             },
             success: function (response) {
                 if (response.success) {
-                    var $card = $button.closest('.fxw-order-card');
+                    var $card = $button.closest('.routew-order-card');
 
                     var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                     var delay = reducedMotion ? 0 : 150;
-                    $card.addClass('fxw-card-removing');
+                    $card.addClass('routew-card-removing');
                     requestAnimationFrame(function () {
                         if (!reducedMotion) {
                             $card.css({ opacity: 0, transform: 'scale(0.98)' });
@@ -152,14 +152,14 @@ jQuery(function ($) {
                 } else {
                     alert((response.data && response.data.message) ? response.data.message : 'Failed to update status.');
                     $button.prop('disabled', false).html(originalText);
-                    $(document).trigger('fxw:action-end');
+                    $(document).trigger('routew:action-end');
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error('AJAX Error:', textStatus, errorThrown);
                 alert('Connection error. Please try again.');
                 $button.prop('disabled', false).html(originalText);
-                $(document).trigger('fxw:action-end');
+                $(document).trigger('routew:action-end');
             }
         });
     });
@@ -182,14 +182,14 @@ jQuery(function ($) {
 
     var toastTimer = null;
     function showToast(message) {
-        var $toast = $('#fxw-toast');
+        var $toast = $('#routew-toast');
         if (!$toast.length) {
             return;
         }
-        $toast.text(message).attr('hidden', false).addClass('fxw-toast--visible');
+        $toast.text(message).attr('hidden', false).addClass('routew-toast--visible');
         clearTimeout(toastTimer);
         toastTimer = setTimeout(function () {
-            $toast.removeClass('fxw-toast--visible').attr('hidden', true);
+            $toast.removeClass('routew-toast--visible').attr('hidden', true);
         }, 3200);
     }
 
@@ -207,10 +207,10 @@ jQuery(function ($) {
     // Match by the hidden action input — the form's action URL is plain
     // admin-post.php.
     $(document).on('submit', 'form', function () {
-        if ('fxw_settle_agent_cash' !== String($(this).find('input[name="action"]').val() || '')) {
+        if ('routew_settle_agent_cash' !== String($(this).find('input[name="action"]').val() || '')) {
             return;
         }
-        var amount = $(this).find('.fxw-settle-btn').data('fxw-settle-amount') || '';
+        var amount = $(this).find('.routew-settle-btn').data('routew-settle-amount') || '';
         var message = agentI18n('settle_confirm', 'Send this cash hand-over to the manager for approval?');
         if (amount) {
             message = agentI18n('settle_confirm_amount', 'Send {amount} hand-over request to the manager for approval?').replace('{amount}', String(amount));
@@ -245,8 +245,8 @@ jQuery(function ($) {
     // --- Heartbeat: auto-reload on new orders / status changes ---
     var actionInFlight = false;
     $(document)
-        .on('fxw:action-start', function () { actionInFlight = true; })
-        .on('fxw:action-end', function () { actionInFlight = false; });
+        .on('routew:action-start', function () { actionInFlight = true; })
+        .on('routew:action-end', function () { actionInFlight = false; });
 
     (function heartbeat() {
         var config = agentConfig();
@@ -255,8 +255,8 @@ jQuery(function ($) {
         }
 
         var STORAGE_KEY = 'fxwAgentStateSig';
-        var $shell = $('.fxw-app-dashboard');
-        var knownSignature = ($shell.data('fxw-state') || '') + '';
+        var $shell = $('.routew-app-dashboard');
+        var knownSignature = ($shell.data('routew-state') || '') + '';
 
         // Survive reloads: once a signature has been rendered, remember it
         // so a reload does not trigger another reload.
@@ -276,7 +276,7 @@ jQuery(function ($) {
                 return;
             }
             $.get(config.ajaxUrl, {
-                action: 'fxw_agent_dashboard_state',
+                action: 'routew_agent_dashboard_state',
                 nonce: config.stateNonce
             }).done(function (response) {
                 if (!response || !response.success || !response.data) {

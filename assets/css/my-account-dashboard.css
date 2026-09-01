@@ -1,5 +1,5 @@
 /**
- * FoodXpress My Account — Dashboard Widgets
+ * RouteMile My Account — Dashboard Widgets
  *
  * Customer dashboard surface for /my-account/ (the root endpoint).
  * Sits on top of my-account.css (layout shell + nav sidebar) and
@@ -14,37 +14,37 @@
    defined so the two sheets stay in lockstep. The :root here only
    adds what's unique to the dashboard. */
 :root {
-	--fxw-dash-radius-lg: 18px;
-	--fxw-dash-radius-md: 14px;
-	--fxw-dash-radius-sm: 10px;
-	--fxw-dash-shadow-sm: 0 1px 2px rgba(20, 14, 8, 0.04), 0 1px 6px rgba(20, 14, 8, 0.04);
-	--fxw-dash-shadow-md: 0 4px 16px rgba(20, 14, 8, 0.06);
-	--fxw-dash-shadow-accent: 0 8px 24px rgba(232, 93, 4, 0.18);
-	--fxw-dash-info: #1E6FB8;
-	--fxw-dash-info-bg: #E7F1FB;
-	--fxw-dash-success: #1F8A4C;
-	--fxw-dash-success-bg: #E5F4EB;
-	--fxw-dash-danger: #C0322B;
-	--fxw-dash-danger-bg: #FCEDEC;
-	--fxw-dash-neutral: #5A5A5A;
-	--fxw-dash-neutral-bg: #F0EEEA;
+	--routew-dash-radius-lg: 18px;
+	--routew-dash-radius-md: 14px;
+	--routew-dash-radius-sm: 10px;
+	--routew-dash-shadow-sm: 0 1px 2px rgba(20, 14, 8, 0.04), 0 1px 6px rgba(20, 14, 8, 0.04);
+	--routew-dash-shadow-md: 0 4px 16px rgba(20, 14, 8, 0.06);
+	--routew-dash-shadow-accent: 0 8px 24px rgba(232, 93, 4, 0.18);
+	--routew-dash-info: #1E6FB8;
+	--routew-dash-info-bg: #E7F1FB;
+	--routew-dash-success: #1F8A4C;
+	--routew-dash-success-bg: #E5F4EB;
+	--routew-dash-danger: #C0322B;
+	--routew-dash-danger-bg: #FCEDEC;
+	--routew-dash-neutral: #5A5A5A;
+	--routew-dash-neutral-bg: #F0EEEA;
 }
 
 /* Suppress the default WC "Hello …" greeting and the descriptive
    paragraph on the dashboard so the widget grid reads as one
    cohesive surface, not "default copy + our widgets stacked". */
-.woocommerce-account.fxw-my-account-styled .woocommerce-MyAccount-content > p {
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > p {
 	display: none;
 }
 
 /* === Welcome banner ============================================== */
 
-.fxw-dashboard {
+.routew-dashboard {
 	display: block;
 	margin: 0;
 }
 
-.fxw-dashboard__welcome {
+.routew-dashboard__welcome {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
@@ -52,13 +52,13 @@
 	margin-bottom: 12px;
 	background: linear-gradient(135deg, #FFF4ED 0%, #FFE7D6 100%);
 	border: 1px solid rgba(232, 93, 4, 0.18);
-	border-radius: var(--fxw-dash-radius-lg);
-	box-shadow: var(--fxw-dash-shadow-sm);
+	border-radius: var(--routew-dash-radius-lg);
+	box-shadow: var(--routew-dash-shadow-sm);
 	position: relative;
 	overflow: hidden;
 }
 
-.fxw-dashboard__welcome::before {
+.routew-dashboard__welcome::before {
 	content: "";
 	position: absolute;
 	right: -40px;
@@ -70,7 +70,7 @@
 }
 
 @media (min-width: 700px) {
-	.fxw-dashboard__welcome {
+	.routew-dashboard__welcome {
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
@@ -84,25 +84,25 @@
    which is essential to keep the whole dashboard in a single
    viewport. */
 @media (max-width: 699px) {
-	.fxw-dashboard__welcome {
+	.routew-dashboard__welcome {
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
 		gap: 12px;
 		padding: 10px 14px;
 	}
-	.fxw-dashboard__welcome-text {
+	.routew-dashboard__welcome-text {
 		flex: 1;
 		min-width: 0;
 	}
-	.fxw-dashboard__greeting-eyebrow {
+	.routew-dashboard__greeting-eyebrow {
 		margin-bottom: 2px;
 	}
-	.fxw-dashboard__greeting {
+	.routew-dashboard__greeting {
 		font-size: 1.05em;
 		margin: 0 0 2px;
 	}
-	.fxw-dashboard__subgreeting {
+	.routew-dashboard__subgreeting {
 		font-size: 0.8em;
 		max-width: none;
 		display: -webkit-box;
@@ -110,99 +110,99 @@
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 	}
-	.fxw-dashboard__reorder {
+	.routew-dashboard__reorder {
 		flex-shrink: 0;
 		padding: 8px 14px;
 		font-size: 0.82em;
 	}
 }
 
-.fxw-dashboard__welcome-text {
+.routew-dashboard__welcome-text {
 	position: relative;
 	min-width: 0;
 }
 
-.fxw-dashboard__greeting-eyebrow {
+.routew-dashboard__greeting-eyebrow {
 	display: inline-block;
 	font-size: 0.78em;
 	font-weight: 600;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: var(--fxw-account-primary);
+	color: var(--routew-account-primary);
 	margin-bottom: 6px;
 }
 
-.fxw-dashboard__greeting {
+.routew-dashboard__greeting {
 	margin: 0 0 6px;
 	font-size: 1.35em;
 	font-weight: 700;
-	color: var(--fxw-account-text);
+	color: var(--routew-account-text);
 	line-height: 1.2;
 	letter-spacing: -0.01em;
 }
 
-.fxw-dashboard__subgreeting {
+.routew-dashboard__subgreeting {
 	margin: 0;
 	font-size: 0.88em;
-	color: var(--fxw-account-text-muted);
+	color: var(--routew-account-text-muted);
 	line-height: 1.5;
 	max-width: 52ch;
 }
 
-.fxw-dashboard__reorder {
+.routew-dashboard__reorder {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
 	padding: 10px 18px;
 	min-height: 40px;
-	background: var(--fxw-account-primary);
+	background: var(--routew-account-primary);
 	color: #fff !important;
 	font-weight: 600;
 	font-size: 0.9em;
-	border-radius: var(--fxw-dash-radius-md);
+	border-radius: var(--routew-dash-radius-md);
 	text-decoration: none !important;
-	box-shadow: var(--fxw-dash-shadow-accent);
+	box-shadow: var(--routew-dash-shadow-accent);
 	transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 	white-space: nowrap;
 	flex-shrink: 0;
 	align-self: flex-start;
 }
 
-.fxw-dashboard__reorder:hover,
-.fxw-dashboard__reorder:focus-visible {
-	background: var(--fxw-account-primary-dark);
+.routew-dashboard__reorder:hover,
+.routew-dashboard__reorder:focus-visible {
+	background: var(--routew-account-primary-dark);
 	transform: translateY(-1px);
 	box-shadow: 0 10px 28px rgba(232, 93, 4, 0.24);
 	outline: none;
 }
 
-.fxw-dashboard__reorder:focus-visible {
-	outline: 2px solid var(--fxw-account-primary);
+.routew-dashboard__reorder:focus-visible {
+	outline: 2px solid var(--routew-account-primary);
 	outline-offset: 3px;
 }
 
-.fxw-dashboard__reorder--ghost {
+.routew-dashboard__reorder--ghost {
 	background: #fff;
-	color: var(--fxw-account-primary) !important;
-	border: 1.5px solid var(--fxw-account-primary);
+	color: var(--routew-account-primary) !important;
+	border: 1.5px solid var(--routew-account-primary);
 	box-shadow: none;
 }
 
-.fxw-dashboard__reorder--ghost:hover,
-.fxw-dashboard__reorder--ghost:focus-visible {
-	background: var(--fxw-account-primary-light);
+.routew-dashboard__reorder--ghost:hover,
+.routew-dashboard__reorder--ghost:focus-visible {
+	background: var(--routew-account-primary-light);
 	box-shadow: none;
 }
 
-.fxw-dashboard__reorder-icon {
+.routew-dashboard__reorder-icon {
 	font-size: 1.1em;
 	line-height: 1;
 }
 
 /* === Stats row ================================================== */
 
-.fxw-dashboard__stats {
+.routew-dashboard__stats {
 	display: grid;
 	/* Always 2-up on mobile so the four cards stack as a 2x2 grid
 	   (saves ~50% of the vertical space vs single-column). Each card
@@ -217,58 +217,58 @@
 }
 
 @media (min-width: 1100px) {
-	.fxw-dashboard__stats {
+	.routew-dashboard__stats {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 		gap: 12px;
 	}
 }
 
-.fxw-stat {
+.routew-stat {
 	display: flex;
 	flex-direction: row;
 	align-items: baseline;
 	gap: 8px;
 	padding: 8px 10px;
-	background: var(--fxw-account-card);
-	border: 1px solid var(--fxw-account-border);
-	border-radius: var(--fxw-dash-radius-md);
-	box-shadow: var(--fxw-dash-shadow-sm);
+	background: var(--routew-account-card);
+	border: 1px solid var(--routew-account-border);
+	border-radius: var(--routew-dash-radius-md);
+	box-shadow: var(--routew-dash-shadow-sm);
 	min-height: 40px;
 	position: relative;
 	overflow: hidden;
 	transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.fxw-stat::after {
+.routew-stat::after {
 	content: "";
 	position: absolute;
 	left: 0;
 	top: 0;
 	bottom: 0;
 	width: 3px;
-	background: var(--fxw-account-border);
+	background: var(--routew-account-border);
 }
 
-.fxw-stat--active::after       { background: var(--fxw-account-primary); }
-.fxw-stat--completed::after    { background: var(--fxw-dash-success); }
-.fxw-stat--total::after        { background: var(--fxw-dash-info); }
-.fxw-stat--addresses::after    { background: #6D4C9A; }   /* warm purple — matches the saved-address theme */
+.routew-stat--active::after       { background: var(--routew-account-primary); }
+.routew-stat--completed::after    { background: var(--routew-dash-success); }
+.routew-stat--total::after        { background: var(--routew-dash-info); }
+.routew-stat--addresses::after    { background: #6D4C9A; }   /* warm purple — matches the saved-address theme */
 
-.fxw-stat__value {
+.routew-stat__value {
 	font-size: 1.3em;
 	font-weight: 700;
-	color: var(--fxw-account-text);
+	color: var(--routew-account-text);
 	line-height: 1;
 	letter-spacing: -0.01em;
 	flex-shrink: 0;
 	min-width: 22px;
 }
 
-.fxw-stat__label {
+.routew-stat__label {
 	font-size: 0.72em;
 	font-weight: 600;
 	letter-spacing: 0;
-	color: var(--fxw-account-text-muted);
+	color: var(--routew-account-text-muted);
 	line-height: 1.2;
 	flex: 1;
 	min-width: 0;
@@ -282,7 +282,7 @@
 
 /* === Two-column panel grid ====================================== */
 
-.fxw-dashboard__grid {
+.routew-dashboard__grid {
 	display: grid;
 	/* Always 2-up so Recent Orders + Default Address sit side by side
 	   on every viewport. The Recent Orders column gets 1.6fr (wider
@@ -295,20 +295,20 @@
 }
 
 @media (max-width: 399px) {
-	.fxw-dashboard__grid {
+	.routew-dashboard__grid {
 		grid-template-columns: 1fr;
 	}
 }
 
-.fxw-dashboard__panel {
-	background: var(--fxw-account-card);
-	border: 1px solid var(--fxw-account-border);
-	border-radius: var(--fxw-dash-radius-lg);
-	box-shadow: var(--fxw-dash-shadow-sm);
+.routew-dashboard__panel {
+	background: var(--routew-account-card);
+	border: 1px solid var(--routew-account-border);
+	border-radius: var(--routew-dash-radius-lg);
+	box-shadow: var(--routew-dash-shadow-sm);
 	overflow: hidden;
 }
 
-.fxw-dashboard__panel-header {
+.routew-dashboard__panel-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -316,42 +316,42 @@
 	gap: 12px;
 }
 
-.fxw-dashboard__panel-title {
+.routew-dashboard__panel-title {
 	margin: 0;
 	font-size: 1.05em;
 	font-weight: 700;
-	color: var(--fxw-account-text);
+	color: var(--routew-account-text);
 	letter-spacing: -0.005em;
 }
 
-.fxw-dashboard__panel-link {
+.routew-dashboard__panel-link {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
 	font-size: 0.88em;
 	font-weight: 600;
-	color: var(--fxw-account-primary) !important;
+	color: var(--routew-account-primary) !important;
 	text-decoration: none !important;
 	padding: 6px 10px;
-	border-radius: var(--fxw-dash-radius-sm);
+	border-radius: var(--routew-dash-radius-sm);
 	transition: background 0.15s ease;
 }
 
-.fxw-dashboard__panel-link:hover,
-.fxw-dashboard__panel-link:focus-visible {
-	background: var(--fxw-account-primary-light);
+.routew-dashboard__panel-link:hover,
+.routew-dashboard__panel-link:focus-visible {
+	background: var(--routew-account-primary-light);
 	outline: none;
 }
 
 /* === Recent orders list ========================================= */
 
-.fxw-orders-list {
+.routew-orders-list {
 	list-style: none;
 	margin: 0;
 	padding: 0 10px 10px;
 }
 
-.fxw-order-item {
+.routew-order-item {
 	display: grid;
 	grid-template-columns: 1fr auto;
 	grid-template-areas:
@@ -359,21 +359,21 @@
 		"meta    action";
 	gap: 3px 10px;
 	padding: 10px 10px;
-	border-radius: var(--fxw-dash-radius-md);
+	border-radius: var(--routew-dash-radius-md);
 	border: 1px solid transparent;
 	transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.fxw-order-item + .fxw-order-item {
+.routew-order-item + .routew-order-item {
 	margin-top: 2px;
 }
 
-.fxw-order-item:hover {
-	background: var(--fxw-account-primary-light);
+.routew-order-item:hover {
+	background: var(--routew-account-primary-light);
 	border-color: rgba(232, 93, 4, 0.15);
 }
 
-.fxw-order-item__primary {
+.routew-order-item__primary {
 	grid-area: primary;
 	display: flex;
 	align-items: baseline;
@@ -381,23 +381,23 @@
 	flex-wrap: wrap;
 }
 
-.fxw-order-item__number {
+.routew-order-item__number {
 	font-weight: 700;
 	font-size: 1em;
-	color: var(--fxw-account-primary) !important;
+	color: var(--routew-account-primary) !important;
 	text-decoration: none !important;
 }
 
-.fxw-order-item__number:hover {
+.routew-order-item__number:hover {
 	text-decoration: underline !important;
 }
 
-.fxw-order-item__date {
+.routew-order-item__date {
 	font-size: 0.85em;
-	color: var(--fxw-account-text-muted);
+	color: var(--routew-account-text-muted);
 }
 
-.fxw-order-item__meta {
+.routew-order-item__meta {
 	grid-area: meta;
 	display: flex;
 	align-items: center;
@@ -405,24 +405,24 @@
 	flex-wrap: wrap;
 }
 
-.fxw-order-item__total {
+.routew-order-item__total {
 	font-size: 0.95em;
 	font-weight: 600;
-	color: var(--fxw-account-text);
+	color: var(--routew-account-text);
 }
 
-.fxw-order-item__count {
+.routew-order-item__count {
 	font-weight: 500;
-	color: var(--fxw-account-text-muted);
+	color: var(--routew-account-text-muted);
 	margin-left: 2px;
 }
 
-.fxw-order-item__action {
+.routew-order-item__action {
 	grid-area: action;
 	align-self: center;
 }
 
-.fxw-order-item__view {
+.routew-order-item__view {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -430,24 +430,24 @@
 	padding: 6px 14px;
 	font-size: 0.85em;
 	font-weight: 600;
-	color: var(--fxw-account-primary) !important;
+	color: var(--routew-account-primary) !important;
 	background: transparent;
-	border: 1.5px solid var(--fxw-account-primary);
-	border-radius: var(--fxw-dash-radius-sm);
+	border: 1.5px solid var(--routew-account-primary);
+	border-radius: var(--routew-dash-radius-sm);
 	text-decoration: none !important;
 	transition: background 0.15s ease, color 0.15s ease;
 	white-space: nowrap;
 }
 
-.fxw-order-item__view:hover,
-.fxw-order-item__view:focus-visible {
-	background: var(--fxw-account-primary);
+.routew-order-item__view:hover,
+.routew-order-item__view:focus-visible {
+	background: var(--routew-account-primary);
 	color: #fff !important;
 	outline: none;
 }
 
 @media (max-width: 480px) {
-	.fxw-order-item {
+	.routew-order-item {
 		grid-template-columns: 1fr;
 		grid-template-areas:
 			"primary"
@@ -455,14 +455,14 @@
 			"action";
 	}
 
-	.fxw-order-item__action {
+	.routew-order-item__action {
 		justify-self: start;
 	}
 }
 
 /* === Status pills =============================================== */
 
-.fxw-status-pill {
+.routew-status-pill {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
@@ -471,13 +471,13 @@
 	font-weight: 600;
 	letter-spacing: 0.02em;
 	border-radius: 999px;
-	background: var(--fxw-dash-neutral-bg);
-	color: var(--fxw-dash-neutral);
+	background: var(--routew-dash-neutral-bg);
+	color: var(--routew-dash-neutral);
 	line-height: 1.4;
 	white-space: nowrap;
 }
 
-.fxw-status-pill::before {
+.routew-status-pill::before {
 	content: "";
 	display: inline-block;
 	width: 6px;
@@ -487,77 +487,77 @@
 	opacity: 0.7;
 }
 
-.fxw-status-pill--accent {
-	background: var(--fxw-account-primary-light);
-	color: var(--fxw-account-primary-dark);
+.routew-status-pill--accent {
+	background: var(--routew-account-primary-light);
+	color: var(--routew-account-primary-dark);
 }
 
-.fxw-status-pill--info {
-	background: var(--fxw-dash-info-bg);
-	color: var(--fxw-dash-info);
+.routew-status-pill--info {
+	background: var(--routew-dash-info-bg);
+	color: var(--routew-dash-info);
 }
 
-.fxw-status-pill--success {
-	background: var(--fxw-dash-success-bg);
-	color: var(--fxw-dash-success);
+.routew-status-pill--success {
+	background: var(--routew-dash-success-bg);
+	color: var(--routew-dash-success);
 }
 
-.fxw-status-pill--danger {
-	background: var(--fxw-dash-danger-bg);
-	color: var(--fxw-dash-danger);
+.routew-status-pill--danger {
+	background: var(--routew-dash-danger-bg);
+	color: var(--routew-dash-danger);
 }
 
-.fxw-status-pill--neutral {
-	background: var(--fxw-dash-neutral-bg);
-	color: var(--fxw-dash-neutral);
+.routew-status-pill--neutral {
+	background: var(--routew-dash-neutral-bg);
+	color: var(--routew-dash-neutral);
 }
 
 /* === Address card =============================================== */
 
-.fxw-address-card {
+.routew-address-card {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
 	margin: 0 12px 12px;
 	padding: 12px 14px;
-	background: var(--fxw-account-bg);
-	border: 1px solid var(--fxw-account-border);
-	border-left: 3px solid var(--fxw-account-primary);
-	border-radius: var(--fxw-dash-radius-md);
+	background: var(--routew-account-bg);
+	border: 1px solid var(--routew-account-border);
+	border-left: 3px solid var(--routew-account-primary);
+	border-radius: var(--routew-dash-radius-md);
 	font-style: normal;
 	font-size: 0.88em;
 	line-height: 1.45;
 }
 
-.fxw-address-card__label {
+.routew-address-card__label {
 	display: inline-block;
 	font-size: 0.72em;
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
-	color: var(--fxw-account-primary);
+	color: var(--routew-account-primary);
 	margin-bottom: 4px;
 	padding: 3px 8px;
-	background: var(--fxw-account-primary-light);
+	background: var(--routew-account-primary-light);
 	border-radius: 6px;
 	align-self: flex-start;
 }
 
-.fxw-address-card__name {
+.routew-address-card__name {
 	font-weight: 600;
-	color: var(--fxw-account-text);
+	color: var(--routew-account-text);
 	font-size: 0.98em;
 	margin-top: 2px;
 }
 
-.fxw-address-card__line {
-	color: var(--fxw-account-text-muted);
+.routew-address-card__line {
+	color: var(--routew-account-text-muted);
 	line-height: 1.55;
 }
 
 /* === Empty states =============================================== */
 
-.fxw-dashboard__empty {
+.routew-dashboard__empty {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -567,66 +567,66 @@
 	gap: 6px;
 }
 
-.fxw-dashboard__empty--compact {
+.routew-dashboard__empty--compact {
 	padding: 24px 18px 22px;
 }
 
-.fxw-dashboard__empty-icon {
+.routew-dashboard__empty-icon {
 	font-size: 1.8em;
 	line-height: 1;
 	margin-bottom: 6px;
 	opacity: 0.9;
 }
 
-.fxw-dashboard__empty-title {
+.routew-dashboard__empty-title {
 	margin: 0;
 	font-size: 1em;
 	font-weight: 700;
-	color: var(--fxw-account-text);
+	color: var(--routew-account-text);
 }
 
-.fxw-dashboard__empty-text {
+.routew-dashboard__empty-text {
 	margin: 0;
 	font-size: 0.88em;
-	color: var(--fxw-account-text-muted);
+	color: var(--routew-account-text-muted);
 	max-width: 32ch;
 	line-height: 1.5;
 }
 
-.fxw-dashboard__empty-cta {
+.routew-dashboard__empty-cta {
 	margin-top: 12px;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	min-height: 40px;
 	padding: 8px 18px;
-	background: var(--fxw-account-primary);
+	background: var(--routew-account-primary);
 	color: #fff !important;
 	font-size: 0.88em;
 	font-weight: 600;
-	border-radius: var(--fxw-dash-radius-sm);
+	border-radius: var(--routew-dash-radius-sm);
 	text-decoration: none !important;
 	transition: background 0.15s ease;
 }
 
-.fxw-dashboard__empty-cta:hover,
-.fxw-dashboard__empty-cta:focus-visible {
-	background: var(--fxw-account-primary-dark);
+.routew-dashboard__empty-cta:hover,
+.routew-dashboard__empty-cta:focus-visible {
+	background: var(--routew-account-primary-dark);
 	outline: none;
 }
 
 /* === Reduced motion ============================================= */
 
 @media (prefers-reduced-motion: reduce) {
-	.fxw-dashboard *,
-	.fxw-dashboard *::before,
-	.fxw-dashboard *::after {
+	.routew-dashboard *,
+	.routew-dashboard *::before,
+	.routew-dashboard *::after {
 		transition-duration: 0.01ms !important;
 		animation-duration: 0.01ms !important;
 	}
 
-	.fxw-dashboard__reorder:hover,
-	.fxw-dashboard__reorder:focus-visible {
+	.routew-dashboard__reorder:hover,
+	.routew-dashboard__reorder:focus-visible {
 		transform: none;
 	}
 }

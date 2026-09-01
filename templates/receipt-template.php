@@ -1,8 +1,8 @@
 <?php
 /**
- * Restaurant Bill Style Receipt Template for FoodXpress Orders
+ * Restaurant Bill Style Receipt Template for RouteMile Orders
  *
- * @package FoodXpress
+ * @package RouteMile
  */
 
 // Security check
@@ -16,7 +16,7 @@ global $order;
 
 // If still no order, exit with error
 if (!$order || !is_a($order, 'WC_Order')) {
-    wp_die(__('Invalid order.', 'foodxpress'));
+    wp_die(__('Invalid order.', 'routemile-woocommerce'));
 }
 
 // Get order data
@@ -37,8 +37,8 @@ $currency_symbol = get_woocommerce_currency_symbol($order->get_currency());
  * @param string $country Country code stored on the order.
  * @return string Full state name, or the raw value when unknown.
  */
-if (!function_exists('fxw_receipt_state_name')) {
-    function fxw_receipt_state_name($state, $country)
+if (!function_exists('routew_receipt_state_name')) {
+    function routew_receipt_state_name($state, $country)
     {
         if ($state && function_exists('WC') && WC()->countries) {
             $states = WC()->countries->get_states($country);
@@ -57,7 +57,7 @@ $delivery_address_parts = array_filter(array(
     $order->get_shipping_address_1(),
     $order->get_shipping_address_2(),
     $order->get_shipping_city(),
-    fxw_receipt_state_name($order->get_shipping_state(), $order->get_shipping_country()),
+    routew_receipt_state_name($order->get_shipping_state(), $order->get_shipping_country()),
     $order->get_shipping_postcode(),
 ));
 $delivery_address_line = implode(', ', $delivery_address_parts);
@@ -73,23 +73,23 @@ if ('' === $delivery_address_line && $shipping_address) {
 $items_subtotal = 0.0;
 
 // Get delivery boy info
-$delivery_boy_id = $order->get_meta('_fxw_delivery_boy_id');
+$delivery_boy_id = $order->get_meta('_routew_delivery_boy_id');
 $delivery_boy = $delivery_boy_id ? get_user_by('id', $delivery_boy_id) : null;
 
-// Get FoodXpress receipt branding settings
-$fxw_options = get_option('fxw_settings', array());
+// Get RouteMile receipt branding settings
+$routew_options = get_option('routew_settings', array());
 
 // Receipt Logo
-$receipt_logo = isset($fxw_options['fxw_receipt_logo']) ? $fxw_options['fxw_receipt_logo'] : '';
+$receipt_logo = isset($routew_options['routew_receipt_logo']) ? $routew_options['routew_receipt_logo'] : '';
 
 // Restaurant Name - prioritize FXW setting, fallback to WooCommerce, then site name
-$store_name = isset($fxw_options['fxw_receipt_restaurant_name']) && !empty($fxw_options['fxw_receipt_restaurant_name'])
-    ? $fxw_options['fxw_receipt_restaurant_name']
+$store_name = isset($routew_options['routew_receipt_restaurant_name']) && !empty($routew_options['routew_receipt_restaurant_name'])
+    ? $routew_options['routew_receipt_restaurant_name']
     : get_bloginfo('name');
 
 // Restaurant Address - prioritize FXW setting, fallback to WooCommerce store address
-$receipt_address = isset($fxw_options['fxw_receipt_address']) && !empty($fxw_options['fxw_receipt_address'])
-    ? $fxw_options['fxw_receipt_address']
+$receipt_address = isset($routew_options['routew_receipt_address']) && !empty($routew_options['routew_receipt_address'])
+    ? $routew_options['routew_receipt_address']
     : '';
 
 // If no FXW address, build from WooCommerce settings
@@ -101,20 +101,20 @@ if (empty($receipt_address)) {
 }
 
 // Restaurant Phone - prioritize FXW setting
-$store_phone = isset($fxw_options['fxw_receipt_phone']) && !empty($fxw_options['fxw_receipt_phone'])
-    ? $fxw_options['fxw_receipt_phone']
+$store_phone = isset($routew_options['routew_receipt_phone']) && !empty($routew_options['routew_receipt_phone'])
+    ? $routew_options['routew_receipt_phone']
     : get_option('woocommerce_store_phone');
 
 // Tagline (optional)
-$receipt_tagline = isset($fxw_options['fxw_receipt_tagline']) ? $fxw_options['fxw_receipt_tagline'] : '';
+$receipt_tagline = isset($routew_options['routew_receipt_tagline']) ? $routew_options['routew_receipt_tagline'] : '';
 
 // Footer Message
-$receipt_footer = isset($fxw_options['fxw_receipt_footer_message']) && !empty($fxw_options['fxw_receipt_footer_message'])
-    ? $fxw_options['fxw_receipt_footer_message']
-    : __('Thank You! Have a great day!', 'foodxpress');
+$receipt_footer = isset($routew_options['routew_receipt_footer_message']) && !empty($routew_options['routew_receipt_footer_message'])
+    ? $routew_options['routew_receipt_footer_message']
+    : __('Thank You! Have a great day!', 'routemile-woocommerce');
 
 // Get unit/flat info
-$unit = $order->get_meta('_fxw_address_unit');
+$unit = $order->get_meta('_routew_address_unit');
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -122,212 +122,18 @@ $unit = $order->get_meta('_fxw_address_unit');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php printf(esc_html__('Bill - Order #%s', 'foodxpress'), $order_number); ?></title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Courier New', monospace;
-            background: #fff;
-            color: #000;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .bill-container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #fff;
-        }
-
-        .bill-header {
-            text-align: center;
-            border-bottom: 2px dashed #000;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-
-        .restaurant-name {
-            font-size: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-        }
-
-        .restaurant-address {
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-
-        .bill-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 10px;
-            text-transform: uppercase;
-        }
-
-        .bill-info {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px dashed #000;
-        }
-
-        .bill-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 3px;
-            font-size: 12px;
-        }
-
-        .bill-row.bold {
-            font-weight: bold;
-        }
-
-        .customer-info {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px dashed #000;
-        }
-
-        .section-title {
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-
-        .customer-details {
-            font-size: 12px;
-            line-height: 1.3;
-        }
-
-        .items-section {
-            margin-bottom: 15px;
-        }
-
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            align-items: flex-start;
-        }
-
-        .item-name {
-            flex: 1;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .item-meta {
-            font-size: 11px;
-            color: #666;
-            margin-top: 2px;
-        }
-
-        .item-qty-price {
-            text-align: right;
-            min-width: 90px;
-            margin-left: 10px;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-
-        .item-total {
-            text-align: right;
-            min-width: 60px;
-            font-weight: bold;
-        }
-
-        .bill-totals {
-            border-top: 1px dashed #000;
-            padding-top: 10px;
-            margin-bottom: 15px;
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 12px;
-        }
-
-        .total-row.final {
-            border-top: 1px solid #000;
-            border-bottom: 1px solid #000;
-            padding: 8px 0;
-            margin-top: 10px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .payment-section {
-            text-align: center;
-            margin-bottom: 15px;
-            padding: 10px;
-            border: 1px dashed #000;
-        }
-
-        .payment-method {
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .amount-to-collect {
-            font-size: 18px;
-            font-weight: bold;
-            color: #000;
-        }
-
-        .delivery-section {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px dashed #000;
-        }
-
-        .bill-footer {
-            text-align: center;
-            font-size: 11px;
-            border-top: 1px dashed #000;
-            padding-top: 15px;
-        }
-
-        .thank-you {
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        .separator {
-            text-align: center;
-            margin: 15px 0;
-            font-size: 16px;
-        }
-
-        @media print {
-            body {
-                background: #fff;
-                padding: 0;
-            }
-
-            .bill-container {
-                margin: 0;
-                padding: 10px;
-                max-width: none;
-            }
-        }
-    </style>
-    <script>
-        window.onload = function () {
-            window.print();
-        };
-    </script>
+    <title><?php printf(esc_html__('Bill - Order #%s', 'routemile-woocommerce'), esc_html($order_number)); ?></title>
+    <?php
+    // The receipt is a standalone printable page (rendered via include_once
+    // + exit after a nonce + capability check). It is NOT inside wp_head,
+    // so wp_enqueue_style/script cannot fire here. External files via
+    // <link>/<script> are the closest practical compliance with the
+    // "use wp_enqueue" guideline while keeping the printable-page flow.
+    $receipt_css_url = ROUTEW_PLUGIN_URL . 'assets/css/receipt.css';
+    $receipt_js_url  = ROUTEW_PLUGIN_URL . 'assets/js/receipt-print.js';
+    ?>
+    <link rel="stylesheet" href="<?php echo esc_url( $receipt_css_url ); ?>">
+    <script src="<?php echo esc_url( $receipt_js_url ); ?>"></script>
 </head>
 
 <body>
@@ -348,24 +154,24 @@ $unit = $order->get_meta('_fxw_address_unit');
             <?php endif; ?>
             <?php if ($store_phone): ?>
                 <div class="restaurant-address">
-                    <?php printf(esc_html__('Phone: %s', 'foodxpress'), esc_html($store_phone)); ?></div>
+                    <?php printf(esc_html__('Phone: %s', 'routemile-woocommerce'), esc_html($store_phone)); ?></div>
             <?php endif; ?>
-            <div class="bill-title"><?php esc_html_e('Delivery Bill', 'foodxpress'); ?></div>
+            <div class="bill-title"><?php esc_html_e('Delivery Bill', 'routemile-woocommerce'); ?></div>
         </div>
 
         <!-- Bill Information -->
         <div class="bill-info">
             <div class="bill-row">
-                <span><?php esc_html_e('Order No:', 'foodxpress'); ?></span>
+                <span><?php esc_html_e('Order No:', 'routemile-woocommerce'); ?></span>
                 <span><?php echo esc_html($order_number); ?></span>
             </div>
             <div class="bill-row">
-                <span><?php esc_html_e('Date:', 'foodxpress'); ?></span>
-                <span><?php echo $order_date ? esc_html($order_date->format('j M Y g:i A')) : esc_html__('N/A', 'foodxpress'); ?></span>
+                <span><?php esc_html_e('Date:', 'routemile-woocommerce'); ?></span>
+                <span><?php echo $order_date ? esc_html($order_date->format('j M Y g:i A')) : esc_html__('N/A', 'routemile-woocommerce'); ?></span>
             </div>
             <?php if ($delivery_boy): ?>
                 <div class="bill-row">
-                    <span><?php esc_html_e('Delivery By:', 'foodxpress'); ?></span>
+                    <span><?php esc_html_e('Delivery By:', 'routemile-woocommerce'); ?></span>
                     <span><?php echo esc_html($delivery_boy->display_name); ?></span>
                 </div>
             <?php endif; ?>
@@ -373,24 +179,24 @@ $unit = $order->get_meta('_fxw_address_unit');
 
         <!-- Customer Information -->
         <div class="customer-info">
-            <div class="section-title"><?php esc_html_e('Customer Details', 'foodxpress'); ?></div>
+            <div class="section-title"><?php esc_html_e('Customer Details', 'routemile-woocommerce'); ?></div>
             <div class="customer-details">
                 <div><strong><?php echo esc_html($order->get_formatted_billing_full_name()); ?></strong></div>
                 <?php if ($order->get_billing_phone()): ?>
                     <div><?php echo esc_html($order->get_billing_phone()); ?></div>
                 <?php endif; ?>
                 <br>
-                <div><strong><?php esc_html_e('Delivery Address:', 'foodxpress'); ?></strong></div>
+                <div><strong><?php esc_html_e('Delivery Address:', 'routemile-woocommerce'); ?></strong></div>
                 <div><?php echo esc_html($delivery_address_line); ?></div>
                 <?php if ($unit): ?>
-                    <div><?php printf(esc_html__('Unit/Flat: %s', 'foodxpress'), esc_html($unit)); ?></div>
+                    <div><?php printf(esc_html__('Unit/Flat: %s', 'routemile-woocommerce'), esc_html($unit)); ?></div>
                 <?php endif; ?>
             </div>
         </div>
 
         <!-- Items -->
         <div class="items-section">
-            <div class="section-title"><?php esc_html_e('Items Ordered', 'foodxpress'); ?></div>
+            <div class="section-title"><?php esc_html_e('Items Ordered', 'routemile-woocommerce'); ?></div>
             <div class="separator">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
 
             <?php foreach ($order->get_items() as $item_id => $item): ?>
@@ -418,8 +224,8 @@ $unit = $order->get_meta('_fxw_address_unit');
                     </div>
                     <div class="item-qty-price">
                         <div><?php printf(
-                            esc_html__('%d × %s', 'foodxpress'),
-                            $quantity,
+                            esc_html__('%d × %s', 'routemile-woocommerce'),
+                            (int) $quantity,
                             wp_kses_post(wc_price($unit_price, array('currency' => $order->get_currency())))
                         ); ?></div>
                         <div class="item-total"><?php echo wp_kses_post($line_total); ?></div>
@@ -431,7 +237,7 @@ $unit = $order->get_meta('_fxw_address_unit');
         <!-- Bill Totals -->
         <div class="bill-totals">
             <div class="total-row">
-                <span><?php esc_html_e('Subtotal:', 'foodxpress'); ?></span>
+                <span><?php esc_html_e('Subtotal:', 'routemile-woocommerce'); ?></span>
                 <span><?php echo wp_kses_post(wc_price($items_subtotal, array('currency' => $order->get_currency()))); ?></span>
             </div>
 
@@ -439,13 +245,13 @@ $unit = $order->get_meta('_fxw_address_unit');
                 <?php if (in_array($key, array('order_total', 'payment_method', 'cart_subtotal'), true))
                     continue; // Subtotal shown above; total + payment shown below ?>
                 <div class="total-row">
-                    <span><?php echo esc_html('shipping' === $key ? __('Delivery Fee:', 'foodxpress') : $total['label']); ?></span>
+                    <span><?php echo esc_html('shipping' === $key ? __('Delivery Fee:', 'routemile-woocommerce') : $total['label']); ?></span>
                     <span><?php echo wp_kses_post($total['value']); ?></span>
                 </div>
             <?php endforeach; ?>
 
             <div class="total-row final">
-                <span><?php esc_html_e('TOTAL AMOUNT:', 'foodxpress'); ?></span>
+                <span><?php esc_html_e('TOTAL AMOUNT:', 'routemile-woocommerce'); ?></span>
                 <span><?php echo wp_kses_post($order->get_formatted_order_total()); ?></span>
             </div>
         </div>
@@ -453,15 +259,15 @@ $unit = $order->get_meta('_fxw_address_unit');
         <!-- Payment Information -->
         <?php if ('cod' === $order->get_payment_method()): ?>
             <div class="payment-section">
-                <div class="payment-method"><?php esc_html_e('Cash on Delivery', 'foodxpress'); ?></div>
+                <div class="payment-method"><?php esc_html_e('Cash on Delivery', 'routemile-woocommerce'); ?></div>
                 <div class="amount-to-collect">
-                    <?php printf(esc_html__('COLLECT: %s', 'foodxpress'), wp_kses_post($order->get_formatted_order_total())); ?>
+                    <?php printf(esc_html__('COLLECT: %s', 'routemile-woocommerce'), wp_kses_post($order->get_formatted_order_total())); ?>
                 </div>
             </div>
         <?php else: ?>
             <div class="payment-section">
                 <div class="payment-method"><?php echo esc_html(strtoupper($payment_method)); ?></div>
-                <div><?php esc_html_e('PAYMENT COMPLETED', 'foodxpress'); ?></div>
+                <div><?php esc_html_e('PAYMENT COMPLETED', 'routemile-woocommerce'); ?></div>
             </div>
         <?php endif; ?>
 
@@ -471,7 +277,7 @@ $unit = $order->get_meta('_fxw_address_unit');
         if ($customer_note):
             ?>
             <div class="delivery-section">
-                <div class="section-title"><?php esc_html_e('Special Instructions', 'foodxpress'); ?></div>
+                <div class="section-title"><?php esc_html_e('Special Instructions', 'routemile-woocommerce'); ?></div>
                 <div style="font-size: 12px;"><?php echo esc_html($customer_note); ?></div>
             </div>
         <?php endif; ?>
@@ -480,7 +286,7 @@ $unit = $order->get_meta('_fxw_address_unit');
         <div class="bill-footer">
             <div class="thank-you"><?php echo esc_html($receipt_footer); ?></div>
             <br>
-            <div><?php printf(esc_html__('Printed: %s', 'foodxpress'), current_time('j M Y g:i A')); ?></div>
+            <div><?php printf(esc_html__('Printed: %s', 'routemile-woocommerce'), current_time('j M Y g:i A')); ?></div>
         </div>
     </div>
 </body>

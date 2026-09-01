@@ -1,4 +1,4 @@
-# Contributing to FoodXpress for WooCommerce
+# Contributing to RouteMile for WooCommerce
 
 Thank you for your interest in contributing! This document provides guidelines for contributing to this project.
 
@@ -18,12 +18,12 @@ Be respectful and professional in all interactions.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/codermillat/FoodXpress-for-WooCommerce.git
+   git clone https://github.com/codermillat/RouteMile-for-WooCommerce.git
    ```
 
 2. Copy to your WordPress plugins directory:
    ```bash
-   cp -r FoodXpress-for-WooCommerce /path/to/wordpress/wp-content/plugins/
+   cp -r RouteMile-for-WooCommerce /path/to/wordpress/wp-content/plugins/
    ```
 
 3. Activate the plugin in WordPress admin
@@ -55,7 +55,7 @@ Be respectful and professional in all interactions.
 Run the test suite before submitting changes:
 
 ```bash
-cd wp-content/plugins/foodxpress-for-woocommerce
+cd wp-content/plugins/routemile-woocommerce
 php tests/FXWTestRunner.php
 ```
 

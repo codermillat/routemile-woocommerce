@@ -1,4 +1,4 @@
-# Production QA Checklist — FoodXpress for WooCommerce
+# Production QA Checklist — RouteMile for WooCommerce
 
 The last gate before going live. Everything in the repo is verified statically
 (112-test suite, lint, security scans, docs compliance); this checklist verifies
@@ -25,8 +25,8 @@ Install the plugin: symlink or copy this folder into `wp-content/plugins/`, then
 |---|---|---|
 | 2.1 | **WooCommerce → Settings → General**: set store country/base location | Country sticks; orders will default to it |
 | 2.2 | **Google Cloud Console**: enable *Maps JavaScript API*, *Geocoding API*, *Distance Matrix API*; create an API key with billing enabled; restrict the key to your site's domain | Key works on the site only |
-| 2.3 | **WooCommerce → Settings → FoodXpress**: paste the API key; set *Restaurant Address* **and ideally Restaurant Coordinates* (e.g. from Google Maps right-click → the first two numbers, `lat, lng`); set radius (km), base fee, per-km fee, prep time | Settings save; the red **"delivery is not configured"** admin notice disappears |
-| 2.4 | **WooCommerce → Settings → Shipping**: create a zone covering your area → add the **FoodXpress Delivery** method | Method listed and enabled |
+| 2.3 | **WooCommerce → Settings → RouteMile**: paste the API key; set *Restaurant Address* **and ideally Restaurant Coordinates* (e.g. from Google Maps right-click → the first two numbers, `lat, lng`); set radius (km), base fee, per-km fee, prep time | Settings save; the red **"delivery is not configured"** admin notice disappears |
+| 2.4 | **WooCommerce → Settings → Shipping**: create a zone covering your area → add the **RouteMile Delivery** method | Method listed and enabled |
 | 2.5 | *Pricing Rules* section: try **distance tiers** (e.g. 3 km → small fee, 0 → higher fee), a **free-delivery threshold**, and a **minimum order**; retest §3/§5 with each | Fee matches the tier; threshold order shows Free; below-minimum cart shows the notice and blocks checkout |
 
 ## 3. Checkout — classic shortcode (default `[woocommerce_checkout]`)
@@ -50,7 +50,7 @@ Install the plugin: symlink or copy this folder into `wp-content/plugins/`, then
 | 4.4 | Log in as the delivery boy → `/delivery-dashboard/` | Sees the assigned order; can update status |
 | 4.5 | **Print Receipt** from the dashboard | Thermal receipt opens for printing **and actually prints** (fixed nonce bug, v1.2.9) |
 | 4.6 | Advance In Kitchen → Assigned → Picked Up → Completed | Status emails fire at each step |
-| 4.7 | `[fxw_track_order]` page | Customer sees live status |
+| 4.7 | `[routew_track_order]` page | Customer sees live status |
 
 ## 5. Saved-address defaults (returning customer)
 
@@ -64,7 +64,7 @@ Install the plugin: symlink or copy this folder into `wp-content/plugins/`, then
 
 | # | Step | Expected |
 |---|---|---|
-| 6.1 | Edit the checkout page → replace shortcode with the **Checkout block** | Page shows the map **above** the block; the three FoodXpress fields appear in the block's address/order sections (WC 8.9+) |
+| 6.1 | Edit the checkout page → replace shortcode with the **Checkout block** | Page shows the map **above** the block; the three RouteMile fields appear in the block's address/order sections (WC 8.9+) |
 | 6.2 | Pin inside the radius, fill the fields, place order | Order completes; order meta identical to a classic order (check 4.1) |
 | 6.3 | Pin outside / no pin | Field-level error blocks the order |
 | 6.4 | Returning customer on blocks checkout | Fields pre-filled from the same saved profile |
@@ -74,12 +74,12 @@ Install the plugin: symlink or copy this folder into `wp-content/plugins/`, then
 
 | # | Step | Expected |
 |---|---|---|
-| 7.1 | **Tools → Export Personal Data** for the test customer | "FoodXpress Delivery Profile" group with address/landmark/coordinates; order rows include FoodXpress data |
+| 7.1 | **Tools → Export Personal Data** for the test customer | "RouteMile Delivery Profile" group with address/landmark/coordinates; order rows include RouteMile data |
 | 7.2 | **Tools → Erase Personal Data** | Profile and order meta removed |
 | 7.3 | Temporarily remove the API key | Red **"delivery is not configured"** notice appears for admins |
 
 ## 8. Sign-off
 
 All rows green → the store is production-ready. File any failure at
-<https://github.com/codermillat/FoodXpress-for-WooCommerce/issues> with the
+<https://github.com/codermillat/RouteMile-for-WooCommerce/issues> with the
 step number and what you saw.

@@ -6,10 +6,10 @@
  * cash-on-delivery collection summary, a bottom tab bar, 48px action
  * buttons, safe-area padding, service-worker offline support, and a
  * heartbeat that reloads the dashboard whenever an order is assigned or a
- * status changes. `fxw_render_order_card()` must stay defined ABOVE the
+ * status changes. `routew_render_order_card()` must stay defined ABOVE the
  * render loop — conditionally-defined PHP functions are not hoisted.
  *
- * @package FoodXpress
+ * @package RouteMile
  */
 
 if (!defined('ABSPATH')) {
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Auth check: must be logged in with delivery access
-if (!is_user_logged_in() || !current_user_can('fxw_delivery_access')) {
+if (!is_user_logged_in() || !current_user_can('routew_delivery_access')) {
     wp_redirect(home_url());
     exit;
 }
@@ -29,8 +29,8 @@ if (!is_user_logged_in() || !current_user_can('fxw_delivery_access')) {
  * @return string SVG markup (aria-hidden).
  * @since 1.4.0
  */
-if (!function_exists('fxw_agent_icon')) {
-    function fxw_agent_icon($name)
+if (!function_exists('routew_agent_icon')) {
+    function routew_agent_icon($name)
     {
         $paths = array(
             'person' => '<path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-8 1.7-8 5v2h16v-2c0-3.3-4.7-5-8-5Z"/>',
@@ -51,7 +51,7 @@ if (!function_exists('fxw_agent_icon')) {
             return '';
         }
 
-        return '<svg class="fxw-svg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' . $paths[$name] . '</svg>';
+        return '<svg class="routew-svg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' . $paths[$name] . '</svg>';
     }
 }
 
@@ -64,20 +64,20 @@ if (!function_exists('fxw_agent_icon')) {
  *                        and collected amount shown instead).
  * @since 1.0.0
  */
-if (!function_exists('fxw_render_order_card')) {
-    function fxw_render_order_card($order, $args = array())
+if (!function_exists('routew_render_order_card')) {
+    function routew_render_order_card($order, $args = array())
     {
         $history = !empty($args['history']);
         $shipping_address = $order->get_formatted_shipping_address();
 
         // Get new delivery details
-        $delivery_address = $order->get_meta('_fxw_delivery_address', true);
-        $delivery_lat = $order->get_meta('_fxw_delivery_lat', true);
-        $delivery_lng = $order->get_meta('_fxw_delivery_lng', true);
-        $delivery_distance = $order->get_meta('_fxw_delivery_distance', true);
+        $delivery_address = $order->get_meta('_routew_delivery_address', true);
+        $delivery_lat = $order->get_meta('_routew_delivery_lat', true);
+        $delivery_lng = $order->get_meta('_routew_delivery_lng', true);
+        $delivery_distance = $order->get_meta('_routew_delivery_distance', true);
 
         // Fallback to old unit field for backward compatibility
-        $unit = $order->get_meta('_fxw_address_unit', true);
+        $unit = $order->get_meta('_routew_address_unit', true);
         $status = $order->get_status();
         $is_cod = 'cod' === $order->get_payment_method();
 
@@ -85,131 +85,131 @@ if (!function_exists('fxw_render_order_card')) {
         // note" (customer_note) is a kitchen note — the manager/admin reads
         // it on the order screen and passes it to the kitchen; it must not
         // reach the delivery agent's phone.
-        $instructions = trim((string) $order->get_meta('_fxw_delivery_instructions', true));
+        $instructions = trim((string) $order->get_meta('_routew_delivery_instructions', true));
 
         $completed = $order->get_date_completed();
         ?>
-            <div class="fxw-order-card <?php echo $is_cod ? 'fxw-order-card--cod' : ''; ?> <?php echo $history ? 'fxw-order-card--history' : ''; ?>">
-                <div class="fxw-card-header">
+            <div class="routew-order-card <?php echo $is_cod ? 'routew-order-card--cod' : ''; ?> <?php echo $history ? 'routew-order-card--history' : ''; ?>">
+                <div class="routew-card-header">
                     <h3>
-                        <?php printf(esc_html__('Order #%s', 'foodxpress'), esc_html($order->get_order_number())); ?>
+                        <?php printf(esc_html__('Order #%s', 'routemile-woocommerce'), esc_html($order->get_order_number())); ?>
                         <?php if ($history && $completed): ?>
-                            <span class="fxw-card-header__date">
+                            <span class="routew-card-header__date">
                                 <?php echo esc_html($completed->date_i18n(get_option('date_format') . ' ' . get_option('time_format'))); ?>
                             </span>
                         <?php endif; ?>
                     </h3>
                     <span
-                        class="fxw-status-badge status-<?php echo esc_attr($status); ?>"><?php echo esc_html(wc_get_order_status_name($status)); ?></span>
+                        class="routew-status-badge status-<?php echo esc_attr($status); ?>"><?php echo esc_html(wc_get_order_status_name($status)); ?></span>
                 </div>
                 <?php if ($is_cod): ?>
-                    <div class="fxw-cod-strip <?php echo $history ? 'fxw-cod-strip--settled' : ''; ?>" role="status">
-                        <?php echo fxw_agent_icon('cash'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <span class="fxw-cod-strip__label"><?php echo $history ? esc_html__('Collected on delivery', 'foodxpress') : esc_html__('Collect on delivery', 'foodxpress'); ?></span>
-                        <span class="fxw-cod-strip__amount"><?php echo wp_kses_post($order->get_formatted_order_total()); ?></span>
-                        <span class="fxw-cod-strip__method"><?php echo esc_html($order->get_payment_method_title()); ?></span>
+                    <div class="routew-cod-strip <?php echo $history ? 'routew-cod-strip--settled' : ''; ?>" role="status">
+                        <?php echo routew_agent_icon('cash'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        <span class="routew-cod-strip__label"><?php echo $history ? esc_html__('Collected on delivery', 'routemile-woocommerce') : esc_html__('Collect on delivery', 'routemile-woocommerce'); ?></span>
+                        <span class="routew-cod-strip__amount"><?php echo wp_kses_post($order->get_formatted_order_total()); ?></span>
+                        <span class="routew-cod-strip__method"><?php echo esc_html($order->get_payment_method_title()); ?></span>
                     </div>
                 <?php else: ?>
-                    <div class="fxw-prepaid-strip" role="status">
-                        <?php echo fxw_agent_icon('card'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <span class="fxw-prepaid-strip__label">
+                    <div class="routew-prepaid-strip" role="status">
+                        <?php echo routew_agent_icon('card'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        <span class="routew-prepaid-strip__label">
                             <?php
-                            $fxw_method_title = $order->get_payment_method_title();
-                            if ('' !== $fxw_method_title) {
+                            $routew_method_title = $order->get_payment_method_title();
+                            if ('' !== $routew_method_title) {
                                 // translators: %s = payment method title, e.g. "Direct bank transfer".
-                                printf(esc_html__('Prepaid — %s. Nothing to collect.', 'foodxpress'), esc_html($fxw_method_title));
+                                printf(esc_html__('Prepaid — %s. Nothing to collect.', 'routemile-woocommerce'), esc_html($routew_method_title));
                             } else {
-                                esc_html_e('Prepaid. Nothing to collect.', 'foodxpress');
+                                esc_html_e('Prepaid. Nothing to collect.', 'routemile-woocommerce');
                             }
                             ?>
                         </span>
                     </div>
                 <?php endif; ?>
-                <div class="fxw-card-body">
-                    <div class="fxw-card-section">
-                        <p><?php echo fxw_agent_icon('person'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                            <strong><?php esc_html_e('Customer:', 'foodxpress'); ?></strong>
+                <div class="routew-card-body">
+                    <div class="routew-card-section">
+                        <p><?php echo routew_agent_icon('person'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                            <strong><?php esc_html_e('Customer:', 'routemile-woocommerce'); ?></strong>
                             <?php echo esc_html($order->get_formatted_billing_full_name()); ?></p>
-                        <p><?php echo fxw_agent_icon('phone'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                            <strong><?php esc_html_e('Phone:', 'foodxpress'); ?></strong>
-                            <a class="fxw-call-link"
+                        <p><?php echo routew_agent_icon('phone'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                            <strong><?php esc_html_e('Phone:', 'routemile-woocommerce'); ?></strong>
+                            <a class="routew-call-link"
                                 href="tel:<?php echo esc_attr($order->get_billing_phone()); ?>"><?php echo esc_html($order->get_billing_phone()); ?></a>
                         </p>
 
                         <?php if ($delivery_address): ?>
-                            <p><?php echo fxw_agent_icon('home'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                                <strong><?php esc_html_e('Delivery Address:', 'foodxpress'); ?></strong>
+                            <p><?php echo routew_agent_icon('home'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                                <strong><?php esc_html_e('Delivery Address:', 'routemile-woocommerce'); ?></strong>
                                 <?php echo esc_html($delivery_address); ?></p>
                             <?php if ($delivery_distance): ?>
-                                <p><?php echo fxw_agent_icon('ruler'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                                    <strong><?php esc_html_e('Distance:', 'foodxpress'); ?></strong>
+                                <p><?php echo routew_agent_icon('ruler'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                                    <strong><?php esc_html_e('Distance:', 'routemile-woocommerce'); ?></strong>
                                     <?php echo esc_html($delivery_distance); ?> km</p>
                             <?php endif; ?>
                         <?php else: ?>
-                            <p><?php echo fxw_agent_icon('home'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                                <strong><?php esc_html_e('Address:', 'foodxpress'); ?></strong>
+                            <p><?php echo routew_agent_icon('home'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                                <strong><?php esc_html_e('Address:', 'routemile-woocommerce'); ?></strong>
                                 <?php echo wp_kses_post($shipping_address); ?></p>
                             <?php if ($unit): ?>
-                                <p><?php echo fxw_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                                    <strong><?php esc_html_e('Unit:', 'foodxpress'); ?></strong>
+                                <p><?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                                    <strong><?php esc_html_e('Unit:', 'routemile-woocommerce'); ?></strong>
                                     <?php echo esc_html($unit); ?></p>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
                     <?php if ($instructions): ?>
-                        <div class="fxw-customer-note">
-                            <div class="fxw-customer-note__title">
-                                <?php echo fxw_agent_icon('note'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                                <?php esc_html_e('Delivery instructions', 'foodxpress'); ?>
+                        <div class="routew-customer-note">
+                            <div class="routew-customer-note__title">
+                                <?php echo routew_agent_icon('note'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                                <?php esc_html_e('Delivery instructions', 'routemile-woocommerce'); ?>
                             </div>
-                            <p class="fxw-customer-note__line"><?php echo esc_html($instructions); ?></p>
+                            <p class="routew-customer-note__line"><?php echo esc_html($instructions); ?></p>
                         </div>
                     <?php endif; ?>
                 </div>
-                <div class="fxw-card-footer">
+                <div class="routew-card-footer">
                     <?php
                     // Create precise map link using coordinates if available
                     if ($delivery_lat && $delivery_lng && is_numeric($delivery_lat) && is_numeric($delivery_lng)) {
                         // Use precise coordinate-based map link for exact pinpoint location
                         $map_url = "https://www.google.com/maps?q=" . urlencode(trim($delivery_lat) . ',' . trim($delivery_lng));
-                        $map_label = __('Open Exact Location', 'foodxpress');
-                        $map_class = 'fxw-button-map-precise';
+                        $map_label = __('Open Exact Location', 'routemile-woocommerce');
+                        $map_class = 'routew-button-map-precise';
                     } elseif ($delivery_address) {
                         // Use delivery address if coordinates are missing but delivery address exists
                         $map_url = "https://www.google.com/maps/search/?api=1&query=" . urlencode(trim(strip_tags($delivery_address)));
-                        $map_label = __('Search Delivery Address', 'foodxpress');
-                        $map_class = 'fxw-button-map-address';
+                        $map_label = __('Search Delivery Address', 'routemile-woocommerce');
+                        $map_class = 'routew-button-map-address';
                     } else {
                         // Final fallback to shipping address
                         $map_url = "https://www.google.com/maps/search/?api=1&query=" . urlencode(trim(strip_tags($shipping_address)));
-                        $map_label = __('Search Location', 'foodxpress');
-                        $map_class = 'fxw-button-map-fallback';
+                        $map_label = __('Search Location', 'routemile-woocommerce');
+                        $map_class = 'routew-button-map-fallback';
                     }
                     ?>
                     <a href="<?php echo esc_url($map_url); ?>" target="_blank" rel="noopener noreferrer"
-                        class="fxw-button fxw-button-map <?php echo esc_attr($map_class); ?>">
-                        <?php echo fxw_agent_icon('pin'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        class="routew-button routew-button-map <?php echo esc_attr($map_class); ?>">
+                        <?php echo routew_agent_icon('pin'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
                         <?php echo esc_html($map_label); ?></a>
                     <a href="tel:<?php echo esc_attr($order->get_billing_phone()); ?>"
-                        class="fxw-button fxw-button-call" aria-label="<?php echo esc_attr__('Call customer', 'foodxpress'); ?>">
-                        <?php echo fxw_agent_icon('phone'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <span class="fxw-button-call__label"><?php esc_html_e('Call', 'foodxpress'); ?></span></a>
-                    <?php if (!$history && 'fxw-assigned' === $status): ?>
-                        <button type="button" class="fxw-button fxw-button-pickup fxw-action-btn"
-                            data-action="fxw_update_delivery_status" data-status="fxw-picked-up"
+                        class="routew-button routew-button-call" aria-label="<?php echo esc_attr__('Call customer', 'routemile-woocommerce'); ?>">
+                        <?php echo routew_agent_icon('phone'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        <span class="routew-button-call__label"><?php esc_html_e('Call', 'routemile-woocommerce'); ?></span></a>
+                    <?php if (!$history && 'routew-assigned' === $status): ?>
+                        <button type="button" class="routew-button routew-button-pickup routew-action-btn"
+                            data-action="routew_update_delivery_status" data-status="routew-picked-up"
                             data-order-id="<?php echo esc_attr($order->get_id()); ?>"
-                            data-nonce="<?php echo esc_attr(wp_create_nonce('fxw_delivery_action')); ?>">
-                            <?php echo fxw_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                            <?php esc_html_e('Mark Picked Up', 'foodxpress'); ?>
+                            data-nonce="<?php echo esc_attr(wp_create_nonce('routew_delivery_action')); ?>">
+                            <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                            <?php esc_html_e('Mark Picked Up', 'routemile-woocommerce'); ?>
                         </button>
                     <?php endif; ?>
-                    <?php if (!$history && 'fxw-picked-up' === $status): ?>
-                        <button type="button" class="fxw-button fxw-button-deliver fxw-action-btn"
-                            data-action="fxw_update_delivery_status" data-status="completed"
+                    <?php if (!$history && 'routew-picked-up' === $status): ?>
+                        <button type="button" class="routew-button routew-button-deliver routew-action-btn"
+                            data-action="routew_update_delivery_status" data-status="completed"
                             data-order-id="<?php echo esc_attr($order->get_id()); ?>"
-                            data-nonce="<?php echo esc_attr(wp_create_nonce('fxw_delivery_action')); ?>">
-                            <?php echo fxw_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                            <?php esc_html_e('Mark Delivered', 'foodxpress'); ?>
+                            data-nonce="<?php echo esc_attr(wp_create_nonce('routew_delivery_action')); ?>">
+                            <?php echo routew_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                            <?php esc_html_e('Mark Delivered', 'routemile-woocommerce'); ?>
                         </button>
                     <?php endif; ?>
                 </div>
@@ -217,26 +217,26 @@ if (!function_exists('fxw_render_order_card')) {
         <?php }
 } // end function_exists guard
 
-$fxw_agent = wp_get_current_user();
-$fxw_state = FXW_Delivery_Boy_View::build_dashboard_state(get_current_user_id());
-$fxw_cash = FXW_Agent_Cash::get_agent_cash_summary(get_current_user_id());
-$fxw_delivery_boy_id = get_current_user_id();
+$routew_agent = wp_get_current_user();
+$routew_state = ROUTEW_Delivery_Boy_View::build_dashboard_state(get_current_user_id());
+$routew_cash = ROUTEW_Agent_Cash::get_agent_cash_summary(get_current_user_id());
+$routew_delivery_boy_id = get_current_user_id();
 $new_orders = wc_get_orders(array(
     'limit' => 50,
-    'meta_key' => '_fxw_delivery_boy_id',
-    'meta_value' => $fxw_delivery_boy_id,
-    'status' => 'fxw-assigned',
+    'meta_key' => '_routew_delivery_boy_id',
+    'meta_value' => $routew_delivery_boy_id,
+    'status' => 'routew-assigned',
 ));
 $picked_up_orders = wc_get_orders(array(
     'limit' => 50,
-    'meta_key' => '_fxw_delivery_boy_id',
-    'meta_value' => $fxw_delivery_boy_id,
-    'status' => 'fxw-picked-up',
+    'meta_key' => '_routew_delivery_boy_id',
+    'meta_value' => $routew_delivery_boy_id,
+    'status' => 'routew-picked-up',
 ));
 $delivered_orders = wc_get_orders(array(
     'limit' => 50,
-    'meta_key' => '_fxw_delivery_boy_id',
-    'meta_value' => $fxw_delivery_boy_id,
+    'meta_key' => '_routew_delivery_boy_id',
+    'meta_value' => $routew_delivery_boy_id,
     'status' => array('completed'),
     'orderby' => 'date',
     'order' => 'DESC',
@@ -250,109 +250,109 @@ $delivered_orders = wc_get_orders(array(
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#E85D04">
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="<?php echo esc_url(add_query_arg('fxw_agent_manifest', '1', home_url('/'))); ?>">
-    <link rel="apple-touch-icon" href="<?php echo esc_url(FXW_PLUGIN_URL . 'assets/img/agent-icon.svg'); ?>">
+    <link rel="manifest" href="<?php echo esc_url(add_query_arg('routew_agent_manifest', '1', home_url('/'))); ?>">
+    <link rel="apple-touch-icon" href="<?php echo esc_url(ROUTEW_PLUGIN_URL . 'assets/img/agent-icon.svg'); ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="<?php esc_attr_e('FX Agent', 'foodxpress'); ?>">
+    <meta name="apple-mobile-web-app-title" content="<?php esc_attr_e('FX Agent', 'routemile-woocommerce'); ?>">
     <?php wp_head(); ?>
 </head>
 
-<body <?php body_class('fxw-delivery-dashboard-page'); ?>>
-    <div class="fxw-app-dashboard"
-        data-fxw-state="<?php echo esc_attr($fxw_state['signature']); ?>"
-        data-fxw-counts="<?php echo esc_attr(wp_json_encode($fxw_state['counts'])); ?>">
-        <header class="fxw-app-header">
-            <div class="fxw-app-header__row">
-                <div class="fxw-app-header__brand">
-                    <span class="fxw-app-header__logo" aria-hidden="true">
-                        <?php echo fxw_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+<body <?php body_class('routew-delivery-dashboard-page'); ?>>
+    <div class="routew-app-dashboard"
+        data-routew-state="<?php echo esc_attr($routew_state['signature']); ?>"
+        data-routew-counts="<?php echo esc_attr(wp_json_encode($routew_state['counts'])); ?>">
+        <header class="routew-app-header">
+            <div class="routew-app-header__row">
+                <div class="routew-app-header__brand">
+                    <span class="routew-app-header__logo" aria-hidden="true">
+                        <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
                     </span>
-                    <div class="fxw-app-header__titles">
-                        <h1><?php esc_html_e('FoodXpress Agent', 'foodxpress'); ?></h1>
-                        <p class="fxw-app-header__agent">
-                            <?php echo esc_html($fxw_agent->display_name); ?>
-                            <span class="fxw-app-header__dot" aria-hidden="true"></span>
-                            <span class="fxw-app-header__date"><?php echo esc_html(date_i18n(get_option('date_format'))); ?></span>
+                    <div class="routew-app-header__titles">
+                        <h1><?php esc_html_e('RouteMile Agent', 'routemile-woocommerce'); ?></h1>
+                        <p class="routew-app-header__agent">
+                            <?php echo esc_html($routew_agent->display_name); ?>
+                            <span class="routew-app-header__dot" aria-hidden="true"></span>
+                            <span class="routew-app-header__date"><?php echo esc_html(date_i18n(get_option('date_format'))); ?></span>
                         </p>
                     </div>
                 </div>
             </div>
-            <div class="fxw-agent-stats" role="status">
-                <div class="fxw-agent-stats__item">
-                    <span class="fxw-agent-stats__value"><?php echo absint($fxw_state['today']['delivered']); ?></span>
-                    <span class="fxw-agent-stats__label"><?php esc_html_e('Delivered today', 'foodxpress'); ?></span>
+            <div class="routew-agent-stats" role="status">
+                <div class="routew-agent-stats__item">
+                    <span class="routew-agent-stats__value"><?php echo absint($routew_state['today']['delivered']); ?></span>
+                    <span class="routew-agent-stats__label"><?php esc_html_e('Delivered today', 'routemile-woocommerce'); ?></span>
                 </div>
-                <div class="fxw-agent-stats__item">
-                    <span class="fxw-agent-stats__value"><?php echo absint($fxw_state['today']['active']); ?></span>
-                    <span class="fxw-agent-stats__label"><?php esc_html_e('Active now', 'foodxpress'); ?></span>
+                <div class="routew-agent-stats__item">
+                    <span class="routew-agent-stats__value"><?php echo absint($routew_state['today']['active']); ?></span>
+                    <span class="routew-agent-stats__label"><?php esc_html_e('Active now', 'routemile-woocommerce'); ?></span>
                 </div>
-                <div class="fxw-agent-stats__item">
-                    <span class="fxw-agent-stats__value"><?php echo wp_kses_post(wc_price($fxw_state['today']['collected'], array('currency' => get_woocommerce_currency()))); ?></span>
-                    <span class="fxw-agent-stats__label"><?php esc_html_e('Collected today', 'foodxpress'); ?></span>
+                <div class="routew-agent-stats__item">
+                    <span class="routew-agent-stats__value"><?php echo wp_kses_post(wc_price($routew_state['today']['collected'], array('currency' => get_woocommerce_currency()))); ?></span>
+                    <span class="routew-agent-stats__label"><?php esc_html_e('Collected today', 'routemile-woocommerce'); ?></span>
                 </div>
-                <div class="fxw-agent-stats__item fxw-agent-stats__item--due">
-                    <span class="fxw-agent-stats__value"><?php echo wp_kses_post(wc_price($fxw_cash['unsettled'], array('currency' => get_woocommerce_currency()))); ?></span>
-                    <span class="fxw-agent-stats__label"><?php esc_html_e('To hand over', 'foodxpress'); ?></span>
+                <div class="routew-agent-stats__item routew-agent-stats__item--due">
+                    <span class="routew-agent-stats__value"><?php echo wp_kses_post(wc_price($routew_cash['unsettled'], array('currency' => get_woocommerce_currency()))); ?></span>
+                    <span class="routew-agent-stats__label"><?php esc_html_e('To hand over', 'routemile-woocommerce'); ?></span>
                 </div>
-                <div class="fxw-agent-stats__item">
-                    <span class="fxw-agent-stats__value"><?php echo absint($fxw_state['counts']['delivered']); ?></span>
-                    <span class="fxw-agent-stats__label"><?php esc_html_e('All-time delivered', 'foodxpress'); ?></span>
+                <div class="routew-agent-stats__item">
+                    <span class="routew-agent-stats__value"><?php echo absint($routew_state['counts']['delivered']); ?></span>
+                    <span class="routew-agent-stats__label"><?php esc_html_e('All-time delivered', 'routemile-woocommerce'); ?></span>
                 </div>
             </div>
-            <?php if ($fxw_cash['pending']): ?>
-                <div class="fxw-settle-bar fxw-settle-bar--pending" role="status">
-                    <span class="fxw-settle-bar__text">
+            <?php if ($routew_cash['pending']): ?>
+                <div class="routew-settle-bar routew-settle-bar--pending" role="status">
+                    <span class="routew-settle-bar__text">
                         <?php
                         // translators: 1: formatted amount.
-                        printf(esc_html__('Hand-over of %1$s sent — waiting for manager approval.', 'foodxpress'),
-                            wp_kses_post(wc_price($fxw_cash['pending']['amount'], array('currency' => get_woocommerce_currency())))
+                        printf(esc_html__('Hand-over of %1$s sent — waiting for manager approval.', 'routemile-woocommerce'),
+                            wp_kses_post(wc_price($routew_cash['pending']['amount'], array('currency' => get_woocommerce_currency())))
                         );
                         ?>
                     </span>
                 </div>
-            <?php elseif ($fxw_cash['unsettled'] > 0): ?>
-                <div class="fxw-settle-bar">
-                    <span class="fxw-settle-bar__text">
+            <?php elseif ($routew_cash['unsettled'] > 0): ?>
+                <div class="routew-settle-bar">
+                    <span class="routew-settle-bar__text">
                         <?php
                         // translators: %s = formatted amount.
-                        printf(esc_html__('You are holding %s of the store\'s cash.', 'foodxpress'),
-                            wp_kses_post(wc_price($fxw_cash['unsettled'], array('currency' => get_woocommerce_currency())))
+                        printf(esc_html__('You are holding %s of the store\'s cash.', 'routemile-woocommerce'),
+                            wp_kses_post(wc_price($routew_cash['unsettled'], array('currency' => get_woocommerce_currency())))
                         );
                         ?>
                     </span>
                     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                        <?php wp_nonce_field('fxw_settle_cash_' . get_current_user_id()); ?>
-                        <input type="hidden" name="action" value="fxw_settle_agent_cash" />
+                        <?php wp_nonce_field('routew_settle_cash_' . get_current_user_id()); ?>
+                        <input type="hidden" name="action" value="routew_settle_agent_cash" />
                         <input type="hidden" name="agent_id" value="<?php echo esc_attr(get_current_user_id()); ?>" />
-                        <button type="submit" class="fxw-button fxw-settle-btn" data-fxw-settle-amount="<?php echo esc_attr(wp_strip_all_tags(wc_price($fxw_cash['unsettled']))); ?>">
-                            <?php echo fxw_agent_icon('cash'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                            <?php esc_html_e('Request hand-over', 'foodxpress'); ?>
+                        <button type="submit" class="routew-button routew-settle-btn" data-routew-settle-amount="<?php echo esc_attr(wp_strip_all_tags(wc_price($routew_cash['unsettled']))); ?>">
+                            <?php echo routew_agent_icon('cash'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                            <?php esc_html_e('Request hand-over', 'routemile-woocommerce'); ?>
                         </button>
                     </form>
                 </div>
-            <?php elseif ($fxw_cash['last_accepted']): ?>
-                <p class="fxw-settle-last">
+            <?php elseif ($routew_cash['last_accepted']): ?>
+                <p class="routew-settle-last">
                     <?php
-                    $reviewer = get_user_by('id', absint($fxw_cash['last_accepted']['reviewed_by']));
+                    $reviewer = get_user_by('id', absint($routew_cash['last_accepted']['reviewed_by']));
                     // translators: 1: formatted amount, 2: date/time, 3: approver name.
-                    printf(esc_html__('Last hand-over: %1$s on %2$s, approved by %3$s. All settled.', 'foodxpress'),
-                        wp_kses_post(wc_price($fxw_cash['last_accepted']['amount'], array('currency' => get_woocommerce_currency()))),
-                        esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), (int) $fxw_cash['last_accepted']['reviewed_at'])),
-                        esc_html($reviewer ? $reviewer->display_name : __('manager', 'foodxpress'))
+                    printf(esc_html__('Last hand-over: %1$s on %2$s, approved by %3$s. All settled.', 'routemile-woocommerce'),
+                        wp_kses_post(wc_price($routew_cash['last_accepted']['amount'], array('currency' => get_woocommerce_currency()))),
+                        esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), (int) $routew_cash['last_accepted']['reviewed_at'])),
+                        esc_html($reviewer ? $reviewer->display_name : __('manager', 'routemile-woocommerce'))
                     );
                     ?>
                 </p>
             <?php endif; ?>
-            <?php if ($fxw_state['cod']['count'] > 0): ?>
-                <div class="fxw-cod-summary" role="status">
-                    <?php echo fxw_agent_icon('cash'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                    <span class="fxw-cod-summary__text">
+            <?php if ($routew_state['cod']['count'] > 0): ?>
+                <div class="routew-cod-summary" role="status">
+                    <?php echo routew_agent_icon('cash'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                    <span class="routew-cod-summary__text">
                         <?php
                         // translators: 1 = formatted amount, 2 = number of orders.
-                        printf(esc_html__('Cash to collect: %1$s across %2$s COD order(s)', 'foodxpress'),
-                            wp_kses_post(wc_price($fxw_state['cod']['total'], array('currency' => get_woocommerce_currency()))),
-                            absint($fxw_state['cod']['count'])
+                        printf(esc_html__('Cash to collect: %1$s across %2$s COD order(s)', 'routemile-woocommerce'),
+                            wp_kses_post(wc_price($routew_state['cod']['total'], array('currency' => get_woocommerce_currency()))),
+                            absint($routew_state['cod']['count'])
                         );
                         ?>
                     </span>
@@ -360,70 +360,70 @@ $delivered_orders = wc_get_orders(array(
             <?php endif; ?>
         </header>
 
-        <main class="fxw-app-main">
-            <div id="new-orders" class="fxw-tab-content active" role="tabpanel" aria-labelledby="tab-new-orders">
+        <main class="routew-app-main">
+            <div id="new-orders" class="routew-tab-content active" role="tabpanel" aria-labelledby="tab-new-orders">
                 <?php if ($new_orders): ?>
                     <?php foreach ($new_orders as $order): ?>
-                        <?php fxw_render_order_card($order); ?>
+                        <?php routew_render_order_card($order); ?>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="fxw-no-orders">
-                        <?php echo fxw_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <p><?php esc_html_e('No new deliveries assigned.', 'foodxpress'); ?></p>
-                        <p class="fxw-no-orders__hint"><?php esc_html_e('New orders appear here automatically — leave the app open.', 'foodxpress'); ?></p>
+                    <div class="routew-no-orders">
+                        <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        <p><?php esc_html_e('No new deliveries assigned.', 'routemile-woocommerce'); ?></p>
+                        <p class="routew-no-orders__hint"><?php esc_html_e('New orders appear here automatically — leave the app open.', 'routemile-woocommerce'); ?></p>
                     </div>
                 <?php endif; ?>
             </div>
 
-            <div id="in-progress" class="fxw-tab-content" role="tabpanel" aria-labelledby="tab-in-progress">
+            <div id="in-progress" class="routew-tab-content" role="tabpanel" aria-labelledby="tab-in-progress">
                 <?php if ($picked_up_orders): ?>
                     <?php foreach ($picked_up_orders as $order): ?>
-                        <?php fxw_render_order_card($order); ?>
+                        <?php routew_render_order_card($order); ?>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="fxw-no-orders">
-                        <?php echo fxw_agent_icon('clock'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <p><?php esc_html_e('No deliveries in progress.', 'foodxpress'); ?></p>
+                    <div class="routew-no-orders">
+                        <?php echo routew_agent_icon('clock'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        <p><?php esc_html_e('No deliveries in progress.', 'routemile-woocommerce'); ?></p>
                     </div>
                 <?php endif; ?>
             </div>
 
-            <div id="delivered" class="fxw-tab-content" role="tabpanel" aria-labelledby="tab-delivered">
+            <div id="delivered" class="routew-tab-content" role="tabpanel" aria-labelledby="tab-delivered">
                 <?php if ($delivered_orders): ?>
                     <?php foreach ($delivered_orders as $order): ?>
-                        <?php fxw_render_order_card($order, array('history' => true)); ?>
+                        <?php routew_render_order_card($order, array('history' => true)); ?>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="fxw-no-orders">
-                        <?php echo fxw_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                        <p><?php esc_html_e('No delivered orders yet.', 'foodxpress'); ?></p>
+                    <div class="routew-no-orders">
+                        <?php echo routew_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        <p><?php esc_html_e('No delivered orders yet.', 'routemile-woocommerce'); ?></p>
                     </div>
                 <?php endif; ?>
             </div>
         </main>
 
-        <nav class="fxw-tabbar" role="tablist" aria-label="<?php esc_attr_e('Delivery status filters', 'foodxpress'); ?>">
-            <button type="button" id="tab-new-orders" class="fxw-tab-link active" role="tab" aria-selected="true"
-                aria-controls="new-orders" data-fxw-tab="new-orders">
-                <?php echo fxw_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                <span class="fxw-tabbar__label"><?php esc_html_e('New', 'foodxpress'); ?></span>
-                <span class="fxw-tabbar__count"><?php echo count($new_orders); ?></span>
+        <nav class="routew-tabbar" role="tablist" aria-label="<?php esc_attr_e('Delivery status filters', 'routemile-woocommerce'); ?>">
+            <button type="button" id="tab-new-orders" class="routew-tab-link active" role="tab" aria-selected="true"
+                aria-controls="new-orders" data-routew-tab="new-orders">
+                <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                <span class="routew-tabbar__label"><?php esc_html_e('New', 'routemile-woocommerce'); ?></span>
+                <span class="routew-tabbar__count"><?php echo count($new_orders); ?></span>
             </button>
-            <button type="button" id="tab-in-progress" class="fxw-tab-link" role="tab" aria-selected="false"
-                aria-controls="in-progress" data-fxw-tab="in-progress">
-                <?php echo fxw_agent_icon('clock'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                <span class="fxw-tabbar__label"><?php esc_html_e('In Progress', 'foodxpress'); ?></span>
-                <span class="fxw-tabbar__count"><?php echo count($picked_up_orders); ?></span>
+            <button type="button" id="tab-in-progress" class="routew-tab-link" role="tab" aria-selected="false"
+                aria-controls="in-progress" data-routew-tab="in-progress">
+                <?php echo routew_agent_icon('clock'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                <span class="routew-tabbar__label"><?php esc_html_e('In Progress', 'routemile-woocommerce'); ?></span>
+                <span class="routew-tabbar__count"><?php echo count($picked_up_orders); ?></span>
             </button>
-            <button type="button" id="tab-delivered" class="fxw-tab-link" role="tab" aria-selected="false"
-                aria-controls="delivered" data-fxw-tab="delivered">
-                <?php echo fxw_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
-                <span class="fxw-tabbar__label"><?php esc_html_e('Delivered', 'foodxpress'); ?></span>
-                <span class="fxw-tabbar__count"><?php echo count($delivered_orders); ?></span>
+            <button type="button" id="tab-delivered" class="routew-tab-link" role="tab" aria-selected="false"
+                aria-controls="delivered" data-routew-tab="delivered">
+                <?php echo routew_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                <span class="routew-tabbar__label"><?php esc_html_e('Delivered', 'routemile-woocommerce'); ?></span>
+                <span class="routew-tabbar__count"><?php echo count($delivered_orders); ?></span>
             </button>
         </nav>
 
-        <div id="fxw-toast" class="fxw-toast" role="status" aria-live="polite" hidden></div>
+        <div id="routew-toast" class="routew-toast" role="status" aria-live="polite" hidden></div>
     </div>
 
     <?php wp_footer(); ?>

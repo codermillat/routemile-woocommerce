@@ -8,7 +8,7 @@
 |---|---|---|---|---|---|---|
 | `restaurant-delivery-manager` (RDM) | 2025-06-07 | 2025-08-16 | `main` | PHP | 95 lines | 2.9 MB |
 | `RestroReach` (RR) | 2025-07-04 | 2025-07-17 | `main` | PHP | 1057 lines | 2.9 MB |
-| `FoodXpress-for-WooCommerce` (FX) | 2025-08-31 | **2026-08-14** | `main` | "Python" (mis-tag) — actually PHP | 143 lines | 16 MB |
+| `RouteMile-for-WooCommerce` (FX) | 2025-08-31 | **2026-08-14** | `main` | "Python" (mis-tag) — actually PHP | 143 lines | 16 MB |
 
 > All three are the **same product**, three different rebrand/refactor passes. RDM → RR → FX is the evolution.
 
@@ -16,11 +16,11 @@
 
 ## TL;DR — Recommendation
 
-**Keep `FoodXpress-for-WooCommerce`** as the canonical repo. **Archive** the other two.
+**Keep `RouteMile-for-WooCommerce`** as the canonical repo. **Archive** the other two.
 
 | Decision | Repo | Reason |
 |---|---|---|
-| ✅ KEEP | `FoodXpress-for-WooCommerce` | Cleanest, most active (last push today-2 days), modern structure, HPOS-compatible, active dev. |
+| ✅ KEEP | `RouteMile-for-WooCommerce` | Cleanest, most active (last push today-2 days), modern structure, HPOS-compatible, active dev. |
 | 🗄️ ARCHIVE | `RestroReach` | Most feature-rich but frozen at v1.1.0 / 85% complete. Keep accessible for code archaeology. |
 | 🗄️ ARCHIVE | `restaurant-delivery-manager` | Oldest, has duplicate classes and 32K messy LOC. Only useful as the v1 baseline. |
 
@@ -37,7 +37,7 @@ The right consolidation is **FX as the destination**, with FX receiving a "premi
 | PHP source LOC | 33,697 | 20,370 | **5,170** |
 | JS source LOC | 1,667 | 412 | 938 |
 | CSS source LOC | 519 | 519 | 2,117 |
-| PHP files in `includes/` | 32 (RDM_*) + 5 (legacy unprefixed) | 19 | 14 (`fxw_*` only) |
+| PHP files in `includes/` | 32 (RDM_*) + 5 (legacy unprefixed) | 19 | 14 (`routew_*` only) |
 | Plugin main file | 95 lines (slim) | 1057 lines (monolithic) | 143 lines (slim) |
 | Classes > 1500 LOC | 7 | 5 | 0 |
 | `includes/` total LOC | 32,284 | 19,010 | 3,973 |
@@ -61,10 +61,10 @@ The right consolidation is **FX as the destination**, with FX receiving a "premi
 
 | Field | RDM | RR | FX |
 |---|---|---|---|
-| Plugin Name | Restaurant Delivery Manager | Restaurant Delivery Manager Professional | **FoodXpress for WooCommerce** |
+| Plugin Name | Restaurant Delivery Manager | Restaurant Delivery Manager Professional | **RouteMile for WooCommerce** |
 | Version | 1.1.0 | 1.1.0 | 1.1.0 |
-| Text Domain | `restaurant-delivery-manager` | `restaurant-delivery-manager` | **`foodxpress`** |
-| Prefix | `RDM_` (mixed) | `RDM_` (mostly clean) | **`FXW_` (consistent)** |
+| Text Domain | `restaurant-delivery-manager` | `restaurant-delivery-manager` | **`routemile`** |
+| Prefix | `RDM_` (mixed) | `RDM_` (mostly clean) | **`ROUTEW_` (consistent)** |
 | Min PHP | 8.0 | 8.0 | 7.4 (lower — broader compat) |
 | Min WP | 6.0 | 6.0 | 6.0 |
 | Min WC | 8.0 | 8.0 | 7.0 (lower — broader compat) |
@@ -96,16 +96,16 @@ RR/
 └── markdown/   docs
 
 FX/
-├── foodxpress-for-woocommerce.php  (143 lines, slim bootstrap)
+├── routemile-woocommerce.php  (143 lines, slim bootstrap)
 ├── uninstall.php
-├── includes/   3,973 LOC, 14 classes (all clean fxw_*)
-│   ├── class-fxw-{admin-bar, checkout, config, core, dashboard, delivery-boy-view, notifications, order-admin, order-statuses, reporting, roles, settings, shipping-method, shortcodes}.php
-│   ├── api/class-fxw-rest-checkout-controller.php
-│   ├── services/class-fxw-{mapping-service, rate-limiter}.php
-│   └── emails/class-fxw-email-{assigned, in-kitchen, picked-up}.php
+├── includes/   3,973 LOC, 14 classes (all clean routew_*)
+│   ├── class-routew-{admin-bar, checkout, config, core, dashboard, delivery-boy-view, notifications, order-admin, order-statuses, reporting, roles, settings, shipping-method, shortcodes}.php
+│   ├── api/class-routew-rest-checkout-controller.php
+│   ├── services/class-routew-{mapping-service, rate-limiter}.php
+│   └── emails/class-routew-email-{assigned, in-kitchen, picked-up}.php
 ├── templates/   3 files
 │   ├── delivery-dashboard-template.php, delivery-boy-view.php, receipt-template.php
-│   └── emails/{fxw-order-status.php, plain/}
+│   └── emails/{routew-order-status.php, plain/}
 ├── assets/{css, js}/    (small — 92 KB total)
 ├── tests/   static analyzer (FXWTestRunner.php) + TestSprite config
 ├── skills/{wordpress-pro, wordpress-advanced-architecture}/  ← WordPress development knowledge packs
@@ -166,8 +166,8 @@ FX/
 | Live agent location on map | ✅ | ✅ | ✗ |
 | ETA calculation | ✅ | ✅ | 🟡 |
 | **Shortcodes** | | | |
-| `[fxw_track_order]` / `[rdm_track_order]` | ✅ | ✅ | ✅ |
-| `[fxw_reorder]` / `[rdm_reorder]` | ✗ | ✗ | ✅ |
+| `[routew_track_order]` / `[rdm_track_order]` | ✅ | ✅ | ✅ |
+| `[routew_reorder]` / `[rdm_reorder]` | ✗ | ✗ | ✅ |
 | **WordPress / WC integration** | | | |
 | HPOS (custom-order-tables) compat | ✅ | ✅ | ✅ |
 | Cart-checkout-blocks compat declared | ✗ | ✗ | ✅ (opt-out) |
@@ -241,7 +241,7 @@ FX/
 
 **Notable:** The `.cursorrules` file is 12 KB — extensive, well-curated Cursor rules (a model of what good AI-dev-rules look like). Worth porting into FX.
 
-### 3.3 `FoodXpress-for-WooCommerce` (FX) — ✅ keep
+### 3.3 `RouteMile-for-WooCommerce` (FX) — ✅ keep
 
 **Critical:**
 
@@ -253,15 +253,15 @@ FX/
 **High:**
 
 5. **Feature gap vs. RR/RDM.** Missing the entire premium layer: PWA / mobile-agent / GPS / COD reconciliation / analytics / multi-channel notifications / BI / automated email reports. FX today is roughly the **MVP tier** of what RR ships.
-6. **String "RestroReach" appears in legacy code paths** (verified: zero matches in the fresh clone, but the commit history of FX shows the rename wasn't 100% clean — the readme of the old local Desktop copy at `~/Desktop/FoodXpress for WooCommerce/` still had it).
+6. **String "RestroReach" appears in legacy code paths** (verified: zero matches in the fresh clone, but the commit history of FX shows the rename wasn't 100% clean — the readme of the old local Desktop copy at `~/Desktop/RouteMile for WooCommerce/` still had it).
 7. **No real test coverage** — only `FXWTestRunner.php` static analysis. The TestSprite setup is documented but not run anywhere.
 8. **License says "Proprietary" in plugin header** but `LICENSE.md` not present in repo (only inferred from header). Decide explicitly.
 
 **Medium:**
 
 9. **Two `delivery-dashboard-template.php` and `delivery-boy-view.php` templates** — could be one.
-10. **`includes/class-fxw-checkout.php` is 1046 LOC** — biggest FX class, but well within reason (vs. RDM's 2700+ LOC admin interface).
-11. **`foodxpress-landing` is a separate sibling project** at `~/Desktop/FoodXpress/foodxpress-landing/` (not in the repo) — landing page lives outside source control. Not a problem per se, but the repo's `LANDING-PAGE.md` (33 KB) reads as a spec for an external site.
+10. **`includes/class-routew-checkout.php` is 1046 LOC** — biggest FX class, but well within reason (vs. RDM's 2700+ LOC admin interface).
+11. **`routemile-landing` is a separate sibling project** at `~/Desktop/RouteMile/routemile-landing/` (not in the repo) — landing page lives outside source control. Not a problem per se, but the repo's `LANDING-PAGE.md` (33 KB) reads as a spec for an external site.
 
 **Notable / positive:**
 
@@ -285,7 +285,7 @@ gh repo edit codermillat/restaurant-delivery-manager --archive
 gh repo edit codermillat/RestroReach --archive
 
 # 2. Clone FX as the active working repo
-gh repo clone codermillat/FoodXpress-for-WooCommerce
+gh repo clone codermillat/RouteMile-for-WooCommerce
 
 # 3. From RR, copy the valuable artifacts that FX needs (NOT the code yet)
 #    - .cursorrules → merge into FX's .cursorrules
@@ -309,7 +309,7 @@ gh repo clone codermillat/FoodXpress-for-WooCommerce
 
 Priority order, by user value and risk:
 
-1. **Custom DB tables** (7 tables, `rr_` prefix → rename to `fxw_`). Land migration scripts.
+1. **Custom DB tables** (7 tables, `rr_` prefix → rename to `routew_`). Land migration scripts.
 2. **Mobile agent PWA**: `manifest.json` + service worker + `templates/mobile-agent/`.
 3. **GPS tracking** class + REST endpoint + 45s-interval battery optimization.
 4. **COD payment workflow** + cash reconciliation (with audit trail table).
@@ -344,9 +344,9 @@ Priority order, by user value and risk:
 | Date | Event | Reference |
 |---|---|---|
 | 2026-08-16 | `RestroReach` and `restaurant-delivery-manager` archived on GitHub (recoverable, not deleted) | Session 140b19f-Δ |
-| 2026-08-16 | Duplicate local working trees removed to `mavis-trash` (~378 MB): `~/Desktop/FoodXpress*/` and `~/Local Sites/foodxpress-for-woocommerce/` | Session 140b19f-Δ |
+| 2026-08-16 | Duplicate local working trees removed to `mavis-trash` (~378 MB): `~/Desktop/RouteMile*/` and `~/Local Sites/routemile-woocommerce/` | Session 140b19f-Δ |
 | 2026-08-16 | This report + 8-phase backport roadmap committed to `fx/docs/` | commits `83e42ff`, `cbcdbe8` |
-| 2026-08-17 | **Phase 0 complete** — `v1.2.0` shipped: checkout class split, 2 new services extracted, `.gitignore` rewritten, `LICENSE.md` added, 9 AI-tool config folders + 5 AI dev docs removed (~11 MB), 101/101 tests pass | commit `140b19f`, tag `v1.2.0`, [release](https://github.com/codermillat/FoodXpress-for-WooCommerce/releases/tag/v1.2.0) |
+| 2026-08-17 | **Phase 0 complete** — `v1.2.0` shipped: checkout class split, 2 new services extracted, `.gitignore` rewritten, `LICENSE.md` added, 9 AI-tool config folders + 5 AI dev docs removed (~11 MB), 101/101 tests pass | commit `140b19f`, tag `v1.2.0`, [release](https://github.com/codermillat/RouteMile-for-WooCommerce/releases/tag/v1.2.0) |
 | 2026-08-17 | New `AGENTS.md` at repo root so the next AI tool (Cursor, Codex, Claude Code, etc.) can pick up the project state without re-discovering it | commit (in this session) |
 
 For the live phase tracker and full delivery plan, see [ROADMAP.md](./ROADMAP.md).

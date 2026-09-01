@@ -1,5 +1,5 @@
 /* General App-like Styles - scoped to delivery dashboard */
-.fxw-app-dashboard {
+.routew-app-dashboard {
     margin: 0;
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -7,7 +7,7 @@
     min-height: 100vh;
 }
 
-.fxw-app-header {
+.routew-app-header {
     background-color: #ffffff;
     padding: 15px;
     text-align: center;
@@ -17,13 +17,13 @@
     z-index: 1000;
 }
 
-.fxw-app-header h1 {
+.routew-app-header h1 {
     margin: 0;
     font-size: 1.2em;
     font-weight: 600;
 }
 
-.fxw-tabs {
+.routew-tabs {
     display: flex;
     background-color: #ffffff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -33,7 +33,7 @@
     z-index: 999;
 }
 
-.fxw-tab-link {
+.routew-tab-link {
     flex-grow: 1;
     padding: 15px;
     text-align: center;
@@ -46,25 +46,25 @@
     transition: all 0.3s ease;
 }
 
-.fxw-tab-link.active {
+.routew-tab-link.active {
     color: #007cba;
     border-bottom-color: #007cba;
     font-weight: 600;
 }
 
-.fxw-app-main {
+.routew-app-main {
     padding: 15px;
 }
 
-.fxw-tab-content {
+.routew-tab-content {
     display: none;
 }
 
-.fxw-tab-content.active {
+.routew-tab-content.active {
     display: block;
 }
 
-.fxw-order-card {
+.routew-order-card {
     background: #fff;
     border: 1px solid #e5e5e5;
     border-radius: 12px;
@@ -73,7 +73,7 @@
     overflow: hidden;
 }
 
-.fxw-card-header {
+.routew-card-header {
     padding: 15px;
     border-bottom: 1px solid #e5e5e5;
     display: flex;
@@ -81,13 +81,13 @@
     align-items: center;
 }
 
-.fxw-card-header h3 {
+.routew-card-header h3 {
     margin: 0;
     font-size: 1.1em;
     font-weight: 600;
 }
 
-.fxw-status-badge {
+.routew-status-badge {
     padding: 5px 12px;
     border-radius: 15px;
     font-size: 0.8em;
@@ -96,28 +96,28 @@
     font-weight: 500;
 }
 
-.status-fxw-assigned {
+.status-routew-assigned {
     background-color: #ffb900;
     color: #1a1a1a;
 }
 
-.status-fxw-picked-up {
+.status-routew-picked-up {
     background-color: #1e88e5;
 }
 
-.fxw-card-body {
+.routew-card-body {
     padding: 15px;
 }
 
-.fxw-card-section {
+.routew-card-section {
     margin-bottom: 15px;
 }
 
-.fxw-card-section:last-child {
+.routew-card-section:last-child {
     margin-bottom: 0;
 }
 
-.fxw-card-section p {
+.routew-card-section p {
     margin: 0 0 12px;
     display: flex;
     align-items: center;
@@ -125,11 +125,11 @@
     color: #333;
 }
 
-.fxw-card-section p strong {
+.routew-card-section p strong {
     color: #111;
 }
 
-.fxw-icon {
+.routew-icon {
     margin-right: 12px;
     font-size: 1.4em;
     width: 24px;
@@ -137,26 +137,26 @@
     color: #007cba;
 }
 
-.fxw-collect-amount {
+.routew-collect-amount {
     font-weight: bold;
     color: #d32f2f;
     font-size: 1.1em;
 }
 
-.fxw-card-footer {
+.routew-card-footer {
     padding: 0;
     display: flex;
     flex-direction: row;
     gap: 0;
 }
 
-.fxw-action-form,
-.fxw-button {
+.routew-action-form,
+.routew-button {
     flex: 1;
     margin: 0;
 }
 
-.fxw-button {
+.routew-button {
     text-decoration: none;
     padding: 18px;
     text-align: center;
@@ -170,75 +170,75 @@
     transition: background-color 0.3s ease;
 }
 
-.fxw-button .fxw-icon {
+.routew-button .routew-icon {
     margin-right: 8px;
 }
 
-.fxw-button-map {
+.routew-button-map {
     background-color: #f0f0f0;
     color: #333;
     border-bottom-left-radius: 12px;
 }
 
 /* Enhanced map button styles for different location types */
-.fxw-button-map-precise {
+.routew-button-map-precise {
     background-color: #28a745;
     color: #fff;
 }
 
-.fxw-button-map-precise:hover {
+.routew-button-map-precise:hover {
     background-color: #218838;
     color: #fff;
 }
 
-.fxw-button-map-address {
+.routew-button-map-address {
     background-color: #007cba;
     color: #fff;
 }
 
-.fxw-button-map-address:hover {
+.routew-button-map-address:hover {
     background-color: #0056b3;
     color: #fff;
 }
 
-.fxw-button-map-fallback {
+.routew-button-map-fallback {
     background-color: #e6a800;
     color: #1a1a1a;
 }
 
-.fxw-button-map-fallback:hover {
+.routew-button-map-fallback:hover {
     background-color: #e0a800;
     color: #212529;
 }
 
-.fxw-button-pickup {
+.routew-button-pickup {
     background-color: #E85D04;
     color: #fff;
     border-bottom-right-radius: 12px;
 }
 
-.fxw-button-deliver {
+.routew-button-deliver {
     background-color: #28a745;
     color: #fff;
     border-bottom-right-radius: 12px;
 }
 
-.fxw-button-print {
+.routew-button-print {
     background-color: #6c757d;
     color: #fff;
     flex: 1;
 }
 
-.fxw-button-print:hover {
+.routew-button-print:hover {
     background-color: #5a6268;
 }
 
-.fxw-button-print:disabled {
+.routew-button-print:disabled {
     background-color: #adb5bd;
     cursor: not-allowed;
 }
 
-.fxw-no-orders {
+.routew-no-orders {
     background: #fff;
     border: 1px solid #e5e5e5;
     padding: 40px;
@@ -247,38 +247,38 @@
 }
 
 /* Order Tracking Page Styles */
-.fxw-track-order-page .fxw-container {
+.routew-track-order-page .routew-container {
     max-width: 800px;
     margin: 40px auto;
     padding: 0;
 }
 
 @media (max-width: 600px) {
-    .fxw-track-order-page .fxw-container {
+    .routew-track-order-page .routew-container {
         max-width: 100%;
         margin: 10px;
         padding: 0;
     }
 
-    .fxw-track-order-form-container,
-    .fxw-order-status-wrapper {
+    .routew-track-order-form-container,
+    .routew-order-status-wrapper {
         padding: 18px;
         border-radius: 8px;
         margin-bottom: 18px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
-    .fxw-track-order-form-container h2,
-    .fxw-order-status-header h3 {
+    .routew-track-order-form-container h2,
+    .routew-order-status-header h3 {
         font-size: 1.2em;
         margin-bottom: 0.5em;
     }
 
-    .fxw-order-status-header {
+    .routew-order-status-header {
         margin-bottom: 18px;
     }
 
-    .fxw-status-tracker {
+    .routew-status-tracker {
         flex-direction: row;
         gap: 8px;
         overflow-x: auto;
@@ -289,17 +289,17 @@
         position: static !important;
     }
 
-    .fxw-status-tracker::-webkit-scrollbar {
+    .routew-status-tracker::-webkit-scrollbar {
         height: 6px;
         background: #f0f2f5;
     }
 
-    .fxw-status-tracker::-webkit-scrollbar-thumb {
+    .routew-status-tracker::-webkit-scrollbar-thumb {
         background: #007cba;
         border-radius: 3px;
     }
 
-    .fxw-status-line {
+    .routew-status-line {
         display: none !important;
     }
 
@@ -323,21 +323,21 @@
         word-break: break-word;
     }
 
-    .fxw-delivery-boy-info {
+    .routew-delivery-boy-info {
         margin-top: 18px;
         padding: 12px;
         border-radius: 6px;
         font-size: 0.95em;
     }
 
-    .fxw-button-call {
+    .routew-button-call {
         padding: 8px 14px;
         font-size: 1em;
         border-radius: 6px;
     }
 }
 
-.fxw-track-order-form-container {
+.routew-track-order-form-container {
     background: #fff;
     padding: 40px;
     border-radius: 12px;
@@ -345,45 +345,45 @@
     margin-bottom: 30px;
 }
 
-.fxw-track-order-form-container h2 {
+.routew-track-order-form-container h2 {
     text-align: center;
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 1.8em;
 }
 
-.fxw-track-order-form-container p {
+.routew-track-order-form-container p {
     text-align: center;
     color: #777;
     margin-bottom: 30px;
 }
 
-.fxw-track-order-form {
+.routew-track-order-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-.fxw-track-order-form .form-row {
+.routew-track-order-form .form-row {
     display: flex;
     flex-direction: column;
 }
 
-.fxw-track-order-form label {
+.routew-track-order-form label {
     margin-bottom: 8px;
     font-weight: 600;
     color: #333;
 }
 
-.fxw-track-order-form input[type="text"],
-.fxw-track-order-form input[type="email"] {
+.routew-track-order-form input[type="text"],
+.routew-track-order-form input[type="email"] {
     padding: 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 1em;
 }
 
-.fxw-button-track {
+.routew-button-track {
     padding: 15px;
     border-radius: 8px;
     background-color: #007cba;
@@ -394,39 +394,39 @@
     width: 100%;
 }
 
-.fxw-order-status-wrapper {
+.routew-order-status-wrapper {
     background: #fff;
     padding: 40px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.fxw-order-status-header {
+.routew-order-status-header {
     text-align: center;
     margin-bottom: 40px;
 }
 
-.fxw-order-status-header h3 {
+.routew-order-status-header h3 {
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 1.8em;
 }
 
-.fxw-current-status-text {
+.routew-current-status-text {
     color: #333;
     font-size: 1.2em;
     font-weight: 500;
     margin: 0;
 }
 
-.fxw-status-tracker {
+.routew-status-tracker {
     display: flex;
     justify-content: space-between;
     position: relative;
     margin: 50px 0;
 }
 
-.fxw-status-line {
+.routew-status-line {
     position: absolute;
     top: 12px;
     left: 10%;
@@ -455,7 +455,7 @@
     transition: all 0.4s ease;
 }
 
-.status-step .dot .fxw-icon {
+.status-step .dot .routew-icon {
     font-size: 22px;
     color: #fff;
     display: flex;
@@ -465,12 +465,12 @@
     width: 100%;
 }
 
-.status-step.completed .dot .fxw-icon,
-.status-step.delivered .dot .fxw-icon {
+.status-step.completed .dot .routew-icon,
+.status-step.delivered .dot .routew-icon {
     color: #fff;
 }
 
-.status-step.current .dot .fxw-icon {
+.status-step.current .dot .routew-icon {
     color: #ffb900;
 }
 
@@ -483,10 +483,10 @@
     background-color: #28a745 !important;
     border-color: #28a745 !important;
     box-shadow: 0 0 8px #28a74544;
-    animation: fxw-pop 0.4s;
+    animation: routew-pop 0.4s;
 }
 
-@keyframes fxw-pop {
+@keyframes routew-pop {
     0% {
         transform: scale(1);
     }
@@ -519,21 +519,21 @@
     letter-spacing: 0.5px;
 }
 
-.fxw-order-status-header h3 {
+.routew-order-status-header h3 {
     font-size: 1.5em;
     color: #007cba;
     font-weight: 700;
     margin-bottom: 0.5em;
 }
 
-.fxw-current-status-text {
+.routew-current-status-text {
     color: #28a745;
     font-size: 1.1em;
     font-weight: 600;
     margin: 0;
 }
 
-.fxw-order-status-wrapper {
+.routew-order-status-wrapper {
     border: 2px solid #e0e0e0;
     box-shadow: 0 6px 24px rgba(0, 124, 186, 0.07);
     padding: 32px;
@@ -541,7 +541,7 @@
     background: linear-gradient(135deg, #fff 80%, #f0f2f5 100%);
 }
 
-.fxw-delivery-boy-info {
+.routew-delivery-boy-info {
     margin-top: 40px;
     padding: 20px;
     background: #f9f9f9;
@@ -549,19 +549,19 @@
     text-align: center;
 }
 
-.fxw-delivery-boy-info h4 {
+.routew-delivery-boy-info h4 {
     margin-top: 0;
     margin-bottom: 15px;
 }
 
-.fxw-delivery-boy-info p {
+.routew-delivery-boy-info p {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 15px;
 }
 
-.fxw-button-call {
+.routew-button-call {
     text-decoration: none;
     padding: 12px 24px;
     border-radius: 8px;
@@ -574,14 +574,14 @@
 }
 
 /* Admin Dashboard Print Receipt Button Styles */
-.fxw-action-buttons {
+.routew-action-buttons {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
 }
 
-.fxw-action-buttons .fxw-print-receipt {
+.routew-action-buttons .routew-print-receipt {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -597,18 +597,18 @@
     transition: all 0.2s ease;
 }
 
-.fxw-action-buttons .fxw-print-receipt:hover {
+.routew-action-buttons .routew-print-receipt:hover {
     background-color: #135e96;
     border-color: #135e96;
     color: #fff;
 }
 
-.fxw-action-buttons .fxw-print-receipt:focus {
+.routew-action-buttons .routew-print-receipt:focus {
     box-shadow: 0 0 0 1px #fff, 0 0 0 3px #2271b1;
     outline: none;
 }
 
-.fxw-action-buttons .fxw-print-receipt .dashicons {
+.routew-action-buttons .routew-print-receipt .dashicons {
     font-size: 16px;
     width: 16px;
     height: 16px;
@@ -617,53 +617,53 @@
 
 /* Responsive design for smaller screens */
 @media (max-width: 782px) {
-    .fxw-action-buttons {
+    .routew-action-buttons {
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
     }
 
-    .fxw-action-buttons .fxw-print-receipt {
+    .routew-action-buttons .routew-print-receipt {
         width: 100%;
         justify-content: center;
         padding: 8px 12px;
         font-size: 14px;
     }
 
-    .fxw-action-buttons .fxw-print-receipt .button-text {
+    .routew-action-buttons .routew-print-receipt .button-text {
         display: inline;
     }
 }
 
 @media (max-width: 600px) {
-    .fxw-action-buttons .fxw-print-receipt .button-text {
+    .routew-action-buttons .routew-print-receipt .button-text {
         display: none;
     }
 
-    .fxw-action-buttons .fxw-print-receipt {
+    .routew-action-buttons .routew-print-receipt {
         width: auto;
         min-width: 36px;
         padding: 8px;
         justify-content: center;
     }
 
-    .fxw-action-buttons .fxw-print-receipt .dashicons {
+    .routew-action-buttons .routew-print-receipt .dashicons {
         margin: 0;
     }
 }
 
 /* Ensure button visibility in WordPress admin tables */
-.widefat .fxw-action-buttons {
+.widefat .routew-action-buttons {
     white-space: nowrap;
 }
 
-.widefat .fxw-action-buttons form {
+.widefat .routew-action-buttons form {
     display: inline-block;
     margin: 0;
 }
 
 /* Enhanced Checkout Location Picker Styles */
-#fxw-location-picker-container {
+#routew-location-picker-container {
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -672,21 +672,21 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-#fxw-location-picker-container h3 {
+#routew-location-picker-container h3 {
     margin-top: 0;
     color: #007cba;
     font-size: 1.3em;
     font-weight: 600;
 }
 
-.fxw-location-search-wrapper {
+.routew-location-search-wrapper {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
     align-items: center;
 }
 
-#fxw-location-search-input {
+#routew-location-search-input {
     flex: 1;
     padding: 12px 15px;
     border: 2px solid #ddd;
@@ -695,13 +695,13 @@
     transition: border-color 0.3s ease;
 }
 
-#fxw-location-search-input:focus {
+#routew-location-search-input:focus {
     border-color: #007cba;
     outline: 2px solid #007cba;
     outline-offset: -2px;
 }
 
-#fxw-get-location {
+#routew-get-location {
     padding: 12px 18px;
     background-color: #28a745;
     color: #fff;
@@ -714,13 +714,13 @@
     transition: background-color 0.3s ease;
 }
 
-#fxw-get-location:hover {
+#routew-get-location:hover {
     background-color: #218838;
     color: #fff;
 }
 
 /* Map styling */
-#fxw-map {
+#routew-map {
     border: 2px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
@@ -731,34 +731,34 @@
 
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
-    .fxw-location-search-wrapper {
+    .routew-location-search-wrapper {
         flex-direction: column;
         gap: 8px;
     }
 
-    #fxw-get-location {
+    #routew-get-location {
         width: 100%;
         text-align: center;
     }
 
-    #fxw-location-picker-container {
+    #routew-location-picker-container {
         padding: 15px;
         margin: 15px 0;
     }
 
-    #fxw-map {
+    #routew-map {
         height: 250px;
     }
 }
 
 /* Skeleton Loading Animation */
-.fxw-skeleton-loading {
+.routew-skeleton-loading {
     position: relative;
     overflow: hidden;
     background-color: #f0f0f0;
 }
 
-.fxw-skeleton-loading::after {
+.routew-skeleton-loading::after {
     display: block;
     content: "";
     position: absolute;
@@ -768,10 +768,10 @@
     left: 0;
     transform: translateX(-100%);
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    animation: fxw-skeleton-loading 1.5s infinite;
+    animation: routew-skeleton-loading 1.5s infinite;
 }
 
-@keyframes fxw-skeleton-loading {
+@keyframes routew-skeleton-loading {
     100% {
         transform: translateX(100%);
     }
@@ -804,7 +804,7 @@ gmp-place-autocomplete::part(input):focus {
 }
 
 /* Map Notification Toast */
-#fxw-map-notification {
+#routew-map-notification {
     display: none;
     margin-top: 10px;
     padding: 12px 16px;
@@ -815,32 +815,32 @@ gmp-place-autocomplete::part(input):focus {
     transition: opacity 0.3s;
 }
 
-#fxw-map-notification.error {
+#routew-map-notification.error {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
 }
 
-#fxw-map-notification.success {
+#routew-map-notification.success {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
 }
 
-#fxw-map-notification.info {
+#routew-map-notification.info {
     background-color: #d1ecf1;
     color: #0c5460;
     border: 1px solid #bee5eb;
 }
 
 /* Locate Me button loading state */
-#fxw-get-location.loading {
+#routew-get-location.loading {
     opacity: 0.7;
     pointer-events: none;
 }
 
 /* Order Tracking - My Account & Shortcode */
-.fxw-order-tracking {
+.routew-order-tracking {
     margin: 2em 0;
     padding: 1.5em;
     background: #fff;
@@ -849,7 +849,7 @@ gmp-place-autocomplete::part(input):focus {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.fxw-order-tracking__title {
+.routew-order-tracking__title {
     margin: 0 0 0.5em;
     font-size: 1.15em !important;
     font-weight: 600;
@@ -857,11 +857,11 @@ gmp-place-autocomplete::part(input):focus {
     line-height: 1.3;
 }
 
-.fxw-order-tracking__status {
+.routew-order-tracking__status {
     margin-bottom: 1.5em;
 }
 
-.fxw-order-tracking__status-badge {
+.routew-order-tracking__status-badge {
     display: inline-block;
     padding: 6px 14px;
     border-radius: 20px;
@@ -872,7 +872,7 @@ gmp-place-autocomplete::part(input):focus {
     text-transform: capitalize;
 }
 
-.fxw-status-stepper {
+.routew-status-stepper {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -880,7 +880,7 @@ gmp-place-autocomplete::part(input):focus {
     margin: 1.5em 0;
 }
 
-.fxw-status-step {
+.routew-status-step {
     flex: 1;
     min-width: 0;
     display: flex;
@@ -889,7 +889,7 @@ gmp-place-autocomplete::part(input):focus {
     text-align: center;
 }
 
-.fxw-status-step__dot {
+.routew-status-step__dot {
     width: 36px;
     height: 36px;
     min-width: 36px;
@@ -902,31 +902,31 @@ gmp-place-autocomplete::part(input):focus {
     transition: all 0.3s ease;
 }
 
-.fxw-status-step__icon {
+.routew-status-step__icon {
     font-size: 1.1em;
     line-height: 1;
     color: #fff;
 }
 
-.fxw-status-step--completed .fxw-status-step__dot,
-.fxw-status-step--delivered .fxw-status-step__dot {
+.routew-status-step--completed .routew-status-step__dot,
+.routew-status-step--delivered .routew-status-step__dot {
     background: #28a745;
     border-color: #28a745;
 }
 
-.fxw-status-step--current .fxw-status-step__dot {
+.routew-status-step--current .routew-status-step__dot {
     background: #ffb900;
     border-color: #ffb900;
     transform: scale(1.15);
 }
 
-.fxw-status-step--completed .fxw-status-step__icon,
-.fxw-status-step--delivered .fxw-status-step__icon,
-.fxw-status-step--current .fxw-status-step__icon {
+.routew-status-step--completed .routew-status-step__icon,
+.routew-status-step--delivered .routew-status-step__icon,
+.routew-status-step--current .routew-status-step__icon {
     color: #fff;
 }
 
-.fxw-status-step__label {
+.routew-status-step__label {
     display: block;
     margin-top: 10px;
     font-size: 0.85em;
@@ -934,13 +934,13 @@ gmp-place-autocomplete::part(input):focus {
     color: #666;
 }
 
-.fxw-status-step--completed .fxw-status-step__label,
-.fxw-status-step--delivered .fxw-status-step__label,
-.fxw-status-step--current .fxw-status-step__label {
+.routew-status-step--completed .routew-status-step__label,
+.routew-status-step--delivered .routew-status-step__label,
+.routew-status-step--current .routew-status-step__label {
     color: #333;
 }
 
-.fxw-delivery-contact {
+.routew-delivery-contact {
     margin-top: 1.5em;
     padding: 1em 1.25em;
     background: linear-gradient(135deg, #e8f4fd 0%, #f0f9ff 100%);
@@ -948,14 +948,14 @@ gmp-place-autocomplete::part(input):focus {
     border: 1px solid rgba(0, 124, 186, 0.15);
 }
 
-.fxw-delivery-contact__title {
+.routew-delivery-contact__title {
     margin: 0 0 0.5em;
     font-size: 1em;
     font-weight: 600;
     color: #1d2327;
 }
 
-.fxw-delivery-contact__content {
+.routew-delivery-contact__content {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -963,13 +963,13 @@ gmp-place-autocomplete::part(input):focus {
     row-gap: 8px;
 }
 
-.fxw-delivery-contact__name {
+.routew-delivery-contact__name {
     font-weight: 600;
     font-size: 1.05em;
     color: #1d2327;
 }
 
-.fxw-delivery-contact__call {
+.routew-delivery-contact__call {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -985,30 +985,30 @@ gmp-place-autocomplete::part(input):focus {
     box-sizing: border-box;
 }
 
-.fxw-delivery-contact__call:hover {
+.routew-delivery-contact__call:hover {
     background: linear-gradient(135deg, #005a87 0%, #004060 100%);
     color: #fff;
 }
 
-.fxw-delivery-contact__call:focus {
+.routew-delivery-contact__call:focus {
     outline: 2px solid #007cba;
     outline-offset: 2px;
 }
 
-.fxw-delivery-contact__phone {
+.routew-delivery-contact__phone {
     font-variant-numeric: tabular-nums;
 }
 
-.fxw-delivery-contact__call-label {
+.routew-delivery-contact__call-label {
     opacity: 0.9;
 }
 
-.fxw-delivery-contact__no-phone {
+.routew-delivery-contact__no-phone {
     font-size: 0.9em;
     color: #666;
 }
 
-.fxw-track-error {
+.routew-track-error {
     padding: 1em;
     background: #f8d7da;
     color: #721c24;
@@ -1017,16 +1017,16 @@ gmp-place-autocomplete::part(input):focus {
 
 /* Mobile-friendly order tracking */
 @media (max-width: 600px) {
-    .fxw-order-tracking {
+    .routew-order-tracking {
         margin: 1.5em 0;
         padding: 1.25em;
     }
 
-    .fxw-order-tracking__title {
+    .routew-order-tracking__title {
         font-size: 1.15em;
     }
 
-    .fxw-status-stepper {
+    .routew-status-stepper {
         flex-wrap: nowrap;
         overflow-x: auto;
         overflow-y: hidden;
@@ -1037,42 +1037,42 @@ gmp-place-autocomplete::part(input):focus {
         gap: 6px;
     }
 
-    .fxw-status-stepper::-webkit-scrollbar {
+    .routew-status-stepper::-webkit-scrollbar {
         height: 6px;
     }
 
-    .fxw-status-stepper::-webkit-scrollbar-thumb {
+    .routew-status-stepper::-webkit-scrollbar-thumb {
         background: #007cba40;
         border-radius: 3px;
     }
 
-    .fxw-status-step {
+    .routew-status-step {
         flex: 0 0 auto;
         min-width: 88px;
     }
 
-    .fxw-status-step__dot {
+    .routew-status-step__dot {
         width: 32px;
         height: 32px;
         min-width: 32px;
     }
 
-    .fxw-status-step__label {
+    .routew-status-step__label {
         font-size: 0.8em;
         margin-top: 8px;
     }
 
-    .fxw-delivery-contact {
+    .routew-delivery-contact {
         padding: 1em;
         margin-top: 1.25em;
     }
 
-    .fxw-delivery-contact__content {
+    .routew-delivery-contact__content {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .fxw-delivery-contact__call {
+    .routew-delivery-contact__call {
         width: 100%;
         justify-content: center;
         min-height: 48px;
@@ -1080,7 +1080,7 @@ gmp-place-autocomplete::part(input):focus {
 }
 
 /* WooCommerce My Account order view context */
-.woocommerce-order .fxw-order-tracking--myaccount {
+.woocommerce-order .routew-order-tracking--myaccount {
     margin-top: 2em;
 }
 
@@ -1096,9 +1096,9 @@ gmp-place-autocomplete::part(input):focus {
 }
 
 /* Focus indicator fixes */
-.fxw-button:focus-visible,
-.fxw-tab-link:focus-visible,
-.fxw-button-track:focus-visible {
+.routew-button:focus-visible,
+.routew-tab-link:focus-visible,
+.routew-button-track:focus-visible {
     outline: 2px solid #007cba;
     outline-offset: 2px;
 }

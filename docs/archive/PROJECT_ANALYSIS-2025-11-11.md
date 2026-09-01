@@ -1,13 +1,13 @@
-# FoodXpress for WooCommerce - Project Analysis
+# RouteMile for WooCommerce - Project Analysis
 
 ## Executive Summary
 
-**FoodXpress for WooCommerce** is a comprehensive delivery management system plugin designed for single-restaurant WooCommerce stores. The plugin provides end-to-end delivery workflow management, from checkout to delivery completion, with features including distance-based shipping calculation, delivery personnel management, order tracking, and receipt printing.
+**RouteMile for WooCommerce** is a comprehensive delivery management system plugin designed for single-restaurant WooCommerce stores. The plugin provides end-to-end delivery workflow management, from checkout to delivery completion, with features including distance-based shipping calculation, delivery personnel management, order tracking, and receipt printing.
 
 **Version:** 1.0.1  
 **License:** Proprietary  
 **Author:** MD MILLAT HOSEN  
-**Repository:** https://github.com/codermillat/foodxpress-woocommerce
+**Repository:** https://github.com/codermillat/routemile-woocommerce
 
 ---
 
@@ -18,26 +18,26 @@
 The plugin follows WordPress coding standards with a modular, class-based architecture:
 
 ```
-FoodXpress for WooCommerce/
-├── foodxpress-for-woocommerce.php  # Main plugin file
+RouteMile for WooCommerce/
+├── routemile-woocommerce.php  # Main plugin file
 ├── includes/                        # Core business logic
-│   ├── class-fxw-core.php          # Main plugin orchestrator
-│   ├── class-fxw-config.php        # Configuration constants
-│   ├── class-fxw-roles.php         # User role management
-│   ├── class-fxw-order-statuses.php # Custom order statuses
-│   ├── class-fxw-checkout.php      # Checkout enhancements
-│   ├── class-fxw-shipping-method.php # Custom shipping method
-│   ├── class-fxw-dashboard.php     # Admin dashboard
-│   ├── class-fxw-order-admin.php   # Order admin functionality
-│   ├── class-fxw-delivery-boy-view.php # Delivery personnel view
-│   ├── class-fxw-shortcodes.php    # Frontend shortcodes
-│   ├── class-fxw-settings.php      # Settings page
-│   ├── class-fxw-notifications.php # Email notifications
-│   ├── class-fxw-reporting.php     # Reporting functionality
-│   ├── class-fxw-admin-bar.php     # Admin bar integration
+│   ├── class-routew-core.php          # Main plugin orchestrator
+│   ├── class-routew-config.php        # Configuration constants
+│   ├── class-routew-roles.php         # User role management
+│   ├── class-routew-order-statuses.php # Custom order statuses
+│   ├── class-routew-checkout.php      # Checkout enhancements
+│   ├── class-routew-shipping-method.php # Custom shipping method
+│   ├── class-routew-dashboard.php     # Admin dashboard
+│   ├── class-routew-order-admin.php   # Order admin functionality
+│   ├── class-routew-delivery-boy-view.php # Delivery personnel view
+│   ├── class-routew-shortcodes.php    # Frontend shortcodes
+│   ├── class-routew-settings.php      # Settings page
+│   ├── class-routew-notifications.php # Email notifications
+│   ├── class-routew-reporting.php     # Reporting functionality
+│   ├── class-routew-admin-bar.php     # Admin bar integration
 │   └── services/
-│       ├── class-fxw-mapping-service.php # Google Maps integration
-│       └── class-fxw-rate-limiter.php    # Rate limiting service
+│       ├── class-routew-mapping-service.php # Google Maps integration
+│       └── class-routew-rate-limiter.php    # Rate limiting service
 ├── templates/                       # Frontend templates
 │   ├── delivery-dashboard-template.php
 │   ├── delivery-boy-view.php
@@ -58,32 +58,32 @@ FoodXpress for WooCommerce/
 
 ### 1.2 Core Components
 
-#### **FXW_Core** (Main Orchestrator)
+#### **ROUTEW_Core** (Main Orchestrator)
 - Loads all dependencies conditionally (admin/frontend)
 - Manages rewrite rules for delivery dashboard
 - Handles shipping method registration
 - Enqueues scripts and styles
 
-#### **FXW_Checkout** (Checkout Enhancement)
+#### **ROUTEW_Checkout** (Checkout Enhancement)
 - Integrates Google Maps for address selection
 - Validates delivery zones
 - Calculates distance-based shipping
 - Saves delivery location data to orders
 - Handles AJAX requests for location updates
 
-#### **FXW_Shipping_Method** (Custom Shipping)
+#### **ROUTEW_Shipping_Method** (Custom Shipping)
 - Extends `WC_Shipping_Method`
 - Calculates shipping costs based on distance
 - Uses Google Maps Distance Matrix API
 - Supports shipping zones
 
-#### **FXW_Dashboard** (Admin Dashboard)
+#### **ROUTEW_Dashboard** (Admin Dashboard)
 - Manages order assignment to delivery personnel
 - Displays unassigned, assigned, and in-progress orders
 - Provides order status update functionality
 - Receipt printing capability
 
-#### **FXW_Mapping_Service** (Google Maps Integration)
+#### **ROUTEW_Mapping_Service** (Google Maps Integration)
 - Geocoding addresses to coordinates
 - Distance calculation using Distance Matrix API
 - Error handling and logging
@@ -96,14 +96,14 @@ FoodXpress for WooCommerce/
 ### 2.1 Delivery Management
 
 #### Custom Order Statuses
-- **In the Kitchen** (`fxw-in-kitchen`): Order is being prepared
-- **Assigned** (`fxw-assigned`): Delivery personnel assigned
-- **Picked Up** (`fxw-picked-up`): Order collected, out for delivery
+- **In the Kitchen** (`routew-in-kitchen`): Order is being prepared
+- **Assigned** (`routew-assigned`): Delivery personnel assigned
+- **Picked Up** (`routew-picked-up`): Order collected, out for delivery
 - **Completed**: Standard WooCommerce status for delivered orders
 
 #### Delivery Personnel Management
 - Custom `delivery_boy` user role with limited capabilities
-- Custom capability: `fxw_delivery_access`
+- Custom capability: `routew_delivery_access`
 - Dedicated delivery dashboard at `/delivery-dashboard`
 - Order assignment and tracking functionality
 
@@ -145,7 +145,7 @@ FoodXpress for WooCommerce/
 ### 2.4 Customer Features
 
 #### Order Tracking
-- Shortcode: `[fxw_track_order]`
+- Shortcode: `[routew_track_order]`
 - Track orders by order ID and email
 - Visual status progress indicator
 - Delivery personnel contact information
@@ -182,7 +182,7 @@ FoodXpress for WooCommerce/
 - Security checks on admin actions
 
 #### Authorization
-- Capability checks (`manage_options`, `edit_shop_orders`, `fxw_delivery_access`)
+- Capability checks (`manage_options`, `edit_shop_orders`, `routew_delivery_access`)
 - User role-based access control
 - Order ownership verification for receipts
 
@@ -230,13 +230,13 @@ FoodXpress for WooCommerce/
 ### 3.3 Data Storage
 
 #### Order Meta Fields
-- `_fxw_delivery_boy_id`: Assigned delivery personnel ID
-- `_fxw_delivery_address`: Full delivery address
-- `_fxw_delivery_lat`: Delivery latitude
-- `_fxw_delivery_lng`: Delivery longitude
-- `_fxw_delivery_distance`: Distance in kilometers
-- `_fxw_delivery_duration`: Estimated duration in minutes
-- `_fxw_address_unit`: Unit/apartment number
+- `_routew_delivery_boy_id`: Assigned delivery personnel ID
+- `_routew_delivery_address`: Full delivery address
+- `_routew_delivery_lat`: Delivery latitude
+- `_routew_delivery_lng`: Delivery longitude
+- `_routew_delivery_distance`: Distance in kilometers
+- `_routew_delivery_duration`: Estimated duration in minutes
+- `_routew_address_unit`: Unit/apartment number
 
 #### Session Data
 - `customer_lat`: Customer latitude
@@ -244,14 +244,14 @@ FoodXpress for WooCommerce/
 - `customer_address`: Customer address
 
 #### Options
-- `fxw_settings`: Plugin settings array
-  - `fxw_google_maps_api_key`
-  - `fxw_restaurant_address`
-  - `fxw_preparation_time`
-  - `fxw_delivery_fee_base`
-  - `fxw_delivery_fee_per_km`
-  - `fxw_delivery_zone_radius`
-  - `fxw_is_open`: Delivery status toggle
+- `routew_settings`: Plugin settings array
+  - `routew_google_maps_api_key`
+  - `routew_restaurant_address`
+  - `routew_preparation_time`
+  - `routew_delivery_fee_base`
+  - `routew_delivery_fee_per_km`
+  - `routew_delivery_zone_radius`
+  - `routew_is_open`: Delivery status toggle
 
 ### 3.4 Error Handling
 
@@ -403,11 +403,11 @@ tests/
 ### 7.1 Required Settings
 
 1. **Google Maps API Key**
-   - Location: Settings → FoodXpress
+   - Location: Settings → RouteMile
    - Required for: Maps, geocoding, distance calculation
 
 2. **Restaurant Address**
-   - Location: Settings → FoodXpress
+   - Location: Settings → RouteMile
    - Required for: Distance calculations, zone validation
 
 3. **Delivery Fee Settings**
@@ -433,7 +433,7 @@ tests/
 - **Capabilities:**
   - `read`: Basic WordPress access
   - `edit_posts`: Required for admin access
-  - `fxw_delivery_access`: Custom capability for delivery dashboard
+  - `routew_delivery_access`: Custom capability for delivery dashboard
 - **Restrictions:**
   - No admin bar (disabled)
   - Limited to delivery dashboard
@@ -442,7 +442,7 @@ tests/
 ### 8.2 Modified Roles
 
 #### Administrator
-- Automatically granted `fxw_delivery_access` capability
+- Automatically granted `routew_delivery_access` capability
 - Full access to all plugin features
 
 #### Customer
@@ -489,30 +489,30 @@ tests/
 
 ### 10.1 AJAX Endpoints
 
-#### `fxw_get_restaurant_location`
+#### `routew_get_restaurant_location`
 - **Method:** POST
 - **Auth:** Public (with nonce)
 - **Purpose:** Get restaurant coordinates
 - **Rate Limited:** Yes (10 requests/minute)
 
-#### `fxw_update_customer_location`
+#### `routew_update_customer_location`
 - **Method:** POST
 - **Auth:** Public (with nonce)
 - **Purpose:** Update customer location in session
 - **Rate Limited:** Yes
 
-#### `fxw_toggle_delivery_status`
+#### `routew_toggle_delivery_status`
 - **Method:** POST
 - **Auth:** Admin only (with nonce)
 - **Purpose:** Toggle delivery open/closed status
 
-#### `fxw_print_receipt`
+#### `routew_print_receipt`
 - **Method:** GET/POST
 - **Auth:** Delivery boy, admin, or shop manager
 - **Purpose:** Print order receipt
 - **Security:** Nonce verification + capability check
 
-#### `fxw_debug_status`
+#### `routew_debug_status`
 - **Method:** POST
 - **Auth:** Public (with nonce)
 - **Purpose:** Debug endpoint (development)
@@ -538,16 +538,16 @@ tests/
 
 2. **Order processing**
    - Status: `pending` → `processing`
-   - Admin can update to `fxw-in-kitchen`
+   - Admin can update to `routew-in-kitchen`
 
 3. **Delivery assignment**
    - Admin assigns delivery personnel
-   - Status: `fxw-assigned`
+   - Status: `routew-assigned`
    - Email notification sent
 
 4. **Pickup**
    - Delivery personnel marks as picked up
-   - Status: `fxw-picked-up`
+   - Status: `routew-picked-up`
    - Email notification sent
 
 5. **Delivery**
@@ -657,7 +657,7 @@ tests/
 
 ## 14. Conclusion
 
-FoodXpress for WooCommerce is a well-architected plugin that provides comprehensive delivery management functionality for single-restaurant WooCommerce stores. The plugin demonstrates:
+RouteMile for WooCommerce is a well-architected plugin that provides comprehensive delivery management functionality for single-restaurant WooCommerce stores. The plugin demonstrates:
 
 ✅ **Strong Architecture:** Modular, class-based design  
 ✅ **Security Focus:** Comprehensive security measures  

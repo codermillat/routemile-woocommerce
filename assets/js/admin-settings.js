@@ -1,12 +1,12 @@
 /**
- * FoodXpress settings tab — conditional field visibility + key masking.
+ * RouteMile settings tab — conditional field visibility + key masking.
  *
  * Contract (emitted by the settings renderers):
- *  - A controlling select carries `data-fxw-provider-select` or
- *    `data-fxw-fee-mode-select`. Its value is the current "state".
- *  - Any element inside the form with `data-fxw-show-when="state:values"`
+ *  - A controlling select carries `data-routew-provider-select` or
+ *    `data-routew-fee-mode-select`. Its value is the current "state".
+ *  - Any element inside the form with `data-routew-show-when="state:values"`
  *    is shown only while the state matches one of its comma-separated
- *    values; `data-fxw-hide-when` is the inverse. The affected element's
+ *    values; `data-routew-hide-when` is the inverse. The affected element's
  *    closest <tr> row hides with it.
  *
  * Purely visual: hidden fields still submit their values so saving an
@@ -14,7 +14,7 @@
  * provider. Sanitizing is unchanged server-side.
  */
 jQuery(function ($) {
-	var $root = $('.fxw-settings-cards');
+	var $root = $('.routew-settings-cards');
 	if (!$root.length) {
 		return;
 	}
@@ -22,8 +22,8 @@ jQuery(function ($) {
 	function applyRule($els, activeValue) {
 		$els.each(function () {
 			var $el = $(this);
-			var showWhen = String($el.data('fxw-show-when') || '');
-			var hideWhen = String($el.data('fxw-hide-when') || '');
+			var showWhen = String($el.data('routew-show-when') || '');
+			var hideWhen = String($el.data('routew-hide-when') || '');
 			var visible = true;
 
 			if (showWhen) {
@@ -48,20 +48,20 @@ jQuery(function ($) {
 	}
 
 	function applyAll() {
-		$root.find('[data-fxw-provider-select]').each(function () {
-			applyRule($root.find('[data-fxw-show-when^="provider:"], [data-fxw-hide-when^="provider:"]'), String($(this).val()));
+		$root.find('[data-routew-provider-select]').each(function () {
+			applyRule($root.find('[data-routew-show-when^="provider:"], [data-routew-hide-when^="provider:"]'), String($(this).val()));
 		});
-		$root.find('[data-fxw-fee-mode-select]').each(function () {
-			applyRule($root.find('[data-fxw-show-when^="feemode:"]'), String($(this).val()));
+		$root.find('[data-routew-fee-mode-select]').each(function () {
+			applyRule($root.find('[data-routew-show-when^="feemode:"]'), String($(this).val()));
 		});
 	}
 
-	$root.on('change', '[data-fxw-provider-select], [data-fxw-fee-mode-select]', applyAll);
+	$root.on('change', '[data-routew-provider-select], [data-routew-fee-mode-select]', applyAll);
 
 	// API key masking toggle.
-	$root.on('click', '.fxw-key-toggle', function () {
+	$root.on('click', '.routew-key-toggle', function () {
 		var $btn = $(this);
-		var $input = $btn.closest('.fxw-key-wrap').find('.fxw-key-input');
+		var $input = $btn.closest('.routew-key-wrap').find('.routew-key-input');
 		if (!$input.length) {
 			return;
 		}
@@ -73,8 +73,8 @@ jQuery(function ($) {
 	// Weekly hours: "Open all day" and "Closed all day" are mutually
 	// exclusive per row — ticking one unticks the other visually (the
 	// server-side sanitize also enforces open-wins).
-	$root.on('change', '.fxw-hours-day input[type="checkbox"]', function () {
-		var $row = $(this).closest('.fxw-hours-day');
+	$root.on('change', '.routew-hours-day input[type="checkbox"]', function () {
+		var $row = $(this).closest('.routew-hours-day');
 		if (!$(this).prop('checked')) {
 			return;
 		}

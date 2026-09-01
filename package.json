@@ -1,14 +1,14 @@
 {
-  "name": "foodxpress-for-woocommerce-tests",
-  "version": "1.3.0",
+  "name": "routemile-woocommerce-tests",
+  "version": "1.5.0",
   "private": true,
-  "description": "Browser test harness for FoodXpress for WooCommerce. Not shipped with the plugin.",
+  "description": "Browser test harness for RouteMile for WooCommerce. Not shipped with the plugin.",
   "license": "GPL-3.0-or-later",
   "scripts": {
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report",
-    "test:static": "php tests/FXWTestRunner.php"
+    "test:static": "php tests/RouteWTestRunner.php"
   },
   "devDependencies": {
     "@playwright/test": "1.56.0"

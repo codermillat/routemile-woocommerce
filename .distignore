@@ -1,0 +1,100 @@
+# RouteMile-for-WooCommerce .distignore
+#
+# Used by `wp dist-archive` / `wp plugin zip` / WP-CLI deploy tooling to
+# determine which paths are NOT shipped in the production zip uploaded to
+# the WordPress.org Plugin Directory. Mirrors the .gitignore plus a few
+# extras that are committed for source hygiene but must not ship.
+
+# WP.org directory listing assets live here during submission, but they
+# are also placed at .wordpress-org/banner-*.png + icon-*.png in the
+# repository — keep those out of the production zip; the WP.org Plugin
+# Directory has its own asset pipeline that consumes the .wordpress-org/
+# folder directly via the Plugin Directory assets API.
+.wordpress-org/
+
+# Test framework + dev fixtures — referenced by AGENTS.md for local
+# development; nothing inside is required at runtime.
+tests/
+playwright.config.js
+playwright-report/
+test-results/
+
+# Local-only session / AI artifact folders — Claude, Codex, Mimosa,
+# ZCode, plus any tool that drops config into a dotfile folder.
+.agent/
+.agents/
+.claude/
+.cline/
+.codex/
+.cursor/
+.gemini/
+.kiro/
+.mimosa/
+.playwright-mcp/
+.zcode/
+skills/
+
+# Node + JS tooling — Playwright harness only; not part of the plugin.
+node_modules/
+package.json
+package-lock.json
+
+# Documentation kept for maintainers; not part of the user-facing plugin.
+docs/
+
+# Build artifacts that should never appear in the zip.
+dist/
+build/
+.cache/
+.parcel-cache/
+
+# VCS + CI metadata.
+.git/
+.gitignore
+.distignore
+.github/
+.gitattributes
+
+# IDE / editor scratchpads.
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# QA / debug screenshot artifacts committed for local review but never
+# shipped to end users (per repo's own .gitignore).
+audit-*.png
+audit-*.jpg
+agent-pwa-*.png
+agent-pwa-*.jpg
+customer-tracking-*.png
+customer-tracking-*.jpg
+my-account-*.png
+my-account-*.jpg
+myaccount-*.png
+myaccount-*.jpg
+orders-*.png
+order-*.png
+order-*.jpg
+ma-*.png
+
+# Repo-level docs the user gets via the WP.org readme, not the archive.
+AGENTS.md
+CHANGELOG.md
+CONTRIBUTING.md
+SECURITY.md
+README.md
+.editorconfig
+.eslintrc*
+phpcs.xml*
+phpunit.xml*
+phpstan.neon*
+psalm.xml*
+composer.lock
+.phpaudit.json
+# Note: LICENSE.md is intentionally kept in the archive — wp.org reviewers
+# and downstream distributors need the licence file inside the zip.

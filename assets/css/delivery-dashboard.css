@@ -1,5 +1,5 @@
 /**
- * FoodXpress Delivery Dashboard - Mobile-First, Battery-Optimized
+ * RouteMile Delivery Dashboard - Mobile-First, Battery-Optimized
  *
  * Optimizations:
  * - CSS containment for cards (reduces layout recalc)
@@ -12,18 +12,18 @@
  */
 
 :root {
-	--fxw-dd-primary: #E85D04;
-	--fxw-dd-primary-dark: #D44D00;
-	--fxw-dd-bg: #F5F5F5;
-	--fxw-dd-card: #FFFFFF;
-	--fxw-dd-text: #1A1A1A;
-	--fxw-dd-text-muted: #6B6B6B;
-	--fxw-dd-radius: 12px;
-	--fxw-dd-touch-min: 44px;
-	--fxw-dd-safe-top: env(safe-area-inset-top, 0);
-	--fxw-dd-safe-bottom: env(safe-area-inset-bottom, 0);
-	--fxw-dd-safe-left: env(safe-area-inset-left, 0);
-	--fxw-dd-safe-right: env(safe-area-inset-right, 0);
+	--routew-dd-primary: #E85D04;
+	--routew-dd-primary-dark: #D44D00;
+	--routew-dd-bg: #F5F5F5;
+	--routew-dd-card: #FFFFFF;
+	--routew-dd-text: #1A1A1A;
+	--routew-dd-text-muted: #6B6B6B;
+	--routew-dd-radius: 12px;
+	--routew-dd-touch-min: 44px;
+	--routew-dd-safe-top: env(safe-area-inset-top, 0);
+	--routew-dd-safe-bottom: env(safe-area-inset-bottom, 0);
+	--routew-dd-safe-left: env(safe-area-inset-left, 0);
+	--routew-dd-safe-right: env(safe-area-inset-right, 0);
 }
 
 /* Reduce motion by default */
@@ -37,8 +37,8 @@
 	}
 }
 
-.fxw-app-dashboard {
-	background: var(--fxw-dd-bg);
+.routew-app-dashboard {
+	background: var(--routew-dd-bg);
 	/* Fixed app viewport: header + scrollable list + fixed tab bar, like a
 	   native app. 100dvh tracks mobile browser chrome. */
 	height: 100vh;
@@ -50,12 +50,12 @@
 }
 
 /* Header - sticky with safe area */
-.fxw-app-header {
-	background: var(--fxw-dd-card);
+.routew-app-header {
+	background: var(--routew-dd-card);
 	padding: 16px 16px;
-	padding-top: calc(16px + var(--fxw-dd-safe-top));
-	padding-left: calc(16px + var(--fxw-dd-safe-left));
-	padding-right: calc(16px + var(--fxw-dd-safe-right));
+	padding-top: calc(16px + var(--routew-dd-safe-top));
+	padding-left: calc(16px + var(--routew-dd-safe-left));
+	padding-right: calc(16px + var(--routew-dd-safe-right));
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 	position: sticky;
 	top: 0;
@@ -63,17 +63,17 @@
 	flex-shrink: 0;
 }
 
-.fxw-app-header h1 {
+.routew-app-header h1 {
 	margin: 0;
 	font-size: 1.25rem;
 	font-weight: 700;
-	color: var(--fxw-dd-text);
+	color: var(--routew-dd-text);
 }
 
 /* Tabs - touch-friendly */
-.fxw-tabs {
+.routew-tabs {
 	display: flex;
-	background: var(--fxw-dd-card);
+	background: var(--routew-dd-card);
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 	position: sticky;
 	top: 0;
@@ -81,38 +81,38 @@
 	flex-shrink: 0;
 }
 
-.fxw-tab-link {
+.routew-tab-link {
 	flex: 1;
-	min-height: var(--fxw-dd-touch-min);
+	min-height: var(--routew-dd-touch-min);
 	padding: 14px 12px;
 	border: none;
 	background: none;
 	font-size: 0.9375rem;
 	font-weight: 600;
-	color: var(--fxw-dd-text-muted);
+	color: var(--routew-dd-text-muted);
 	cursor: pointer;
 	-webkit-tap-highlight-color: transparent;
 	touch-action: manipulation;
 	transition: color 0.15s ease, background 0.15s ease;
 }
 
-.fxw-tab-link:hover {
-	color: var(--fxw-dd-primary);
+.routew-tab-link:hover {
+	color: var(--routew-dd-primary);
 }
 
-.fxw-tab-link.active {
-	color: var(--fxw-dd-primary);
+.routew-tab-link.active {
+	color: var(--routew-dd-primary);
 	background: rgba(232, 93, 4, 0.08);
-	border-bottom: 3px solid var(--fxw-dd-primary);
+	border-bottom: 3px solid var(--routew-dd-primary);
 }
 
 /* Main content - the ONLY scrolling region, between fixed header/tab bar */
-.fxw-app-main {
+.routew-app-main {
 	flex: 1 1 auto;
 	min-height: 0; /* lets flexbox shrink it so overflow-y actually scrolls */
 	padding: 16px;
-	padding-left: calc(16px + var(--fxw-dd-safe-left));
-	padding-right: calc(16px + var(--fxw-dd-safe-right));
+	padding-left: calc(16px + var(--routew-dd-safe-left));
+	padding-right: calc(16px + var(--routew-dd-safe-right));
 	padding-bottom: 24px;
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
@@ -120,19 +120,19 @@
 }
 
 /* Order cards - containment for battery */
-.fxw-order-card {
+.routew-order-card {
 	contain: layout style paint;
 	content-visibility: auto;
 	contain-intrinsic-size: auto 280px;
-	background: var(--fxw-dd-card);
-	border-radius: var(--fxw-dd-radius);
+	background: var(--routew-dd-card);
+	border-radius: var(--routew-dd-radius);
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 	margin-bottom: 16px;
 	overflow: hidden;
 	transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.fxw-card-header {
+.routew-card-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -140,14 +140,14 @@
 	border-bottom: 1px solid #EEEEEE;
 }
 
-.fxw-card-header h3 {
+.routew-card-header h3 {
 	margin: 0;
 	font-size: 1.0625rem;
 	font-weight: 700;
-	color: var(--fxw-dd-text);
+	color: var(--routew-dd-text);
 }
 
-.fxw-status-badge {
+.routew-status-badge {
 	padding: 6px 12px;
 	border-radius: 20px;
 	font-size: 0.8125rem;
@@ -156,67 +156,67 @@
 	text-transform: capitalize;
 }
 
-.status-fxw-assigned {
+.status-routew-assigned {
 	background: #F59E0B;
 	color: #1a1a1a;
 }
 
-.status-fxw-picked-up {
+.status-routew-picked-up {
 	background: #2563EB;
 }
 
-.fxw-card-body {
+.routew-card-body {
 	padding: 14px 16px;
 }
 
-.fxw-card-section {
+.routew-card-section {
 	margin-bottom: 12px;
 }
 
-.fxw-card-section:last-child {
+.routew-card-section:last-child {
 	margin-bottom: 0;
 }
 
-.fxw-card-section p {
+.routew-card-section p {
 	margin: 0 0 10px;
 	display: flex;
 	align-items: flex-start;
 	font-size: 0.9375rem;
-	color: var(--fxw-dd-text);
+	color: var(--routew-dd-text);
 	line-height: 1.4;
 }
 
-.fxw-card-section p:last-child {
+.routew-card-section p:last-child {
 	margin-bottom: 0;
 }
 
-.fxw-icon {
+.routew-icon {
 	flex-shrink: 0;
 	margin-right: 10px;
 	font-size: 1.125rem;
 	width: 22px;
 	text-align: center;
-	color: var(--fxw-dd-primary);
+	color: var(--routew-dd-primary);
 }
 
-.fxw-collect-amount {
+.routew-collect-amount {
 	font-weight: 700;
 	color: #DC2626;
 	font-size: 1.0625rem;
 }
 
 /* Card footer - stacked on mobile for touch */
-.fxw-card-footer {
+.routew-card-footer {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0;
 }
 
-.fxw-action-form,
-.fxw-button {
+.routew-action-form,
+.routew-button {
 	flex: 1;
 	min-width: 0;
-	min-height: var(--fxw-dd-touch-min);
+	min-height: var(--routew-dd-touch-min);
 	margin: 0;
 	padding: 14px 10px;
 	display: flex;
@@ -233,148 +233,148 @@
 	transition: opacity 0.15s ease, background 0.15s ease;
 }
 
-.fxw-button:active {
+.routew-button:active {
 	opacity: 0.9;
 }
 
-.fxw-button-map {
+.routew-button-map {
 	background: #F3F4F6;
-	color: var(--fxw-dd-text);
-	border-radius: 0 0 0 var(--fxw-dd-radius);
+	color: var(--routew-dd-text);
+	border-radius: 0 0 0 var(--routew-dd-radius);
 }
 
-.fxw-button-map-precise {
+.routew-button-map-precise {
 	background: #059669;
 	color: #fff;
 }
 
-.fxw-button-map-precise:hover,
-.fxw-button-map-precise:focus {
+.routew-button-map-precise:hover,
+.routew-button-map-precise:focus {
 	background: #047857;
 	color: #fff;
 }
 
-.fxw-button-map-address {
+.routew-button-map-address {
 	background: #2563EB;
 	color: #fff;
 }
 
-.fxw-button-map-address:hover,
-.fxw-button-map-address:focus {
+.routew-button-map-address:hover,
+.routew-button-map-address:focus {
 	background: #1D4ED8;
 	color: #fff;
 }
 
-.fxw-button-map-fallback {
+.routew-button-map-fallback {
 	background: #D97706;
 	color: #fff;
 }
 
-.fxw-button-map-fallback:hover,
-.fxw-button-map-fallback:focus {
+.routew-button-map-fallback:hover,
+.routew-button-map-fallback:focus {
 	background: #B45309;
 	color: #fff;
 }
 
-.fxw-button-pickup {
-	background: var(--fxw-dd-primary);
+.routew-button-pickup {
+	background: var(--routew-dd-primary);
 	color: #fff;
-	border-radius: 0 var(--fxw-dd-radius) 0 0;
+	border-radius: 0 var(--routew-dd-radius) 0 0;
 }
 
-.fxw-button-pickup:hover,
-.fxw-button-pickup:focus {
-	background: var(--fxw-dd-primary-dark);
+.routew-button-pickup:hover,
+.routew-button-pickup:focus {
+	background: var(--routew-dd-primary-dark);
 	color: #fff;
 }
 
-.fxw-button-deliver {
+.routew-button-deliver {
 	background: #059669;
 	color: #fff;
-	border-radius: 0 0 var(--fxw-dd-radius) 0;
+	border-radius: 0 0 var(--routew-dd-radius) 0;
 }
 
-.fxw-button-deliver:hover,
-.fxw-button-deliver:focus {
+.routew-button-deliver:hover,
+.routew-button-deliver:focus {
 	background: #047857;
 	color: #fff;
 }
 
 /* Single button full width */
-.fxw-card-footer .fxw-button:only-child {
-	border-radius: 0 0 var(--fxw-dd-radius) var(--fxw-dd-radius);
+.routew-card-footer .routew-button:only-child {
+	border-radius: 0 0 var(--routew-dd-radius) var(--routew-dd-radius);
 }
 
-.fxw-card-footer .fxw-button-map + .fxw-button-pickup,
-.fxw-card-footer .fxw-button-map + .fxw-button-deliver {
-	border-radius: 0 0 var(--fxw-dd-radius) 0;
+.routew-card-footer .routew-button-map + .routew-button-pickup,
+.routew-card-footer .routew-button-map + .routew-button-deliver {
+	border-radius: 0 0 var(--routew-dd-radius) 0;
 }
 
-.fxw-card-footer .fxw-button-map:only-of-type {
-	border-radius: 0 0 var(--fxw-dd-radius) var(--fxw-dd-radius);
+.routew-card-footer .routew-button-map:only-of-type {
+	border-radius: 0 0 var(--routew-dd-radius) var(--routew-dd-radius);
 }
 
 /* Empty state */
-.fxw-no-orders {
+.routew-no-orders {
 	contain: layout style paint;
-	background: var(--fxw-dd-card);
-	border-radius: var(--fxw-dd-radius);
+	background: var(--routew-dd-card);
+	border-radius: var(--routew-dd-radius);
 	padding: 48px 24px;
 	text-align: center;
 }
 
-.fxw-no-orders p {
+.routew-no-orders p {
 	margin: 0;
 	font-size: 1rem;
-	color: var(--fxw-dd-text-muted);
+	color: var(--routew-dd-text-muted);
 }
 
-.fxw-tab-content {
+.routew-tab-content {
 	display: none;
 }
 
-.fxw-tab-content.active {
+.routew-tab-content.active {
 	display: block;
 }
 
 /* Mobile: single column buttons, larger touch */
 @media (max-width: 480px) {
-	.fxw-card-footer {
+	.routew-card-footer {
 		flex-direction: column;
 	}
 
-	.fxw-action-form,
-	.fxw-button {
+	.routew-action-form,
+	.routew-button {
 		min-width: 100%;
 		border-radius: 0 !important;
 	}
 
-	.fxw-card-footer .fxw-button:last-child {
-		border-radius: 0 0 var(--fxw-dd-radius) var(--fxw-dd-radius) !important;
+	.routew-card-footer .routew-button:last-child {
+		border-radius: 0 0 var(--routew-dd-radius) var(--routew-dd-radius) !important;
 	}
 }
 
 /* Tablet+ */
 @media (min-width: 600px) {
-	.fxw-app-main {
+	.routew-app-main {
 		max-width: 640px;
 		margin: 0 auto;
 	}
 
-	.fxw-card-footer .fxw-button-map {
-		border-radius: 0 0 0 var(--fxw-dd-radius);
+	.routew-card-footer .routew-button-map {
+		border-radius: 0 0 0 var(--routew-dd-radius);
 	}
 
-	.fxw-card-footer .fxw-button-pickup,
-	.fxw-card-footer .fxw-button-deliver {
-		border-radius: 0 0 var(--fxw-dd-radius) 0;
+	.routew-card-footer .routew-button-pickup,
+	.routew-card-footer .routew-button-deliver {
+		border-radius: 0 0 var(--routew-dd-radius) 0;
 	}
 }
 
 /* Focus visible for keyboard/a11y */
-.fxw-tab-link:focus-visible,
-.fxw-button:focus-visible {
-	outline: 2px solid var(--fxw-dd-primary);
+.routew-tab-link:focus-visible,
+.routew-button:focus-visible {
+	outline: 2px solid var(--routew-dd-primary);
 	outline-offset: 2px;
 }
 
@@ -383,7 +383,7 @@
    SVG icons, customer notes, toast. Layered on the styles above.
    ========================================================================== */
 
-.fxw-svg-icon {
+.routew-svg-icon {
 	width: 20px;
 	height: 20px;
 	fill: currentColor;
@@ -391,25 +391,25 @@
 }
 
 /* --- App header -------------------------------------------------------- */
-.fxw-app-header__row {
+.routew-app-header__row {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
 }
 
-.fxw-app-header__brand {
+.routew-app-header__brand {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 	min-width: 0;
 }
 
-.fxw-app-header__logo {
+.routew-app-header__logo {
 	width: 42px;
 	height: 42px;
 	border-radius: 12px;
-	background: var(--fxw-dd-primary);
+	background: var(--routew-dd-primary);
 	color: #fff;
 	display: flex;
 	align-items: center;
@@ -417,31 +417,31 @@
 	flex-shrink: 0;
 }
 
-.fxw-app-header__logo .fxw-svg-icon {
+.routew-app-header__logo .routew-svg-icon {
 	width: 24px;
 	height: 24px;
 }
 
-.fxw-app-header__titles {
+.routew-app-header__titles {
 	min-width: 0;
 }
 
-.fxw-app-header h1 {
+.routew-app-header h1 {
 	font-size: 1.0625rem;
 	letter-spacing: 0.2px;
 }
 
-.fxw-app-header__agent {
+.routew-app-header__agent {
 	margin: 2px 0 0;
 	font-size: 0.8125rem;
-	color: var(--fxw-dd-text-muted);
+	color: var(--routew-dd-text-muted);
 	display: flex;
 	align-items: center;
 	gap: 6px;
 	min-width: 0;
 }
 
-.fxw-app-header__agent .fxw-app-header__dot {
+.routew-app-header__agent .routew-app-header__dot {
 	width: 7px;
 	height: 7px;
 	border-radius: 50%;
@@ -449,21 +449,21 @@
 	flex-shrink: 0;
 }
 
-.fxw-app-header__date {
+.routew-app-header__date {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
 /* --- Agent work stats (header) ------------------------------------------ */
-.fxw-agent-stats {
+.routew-agent-stats {
 	margin-top: 12px;
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
 	gap: 8px;
 }
 
-.fxw-agent-stats__item {
+.routew-agent-stats__item {
 	background: rgba(232, 93, 4, 0.06);
 	border: 1px solid rgba(232, 93, 4, 0.15);
 	border-radius: 10px;
@@ -472,38 +472,38 @@
 	min-width: 0;
 }
 
-.fxw-agent-stats__item--due {
+.routew-agent-stats__item--due {
 	background: #FEF3C7;
 	border-color: #FDE68A;
 }
 
-.fxw-agent-stats__item--due .fxw-agent-stats__value {
+.routew-agent-stats__item--due .routew-agent-stats__value {
 	color: #B45309;
 }
 
-.fxw-agent-stats__value {
+.routew-agent-stats__value {
 	display: block;
 	font-size: 1rem;
 	font-weight: 800;
-	color: var(--fxw-dd-text);
+	color: var(--routew-dd-text);
 	line-height: 1.2;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-.fxw-agent-stats__label {
+.routew-agent-stats__label {
 	display: block;
 	font-size: 0.625rem;
 	font-weight: 600;
-	color: var(--fxw-dd-text-muted);
+	color: var(--routew-dd-text-muted);
 	text-transform: uppercase;
 	letter-spacing: 0.3px;
 	margin-top: 2px;
 }
 
 /* --- Cash hand-over bar --------------------------------------------------- */
-.fxw-settle-bar {
+.routew-settle-bar {
 	margin-top: 10px;
 	display: flex;
 	align-items: center;
@@ -516,20 +516,20 @@
 	padding: 10px 12px;
 }
 
-.fxw-settle-bar__text {
+.routew-settle-bar__text {
 	font-size: 0.875rem;
 	font-weight: 600;
 	color: #92400E;
 }
 
-.fxw-settle-bar form {
+.routew-settle-bar form {
 	margin: 0;
 }
 
-.fxw-settle-btn {
+.routew-settle-btn {
 	background: #B45309;
 	color: #fff;
-	min-height: var(--fxw-dd-touch-min);
+	min-height: var(--routew-dd-touch-min);
 	padding: 10px 18px;
 	border: none;
 	border-radius: 10px;
@@ -543,30 +543,30 @@
 	touch-action: manipulation;
 }
 
-.fxw-settle-btn:hover,
-.fxw-settle-btn:focus {
+.routew-settle-btn:hover,
+.routew-settle-btn:focus {
 	background: #92400E;
 	color: #fff;
 }
 
-.fxw-settle-last {
+.routew-settle-last {
 	margin: 10px 0 0;
 	font-size: 0.8125rem;
 	color: #047857;
 	font-weight: 600;
 }
 
-.fxw-settle-bar--pending {
+.routew-settle-bar--pending {
 	background: #EFF6FF;
 	border-color: #BFDBFE;
 }
 
-.fxw-settle-bar--pending .fxw-settle-bar__text {
+.routew-settle-bar--pending .routew-settle-bar__text {
 	color: #1D4ED8;
 }
 
 /* Admin: settlement status pills */
-.fxw-settle-status {
+.routew-settle-status {
 	display: inline-block;
 	padding: 3px 10px;
 	border-radius: 12px;
@@ -574,32 +574,32 @@
 	font-weight: 600;
 }
 
-.fxw-settle-status--pending {
+.routew-settle-status--pending {
 	background: #FEF3C7;
 	color: #92400E;
 }
 
-.fxw-settle-status--accepted {
+.routew-settle-status--accepted {
 	background: #D1FAE5;
 	color: #065F46;
 }
 
-.fxw-settle-status--rejected {
+.routew-settle-status--rejected {
 	background: #FEE2E2;
 	color: #991B1B;
 }
 
-.fxw-settlements .fxw-settlement-pending td {
+.routew-settlements .routew-settlement-pending td {
 	background: #FFFBEB;
 }
 
-.fxw-reject-btn {
+.routew-reject-btn {
 	color: #b32d2e !important;
 	border-color: #b32d2e !important;
 }
 
 /* --- COD summary chip (header) ------------------------------------------ */
-.fxw-cod-summary {
+.routew-cod-summary {
 	margin-top: 12px;
 	display: flex;
 	align-items: center;
@@ -613,18 +613,18 @@
 	font-weight: 600;
 }
 
-.fxw-cod-summary .fxw-svg-icon {
+.routew-cod-summary .routew-svg-icon {
 	color: #B45309;
 	width: 18px;
 	height: 18px;
 }
 
 /* --- COD strip (card) --------------------------------------------------- */
-.fxw-order-card--cod {
+.routew-order-card--cod {
 	border: 1px solid #FDE68A;
 }
 
-.fxw-cod-strip {
+.routew-cod-strip {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
@@ -636,24 +636,24 @@
 	color: #92400E;
 }
 
-.fxw-cod-strip .fxw-svg-icon {
+.routew-cod-strip .routew-svg-icon {
 	color: #B45309;
 	width: 18px;
 	height: 18px;
 }
 
-.fxw-cod-strip__label {
+.routew-cod-strip__label {
 	font-weight: 600;
 }
 
-.fxw-cod-strip__amount {
+.routew-cod-strip__amount {
 	font-size: 1.125rem;
 	font-weight: 800;
 	color: #B45309;
 	margin-left: auto;
 }
 
-.fxw-cod-strip__method {
+.routew-cod-strip__method {
 	font-size: 0.75rem;
 	font-weight: 600;
 	text-transform: uppercase;
@@ -662,11 +662,11 @@
 }
 
 /* --- History (delivered) cards ------------------------------------------ */
-.fxw-order-card--history {
+.routew-order-card--history {
 	opacity: 0.92;
 }
 
-.fxw-order-card--history .fxw-card-header h3 {
+.routew-order-card--history .routew-card-header h3 {
 	display: flex;
 	align-items: baseline;
 	gap: 8px;
@@ -674,28 +674,28 @@
 	font-size: 0.9375rem;
 }
 
-.fxw-card-header__date {
+.routew-card-header__date {
 	font-size: 0.6875rem;
 	font-weight: 500;
-	color: var(--fxw-dd-text-muted);
+	color: var(--routew-dd-text-muted);
 	white-space: nowrap;
 }
 
-.fxw-cod-strip--settled {
+.routew-cod-strip--settled {
 	background: #ECFDF5;
 	border-bottom-color: #A7F3D0;
 	color: #065F46;
 }
 
-.fxw-cod-strip--settled .fxw-svg-icon {
+.routew-cod-strip--settled .routew-svg-icon {
 	color: #059669;
 }
 
-.fxw-cod-strip--settled .fxw-cod-strip__amount {
+.routew-cod-strip--settled .routew-cod-strip__amount {
 	color: #047857;
 }
 
-.fxw-cod-strip--settled .fxw-cod-strip__method {
+.routew-cod-strip--settled .routew-cod-strip__method {
 	color: #047857;
 }
 
@@ -703,7 +703,7 @@
 	background: #059669;
 }
 
-.fxw-prepaid-strip {
+.routew-prepaid-strip {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -714,29 +714,29 @@
 	color: #065F46;
 }
 
-.fxw-prepaid-strip .fxw-svg-icon {
+.routew-prepaid-strip .routew-svg-icon {
 	color: #059669;
 	width: 16px;
 	height: 16px;
 }
 
 /* --- Card body icons ---------------------------------------------------- */
-.fxw-card-section p .fxw-svg-icon {
+.routew-card-section p .routew-svg-icon {
 	width: 18px;
 	height: 18px;
 	margin-right: 10px;
 	margin-top: 2px;
 }
 
-.fxw-call-link {
-	color: var(--fxw-dd-primary);
+.routew-call-link {
+	color: var(--routew-dd-primary);
 	font-weight: 600;
 	text-decoration: none;
 	border-bottom: 1px dashed rgba(232, 93, 4, 0.5);
 }
 
 /* --- Note from customer -------------------------------------------------- */
-.fxw-customer-note {
+.routew-customer-note {
 	background: #EEF2FF;
 	border: 1px solid #C7D2FE;
 	border-left: 4px solid #4F46E5;
@@ -745,7 +745,7 @@
 	margin-top: 12px;
 }
 
-.fxw-customer-note__title {
+.routew-customer-note__title {
 	display: flex;
 	align-items: center;
 	gap: 6px;
@@ -757,35 +757,35 @@
 	margin-bottom: 4px;
 }
 
-.fxw-customer-note__title .fxw-svg-icon {
+.routew-customer-note__title .routew-svg-icon {
 	width: 14px;
 	height: 14px;
 }
 
-.fxw-customer-note__line {
+.routew-customer-note__line {
 	margin: 0;
 	font-size: 0.875rem;
 	color: #312E81;
 	line-height: 1.45;
 }
 
-.fxw-customer-note__line + .fxw-customer-note__line {
+.routew-customer-note__line + .routew-customer-note__line {
 	margin-top: 4px;
 }
 
 /* --- Call button in card footer ----------------------------------------- */
-.fxw-button-call {
+.routew-button-call {
 	background: #2563EB;
 	color: #fff;
 }
 
-.fxw-button-call:hover,
-.fxw-button-call:focus {
+.routew-button-call:hover,
+.routew-button-call:focus {
 	background: #1D4ED8;
 	color: #fff;
 }
 
-.fxw-button .fxw-svg-icon {
+.routew-button .routew-svg-icon {
 	width: 18px;
 	height: 18px;
 }
@@ -793,17 +793,17 @@
 /* --- Bottom tab bar (native navigation) ---------------------------------- */
 /* Flex footer of the app shell (not position:fixed): the scrollable main
    region sits between the sticky header and this bar. */
-.fxw-tabbar {
+.routew-tabbar {
 	position: static;
 	flex-shrink: 0;
 	z-index: 200;
 	display: flex;
-	background: var(--fxw-dd-card);
+	background: var(--routew-dd-card);
 	box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.1);
-	padding-bottom: var(--fxw-dd-safe-bottom);
+	padding-bottom: var(--routew-dd-safe-bottom);
 }
 
-.fxw-tabbar .fxw-tab-link {
+.routew-tabbar .routew-tab-link {
 	flex: 1;
 	min-height: 58px;
 	padding: 8px 12px 10px;
@@ -817,17 +817,17 @@
 	letter-spacing: 0.3px;
 	border-radius: 0;
 	border-bottom: none;
-	color: var(--fxw-dd-text-muted);
+	color: var(--routew-dd-text-muted);
 	position: relative;
 }
 
-.fxw-tabbar .fxw-tab-link.active {
+.routew-tabbar .routew-tab-link.active {
 	background: transparent;
 	border-bottom: none;
-	color: var(--fxw-dd-primary);
+	color: var(--routew-dd-primary);
 }
 
-.fxw-tabbar .fxw-tab-link.active::before {
+.routew-tabbar .routew-tab-link.active::before {
 	content: "";
 	position: absolute;
 	top: 0;
@@ -836,21 +836,21 @@
 	width: 28px;
 	height: 3px;
 	border-radius: 0 0 3px 3px;
-	background: var(--fxw-dd-primary);
+	background: var(--routew-dd-primary);
 }
 
-.fxw-tabbar .fxw-svg-icon {
+.routew-tabbar .routew-svg-icon {
 	width: 22px;
 	height: 22px;
 }
 
-.fxw-tabbar__count {
+.routew-tabbar__count {
 	min-width: 18px;
 	height: 18px;
 	padding: 0 5px;
 	border-radius: 9px;
 	background: rgba(0, 0, 0, 0.12);
-	color: var(--fxw-dd-text);
+	color: var(--routew-dd-text);
 	font-size: 0.6875rem;
 	font-weight: 700;
 	display: flex;
@@ -858,38 +858,38 @@
 	justify-content: center;
 }
 
-.fxw-tabbar .fxw-tab-link.active .fxw-tabbar__count {
-	background: var(--fxw-dd-primary);
+.routew-tabbar .routew-tab-link.active .routew-tabbar__count {
+	background: var(--routew-dd-primary);
 	color: #fff;
 }
 
 /* Tab bar is a flex footer now — no extra body padding needed */
 
 /* --- Empty state polish --------------------------------------------------- */
-.fxw-no-orders .fxw-svg-icon {
+.routew-no-orders .routew-svg-icon {
 	width: 36px;
 	height: 36px;
 	color: #D1D5DB;
 	margin-bottom: 8px;
 }
 
-.fxw-no-orders {
+.routew-no-orders {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 }
 
-.fxw-no-orders__hint {
+.routew-no-orders__hint {
 	font-size: 0.8125rem;
 	margin-top: 6px;
 }
 
 /* --- Toast ---------------------------------------------------------------- */
-.fxw-toast {
+.routew-toast {
 	position: fixed;
 	left: 50%;
-	bottom: calc(84px + var(--fxw-dd-safe-bottom));
+	bottom: calc(84px + var(--routew-dd-safe-bottom));
 	transform: translateX(-50%) translateY(8px);
 	background: rgba(26, 26, 26, 0.92);
 	color: #fff;
@@ -905,45 +905,45 @@
 	z-index: 300;
 }
 
-.fxw-toast.fxw-toast--visible {
+.routew-toast.routew-toast--visible {
 	opacity: 1;
 	transform: translateX(-50%) translateY(0);
 }
 
 /* Tablet+: cap the shell and tab bar width */
 @media (min-width: 600px) {
-	.fxw-app-dashboard {
+	.routew-app-dashboard {
 		max-width: 640px;
 		margin: 0 auto;
 	}
 
-	.fxw-tabbar {
-		border-radius: var(--fxw-dd-radius) var(--fxw-dd-radius) 0 0;
+	.routew-tabbar {
+		border-radius: var(--routew-dd-radius) var(--routew-dd-radius) 0 0;
 		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.12);
 	}
 }
 
 /* --- Admin: settlement breakdown + history (wp-admin) ---------------------- */
-.fxw-settle-details summary {
+.routew-settle-details summary {
 	cursor: pointer;
 	color: #2271b1;
 	font-size: 0.75rem;
 	margin-top: 2px;
 }
 
-.fxw-settle-orders {
+.routew-settle-orders {
 	margin: 6px 0 0 18px;
 	list-style: disc;
 }
 
-.fxw-settle-orders li {
+.routew-settle-orders li {
 	margin-bottom: 2px;
 }
 
-.fxw-settlements {
+.routew-settlements {
 	margin-top: 8px;
 }
 
-.fxw-muted {
+.routew-muted {
 	color: #757575;
 }

@@ -1,21 +1,21 @@
 (function () {
     'use strict';
 
-    if (typeof window.fxw_toggle_delivery_status !== 'undefined') {
+    if (typeof window.routew_toggle_delivery_status !== 'undefined') {
         return;
     }
 
-    window.fxw_toggle_delivery_status = function (element) {
-        if (typeof ajaxurl === 'undefined' || typeof fxw_admin_params === 'undefined') {
+    window.routew_toggle_delivery_status = function (element) {
+        if (typeof ajaxurl === 'undefined' || typeof routew_admin_params === 'undefined') {
             return;
         }
 
-        var i18n = fxw_admin_params.i18n || {};
+        var i18n = routew_admin_params.i18n || {};
         element.textContent = i18n.updating || 'Updating...';
 
         jQuery.post(ajaxurl, {
-            action: 'fxw_toggle_delivery_status',
-            nonce: fxw_admin_params.nonce
+            action: 'routew_toggle_delivery_status',
+            nonce: routew_admin_params.nonce
         }, function (response) {
             if (response.success && response.data) {
                 element.textContent = response.data.label || '';
@@ -42,18 +42,18 @@
     'use strict';
 
     function initProviderToggle() {
-        var select = document.getElementById('fxw_map_provider');
+        var select = document.getElementById('routew_map_provider');
         if (!select) {
             return;
         }
 
         // Providers that supply real road distance make the correction
-        // factor irrelevant. Mirrors FXW_Map_Providers::all().
+        // factor irrelevant. Mirrors ROUTEW_Map_Providers::all().
         var hasRouting = { google: true, osm: true, maptiler: false, geoapify: true };
         var googleFieldIds = [
-            'fxw_google_maps_api_key',
-            'fxw_google_maps_server_key',
-            'fxw_google_maps_map_id'
+            'routew_google_maps_api_key',
+            'routew_google_maps_server_key',
+            'routew_google_maps_map_id'
         ];
 
         function toggleRow(id, show) {
@@ -71,13 +71,13 @@
                 toggleRow(id, provider === 'google');
             });
 
-            toggleRow('fxw_map_provider_key', provider !== 'google' && provider !== 'osm');
-            toggleRow('fxw_road_distance_factor', !hasRouting[provider]);
+            toggleRow('routew_map_provider_key', provider !== 'google' && provider !== 'osm');
+            toggleRow('routew_road_distance_factor', !hasRouting[provider]);
 
             Array.prototype.forEach.call(
-                document.querySelectorAll('.fxw-provider-note'),
+                document.querySelectorAll('.routew-provider-note'),
                 function (note) {
-                    var mine = note.classList.contains('fxw-provider-note--' + provider);
+                    var mine = note.classList.contains('routew-provider-note--' + provider);
                     note.style.display = mine ? '' : 'none';
                 }
             );
