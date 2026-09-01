@@ -38,8 +38,13 @@ class ROUTEW_Settings_Ui
 	 */
 	public function __construct()
 	{
-		add_action('woocommerce_settings_routemile', array($this, 'open_wrapper'), 1);
-		add_action('woocommerce_settings_routemile', array($this, 'close_wrapper'), 99);
+		// The settings tab id is `routemile-for-woocommerce`; WC fires
+		// `woocommerce_settings_{tab_id}` verbatim, so the wrapper hooks
+		// must match. Without the `-for-woocommerce` suffix, the wrapper
+		// never opens/closes and the settings page falls back to the
+		// raw WC table. (REGRESSION-FIX R1)
+		add_action('woocommerce_settings_routemile-for-woocommerce', array($this, 'open_wrapper'), 1);
+		add_action('woocommerce_settings_routemile-for-woocommerce', array($this, 'close_wrapper'), 99);
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'));
 	}
 

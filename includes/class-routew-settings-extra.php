@@ -9,7 +9,7 @@
  *   - explicit per-handler `manage_woocommerce` cap check on save
  *
  * All hooks land on the same two extension points the rest of the
- * settings code already uses (woocommerce_update_options_routemile +
+ * settings code already uses (woocommerce_update_options_routemile-for-woocommerce +
  * routew_sanitize_settings_extra), so ROUTEW_Settings remains the single owner
  * of the tab.
  *
@@ -33,7 +33,7 @@ class ROUTEW_Settings_Extra
 	public function __construct()
 	{
 		// Explicit per-handler cap check, matching the repo rule (1.2.16).
-		add_action('woocommerce_update_options_routemile', array($this, 'verify_capability'), 1);
+		add_action('woocommerce_update_options_routemile-for-woocommerce', array($this, 'verify_capability'), 1);
 		// Run after the core sanitize + the other extensions so the
 		// transient + preserve list land at the end of the sanitize.
 		add_filter('routew_sanitize_settings_extra', array($this, 'sanitize_extra'), 100, 2);
@@ -53,7 +53,7 @@ class ROUTEW_Settings_Extra
 			// No UI; the action just bails. WC's own gate is the primary
 			// check; this is the explicit per-handler guard the repo rule
 			// requires.
-			remove_action('woocommerce_update_options_routemile', 'ROUTEW_Settings::save_wc_settings_tab', 10);
+			remove_action('woocommerce_update_options_routemile-for-woocommerce', 'ROUTEW_Settings::save_wc_settings_tab', 10);
 		}
 	}
 

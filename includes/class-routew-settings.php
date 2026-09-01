@@ -24,8 +24,15 @@ class ROUTEW_Settings
 	{
 		// Native tab under WooCommerce → Settings; shop managers can configure delivery (1.2.10).
 		add_filter('woocommerce_settings_tabs_array', array($this, 'register_wc_settings_tab'), 50);
-		add_action('woocommerce_settings_routemile', array($this, 'render_wc_settings_tab'));
-		add_action('woocommerce_update_options_routemile', array($this, 'save_wc_settings_tab'));
+		// The tab id is `routemile-for-woocommerce` (matches the WP.org
+		// plugin slug set in v1.5.0). WC fires
+		// do_action('woocommerce_settings_' . $current_tab) verbatim, so
+		// the action name MUST include the `-for-woocommerce` suffix —
+		// without it the tab renders an empty content area below the
+		// "Save changes" button. Same for `woocommerce_update_options_*`.
+		// (REGRESSION-FIX R1)
+		add_action('woocommerce_settings_routemile-for-woocommerce', array($this, 'render_wc_settings_tab'));
+		add_action('woocommerce_update_options_routemile-for-woocommerce', array($this, 'save_wc_settings_tab'));
 		add_action('admin_init', array($this, 'register_settings'));
 	}
 

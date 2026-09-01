@@ -527,6 +527,52 @@ class ROUTEWTestRunner
             $this->fail('L1.1 could not locate routew_ensure_shipping_method_registered() body');
         }
 
+        // R1 — WC settings tab hook parity.
+        // The v1.5.0 rename changed the tab id to `routemile-for-woocommerce`
+        // (matches WP.org plugin slug) but left the `woocommerce_settings_*`
+        // and `woocommerce_update_options_*` hooks on the bare `routemile`
+        // key. WC fires those actions via do_action('woocommerce_settings_' .
+        // $current_tab) — dash suffix in the id MUST be mirrored in the hook
+        // name, otherwise the tab renders an empty content area. This test
+        // asserts the parity by scanning the three settings classes.
+        $tab_id = 'routemile-for-woocommerce';
+        $settings_class_files = array(
+            'includes/class-routew-settings.php',
+            'includes/class-routew-settings-ui.php',
+            'includes/class-routew-settings-extra.php',
+        );
+        $bad_hooks = array();
+        foreach ($settings_class_files as $rel) {
+            $path = $this->plugin_dir . '/' . $rel;
+            if (!file_exists($path)) {
+                continue;
+            }
+            $body = file_get_contents($path);
+            // Find every add_action/remove_action('woocommerce_settings_*' or
+            // 'woocommerce_update_options_*') call and check the suffix.
+            if (preg_match_all(
+                "/(?:add|remove)_action\\(\\s*['\"](woocommerce_(?:settings|update_options)_[a-z0-9_-]+)['\"]/",
+                $body,
+                $hits
+            )) {
+                foreach ($hits[1] as $hook) {
+                    // The expected form is `woocommerce_settings_{tab_id}` or
+                    // `woocommerce_update_options_{tab_id}`. Anything else
+                    // (e.g. the bare `woocommerce_settings_routemile` from
+                    // before the rename) is a regression.
+                    $expected_suffix = substr($tab_id, 0);
+                    if (substr($hook, -strlen($expected_suffix)) !== $expected_suffix) {
+                        $bad_hooks[] = $rel . ': ' . $hook;
+                    }
+                }
+            }
+        }
+        if (empty($bad_hooks)) {
+            $this->pass('R1 WC settings hooks use tab-id suffix ' . $tab_id);
+        } else {
+            $this->fail('R1 stale WC settings hooks found (do not match tab id ' . $tab_id . '): ' . implode('; ', $bad_hooks));
+        }
+
         echo "\n";
     }
 
