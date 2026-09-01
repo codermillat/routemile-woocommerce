@@ -634,6 +634,29 @@ class ROUTEWTestRunner
             }
         }
 
+        // R3 — shipping-zone auto-sync covers zone 0 (Rest of the world) AND
+        // reactively re-syncs when a zone is added/updated. Without zone 0,
+        // any customer whose address doesn't match a specific zone (e.g.
+        // country=Bangladesh, zone=Rangamati) sees "No shipping options are
+        // available for this address" at checkout even though the JS map
+        // shows a valid delivery fee.
+        $main_php = file_get_contents($this->plugin_dir . '/routemile-woocommerce.php');
+        $r3_checks = array(
+            'R3 sync function defined' => '/function\s+routew_maybe_sync_shipping_zones\s*\(/',
+            'R3 sync adds to Rest of the world zone 0' => '/new\s+WC_Shipping_Zone\s*\(\s*0\s*\)/',
+            'R3 self-heal: zone 0 check inside sync' => '/routew_zone_sync_done[\s\S]{0,400}has_routew_on_rest/s',
+            'R3 reactive hook: zone_added' => "/add_action\\(\\s*'woocommerce_shipping_zone_added'/",
+            'R3 reactive hook: zone_updated' => "/add_action\\(\\s*'woocommerce_shipping_zone_updated'/",
+            'R3 invalidate helper defined' => '/function\s+routew_invalidate_zone_sync\s*\(/',
+        );
+        foreach ($r3_checks as $label => $pattern) {
+            if (preg_match($pattern, $main_php)) {
+                $this->pass($label);
+            } else {
+                $this->fail($label . ' (pattern not found: ' . $pattern . ')');
+            }
+        }
+
         echo "\n";
     }
 

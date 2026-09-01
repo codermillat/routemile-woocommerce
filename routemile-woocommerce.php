@@ -404,7 +404,26 @@ if (!function_exists('routew_ensure_shipping_method_registered')) {
 if (!function_exists('routew_maybe_sync_shipping_zones')) {
     function routew_maybe_sync_shipping_zones()
     {
-        if (get_transient('routew_zone_sync_done')) {
+        // Self-healing: even when the transient says "already synced", if
+        // zone 0 (Rest of the world) lacks RouteMile Delivery the customer
+        // sees "No shipping options are available for this address" the
+        // moment their address doesn't match a specific zone. The transient
+        // is stale at that point — clear it and re-sync. (REGRESSION-FIX R3)
+        if (get_transient('routew_zone_sync_done') && class_exists('WC_Shipping_Zone') && !defined('DOING_AJAX') && !defined('DOING_CRON') && (!function_exists('wp_doing_rest') || !wp_doing_rest())) {
+            $rest_zone = new WC_Shipping_Zone(0);
+            $has_routew_on_rest = false;
+            foreach ($rest_zone->get_shipping_methods() as $m) {
+                if (isset($m->id) && 'routemile_delivery' === $m->id) {
+                    $has_routew_on_rest = true;
+                    break;
+                }
+            }
+            if (!$has_routew_on_rest) {
+                delete_transient('routew_zone_sync_done');
+            } else {
+                return;
+            }
+        } elseif (get_transient('routew_zone_sync_done')) {
             return;
         }
         if (defined('DOING_AJAX') && DOING_AJAX) {
@@ -425,6 +444,19 @@ if (!function_exists('routew_maybe_sync_shipping_zones')) {
 }
 add_action('admin_init', 'routew_maybe_sync_shipping_zones');
 add_action('init', 'routew_maybe_sync_shipping_zones', 5); // before ROUTEW_Checkout / Shipping add their hooks
+// Reactive sync: when the admin adds/updates a zone via the WC UI, the
+// transient is stale (it was set the last time the function ran, possibly
+// before this zone existed). Bust it so the next request re-syncs and the
+// new zone gets RouteMile Delivery added automatically. (REGRESSION-FIX R3)
+add_action('woocommerce_shipping_zone_added', 'routew_invalidate_zone_sync');
+add_action('woocommerce_shipping_zone_updated', 'routew_invalidate_zone_sync');
+
+if (!function_exists('routew_invalidate_zone_sync')) {
+    function routew_invalidate_zone_sync()
+    {
+        delete_transient('routew_zone_sync_done');
+    }
+}
 
 /**
  * Clean up rewrite rules on deactivation.
