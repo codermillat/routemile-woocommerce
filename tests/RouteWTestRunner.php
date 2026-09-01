@@ -394,6 +394,24 @@ class ROUTEWTestRunner
             }
         }
 
+        // H4 (session leak) regression: ensure clear_customer_session_data
+        // is wired to every documented lifecycle event.
+        $session_helper_file = $this->plugin_dir . '/includes/services/class-routew-session-helper.php';
+        $session_helper_content = file_exists($session_helper_file) ? file_get_contents($session_helper_file) : '';
+        $session_hooks = [
+            'woocommerce_checkout_order_created',
+            'woocommerce_thankyou',
+            'woocommerce_order_status_cancelled',
+            'wp_logout',
+        ];
+        foreach ($session_hooks as $hook) {
+            if (false !== strpos($session_helper_content, "'" . $hook . "'")) {
+                $this->pass("H4 hook registered: $hook");
+            } else {
+                $this->fail("H4 missing hook: $hook");
+            }
+        }
+
         // Check order statuses registration
         $statuses_file = $this->plugin_dir . '/includes/class-routew-order-statuses.php';
         $content = file_get_contents($statuses_file);

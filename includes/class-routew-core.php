@@ -70,6 +70,7 @@ class ROUTEW_Core
 		require_once ROUTEW_PLUGIN_DIR . 'includes/services/class-routew-map-providers.php';
 		require_once ROUTEW_PLUGIN_DIR . 'includes/services/class-routew-mapping-service.php';
 		require_once ROUTEW_PLUGIN_DIR . 'includes/services/class-routew-rate-limiter.php';
+		require_once ROUTEW_PLUGIN_DIR . 'includes/services/class-routew-session-helper.php';
 		require_once ROUTEW_PLUGIN_DIR . 'includes/api/class-routew-rest-checkout-controller.php';
 
 		// Core files - loaded on both admin and frontend
