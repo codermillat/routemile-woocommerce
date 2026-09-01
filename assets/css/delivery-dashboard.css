@@ -1,57 +1,71 @@
 /**
- * RouteMile Delivery Dashboard - Mobile-First, Battery-Optimized
+ * RouteMile Delivery Dashboard — Mobile-First, Battery-Optimized
  *
- * Optimizations:
- * - CSS containment for cards (reduces layout recalc)
- * - content-visibility for off-screen content
- * - prefers-reduced-motion support
- * - Touch targets 44px+ min
- * - Safe area insets for notched phones
- * - Minimal animations (transform/opacity only)
- * - No heavy box-shadows or filters
+ * Layered on top of Bootstrap 5.3 (enqueued separately as `routew-bootstrap`).
+ * Bootstrap supplies the primitive layer (grid, buttons, cards, badges,
+ * alerts, progress); this file supplies:
+ *
+ *   1. Brand tokens that override Bootstrap's --bs-* CSS variables.
+ *   2. The PWA shell layout (sticky header, scrollable main, fixed tabbar)
+ *      with safe-area-inset support for notched phones.
+ *   3. Order-card and KPI-tile modifiers that Bootstrap doesn't ship
+ *      (COD strip, history variant, settle bar states, status badges).
+ *   4. Performance hints: prefers-reduced-motion, contain, content-visibility.
+ *
+ * The agent JS (assets/js/delivery-dashboard.js) reads the data-* attributes
+ * and IDs from the template; CSS changes must NOT alter those hooks.
+ *
+ * @since 1.5.0
  */
 
+/* ----------------------------------------------------------------------------
+   1. Brand tokens — override Bootstrap CSS custom properties at :root.
+   The -rgb variants are required for outline-button hover backgrounds and the
+   focus ring (Bootstrap 5.3+ uses rgba(var(--bs-primary-rgb), 0.25)).
+   ---------------------------------------------------------------------------- */
 :root {
-	--routew-dd-primary: #E85D04;
-	--routew-dd-primary-dark: #D44D00;
-	--routew-dd-bg: #F5F5F5;
-	--routew-dd-card: #FFFFFF;
-	--routew-dd-text: #1A1A1A;
-	--routew-dd-text-muted: #6B6B6B;
-	--routew-dd-radius: 12px;
-	--routew-dd-touch-min: 44px;
+	--bs-primary: #E85D04;
+	--bs-primary-rgb: 232, 93, 4;
+	--bs-success: #1F8A4C;
+	--bs-success-rgb: 31, 138, 76;
+	--bs-info: #1E6FB8;
+	--bs-info-rgb: 30, 111, 184;
+	--bs-warning: #F59E0B;
+	--bs-warning-rgb: 245, 158, 11;
+	--bs-danger: #C0322B;
+	--bs-danger-rgb: 192, 50, 43;
+	--bs-body-bg: #F5F5F5;
+	--bs-body-color: #1A1A1A;
+	--bs-border-radius: 0.75rem;
+	--bs-border-radius-sm: 0.5rem;
+	--bs-body-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	--bs-link-color: #1D4ED8;
+
+	/* Safe-area tokens (also used outside Bootstrap). */
 	--routew-dd-safe-top: env(safe-area-inset-top, 0);
 	--routew-dd-safe-bottom: env(safe-area-inset-bottom, 0);
 	--routew-dd-safe-left: env(safe-area-inset-left, 0);
 	--routew-dd-safe-right: env(safe-area-inset-right, 0);
 }
 
-/* Reduce motion by default */
-@media (prefers-reduced-motion: reduce) {
-	*,
-	*::before,
-	*::after {
-		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
-		transition-duration: 0.01ms !important;
-	}
-}
-
+/* ----------------------------------------------------------------------------
+   2. PWA shell layout.
+   Fixed app viewport: header (sticky) + scrollable main + tabbar (fixed).
+   100dvh tracks mobile browser chrome.
+   ---------------------------------------------------------------------------- */
 .routew-app-dashboard {
-	background: var(--routew-dd-bg);
-	/* Fixed app viewport: header + scrollable list + fixed tab bar, like a
-	   native app. 100dvh tracks mobile browser chrome. */
+	background: var(--bs-body-bg);
 	height: 100vh;
 	height: 100dvh;
 	display: flex;
 	flex-direction: column;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-family: var(--bs-body-font-family);
 	-webkit-font-smoothing: antialiased;
+	color: var(--bs-body-color);
 }
 
-/* Header - sticky with safe area */
 .routew-app-header {
-	background: var(--routew-dd-card);
+	background: #fff;
 	padding: 16px 16px;
 	padding-top: calc(16px + var(--routew-dd-safe-top));
 	padding-left: calc(16px + var(--routew-dd-safe-left));
@@ -63,272 +77,71 @@
 	flex-shrink: 0;
 }
 
-.routew-app-header h1 {
-	margin: 0;
-	font-size: 1.25rem;
-	font-weight: 700;
-	color: var(--routew-dd-text);
+.routew-app-main {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	padding-bottom: calc(72px + var(--routew-dd-safe-bottom));
 }
 
-/* Tabs - touch-friendly */
-.routew-tabs {
+/* ----------------------------------------------------------------------------
+   3. Tabbar (bottom of viewport).
+   ---------------------------------------------------------------------------- */
+.routew-tabbar {
+	background: #fff;
+	border-top: 1px solid rgba(0, 0, 0, 0.08);
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding-bottom: var(--routew-dd-safe-bottom);
+	z-index: 100;
 	display: flex;
-	background: var(--routew-dd-card);
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-	position: sticky;
-	top: 0;
-	z-index: 99;
-	flex-shrink: 0;
 }
 
 .routew-tab-link {
 	flex: 1;
-	min-height: var(--routew-dd-touch-min);
-	padding: 14px 12px;
+	min-height: 56px;
+	padding: 8px 4px;
 	border: none;
 	background: none;
-	font-size: 0.9375rem;
-	font-weight: 600;
-	color: var(--routew-dd-text-muted);
+	color: var(--bs-secondary-color, #6B6B6B);
+	font-size: 0.8125rem;
+	font-weight: 500;
 	cursor: pointer;
 	-webkit-tap-highlight-color: transparent;
 	touch-action: manipulation;
-	transition: color 0.15s ease, background 0.15s ease;
-}
-
-.routew-tab-link:hover {
-	color: var(--routew-dd-primary);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 2px;
+	text-decoration: none;
 }
 
 .routew-tab-link.active {
-	color: var(--routew-dd-primary);
-	background: rgba(232, 93, 4, 0.08);
-	border-bottom: 3px solid var(--routew-dd-primary);
+	color: var(--bs-primary);
 }
 
-/* Main content - the ONLY scrolling region, between fixed header/tab bar */
-.routew-app-main {
-	flex: 1 1 auto;
-	min-height: 0; /* lets flexbox shrink it so overflow-y actually scrolls */
-	padding: 16px;
-	padding-left: calc(16px + var(--routew-dd-safe-left));
-	padding-right: calc(16px + var(--routew-dd-safe-right));
-	padding-bottom: 24px;
-	overflow-y: auto;
-	-webkit-overflow-scrolling: touch;
-	overscroll-behavior-y: contain;
+.routew-tab-link:focus-visible {
+	outline: 2px solid var(--bs-primary);
+	outline-offset: -2px;
 }
 
-/* Order cards - containment for battery */
-.routew-order-card {
-	contain: layout style paint;
-	content-visibility: auto;
-	contain-intrinsic-size: auto 280px;
-	background: var(--routew-dd-card);
-	border-radius: var(--routew-dd-radius);
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-	margin-bottom: 16px;
-	overflow: hidden;
-	transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-.routew-card-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 14px 16px;
-	border-bottom: 1px solid #EEEEEE;
-}
-
-.routew-card-header h3 {
-	margin: 0;
-	font-size: 1.0625rem;
-	font-weight: 700;
-	color: var(--routew-dd-text);
-}
-
-.routew-status-badge {
-	padding: 6px 12px;
-	border-radius: 20px;
-	font-size: 0.8125rem;
-	font-weight: 600;
+.routew-tabbar__count {
+	background: var(--bs-primary);
 	color: #fff;
-	text-transform: capitalize;
-}
-
-.status-routew-assigned {
-	background: #F59E0B;
-	color: #1a1a1a;
-}
-
-.status-routew-picked-up {
-	background: #2563EB;
-}
-
-.routew-card-body {
-	padding: 14px 16px;
-}
-
-.routew-card-section {
-	margin-bottom: 12px;
-}
-
-.routew-card-section:last-child {
-	margin-bottom: 0;
-}
-
-.routew-card-section p {
-	margin: 0 0 10px;
-	display: flex;
-	align-items: flex-start;
-	font-size: 0.9375rem;
-	color: var(--routew-dd-text);
+	font-size: 0.6875rem;
+	font-weight: 600;
+	padding: 1px 6px;
+	border-radius: 999px;
+	min-width: 18px;
+	text-align: center;
 	line-height: 1.4;
 }
 
-.routew-card-section p:last-child {
-	margin-bottom: 0;
-}
-
-.routew-icon {
-	flex-shrink: 0;
-	margin-right: 10px;
-	font-size: 1.125rem;
-	width: 22px;
-	text-align: center;
-	color: var(--routew-dd-primary);
-}
-
-.routew-collect-amount {
-	font-weight: 700;
-	color: #DC2626;
-	font-size: 1.0625rem;
-}
-
-/* Card footer - stacked on mobile for touch */
-.routew-card-footer {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0;
-}
-
-.routew-action-form,
-.routew-button {
-	flex: 1;
-	min-width: 0;
-	min-height: var(--routew-dd-touch-min);
-	margin: 0;
-	padding: 14px 10px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
-	font-size: 0.9375rem;
-	font-weight: 600;
-	text-decoration: none;
-	border: none;
-	cursor: pointer;
-	-webkit-tap-highlight-color: transparent;
-	touch-action: manipulation;
-	transition: opacity 0.15s ease, background 0.15s ease;
-}
-
-.routew-button:active {
-	opacity: 0.9;
-}
-
-.routew-button-map {
-	background: #F3F4F6;
-	color: var(--routew-dd-text);
-	border-radius: 0 0 0 var(--routew-dd-radius);
-}
-
-.routew-button-map-precise {
-	background: #059669;
-	color: #fff;
-}
-
-.routew-button-map-precise:hover,
-.routew-button-map-precise:focus {
-	background: #047857;
-	color: #fff;
-}
-
-.routew-button-map-address {
-	background: #2563EB;
-	color: #fff;
-}
-
-.routew-button-map-address:hover,
-.routew-button-map-address:focus {
-	background: #1D4ED8;
-	color: #fff;
-}
-
-.routew-button-map-fallback {
-	background: #D97706;
-	color: #fff;
-}
-
-.routew-button-map-fallback:hover,
-.routew-button-map-fallback:focus {
-	background: #B45309;
-	color: #fff;
-}
-
-.routew-button-pickup {
-	background: var(--routew-dd-primary);
-	color: #fff;
-	border-radius: 0 var(--routew-dd-radius) 0 0;
-}
-
-.routew-button-pickup:hover,
-.routew-button-pickup:focus {
-	background: var(--routew-dd-primary-dark);
-	color: #fff;
-}
-
-.routew-button-deliver {
-	background: #059669;
-	color: #fff;
-	border-radius: 0 0 var(--routew-dd-radius) 0;
-}
-
-.routew-button-deliver:hover,
-.routew-button-deliver:focus {
-	background: #047857;
-	color: #fff;
-}
-
-/* Single button full width */
-.routew-card-footer .routew-button:only-child {
-	border-radius: 0 0 var(--routew-dd-radius) var(--routew-dd-radius);
-}
-
-.routew-card-footer .routew-button-map + .routew-button-pickup,
-.routew-card-footer .routew-button-map + .routew-button-deliver {
-	border-radius: 0 0 var(--routew-dd-radius) 0;
-}
-
-.routew-card-footer .routew-button-map:only-of-type {
-	border-radius: 0 0 var(--routew-dd-radius) var(--routew-dd-radius);
-}
-
-/* Empty state */
-.routew-no-orders {
-	contain: layout style paint;
-	background: var(--routew-dd-card);
-	border-radius: var(--routew-dd-radius);
-	padding: 48px 24px;
-	text-align: center;
-}
-
-.routew-no-orders p {
-	margin: 0;
-	font-size: 1rem;
-	color: var(--routew-dd-text-muted);
-}
-
+/* ----------------------------------------------------------------------------
+   4. Tab panels.
+   ---------------------------------------------------------------------------- */
 .routew-tab-content {
 	display: none;
 }
@@ -337,52 +150,276 @@
 	display: block;
 }
 
-/* Mobile: single column buttons, larger touch */
-@media (max-width: 480px) {
-	.routew-card-footer {
-		flex-direction: column;
-	}
-
-	.routew-action-form,
-	.routew-button {
-		min-width: 100%;
-		border-radius: 0 !important;
-	}
-
-	.routew-card-footer .routew-button:last-child {
-		border-radius: 0 0 var(--routew-dd-radius) var(--routew-dd-radius) !important;
-	}
+/* ----------------------------------------------------------------------------
+   5. Order cards.
+   Wraps Bootstrap .card with routew-specific modifiers.
+   ---------------------------------------------------------------------------- */
+.routew-order-card {
+	margin: 12px;
+	contain: layout style paint;
+	content-visibility: auto;
+	contain-intrinsic-size: auto 280px;
+	overflow: hidden;
 }
 
-/* Tablet+ */
-@media (min-width: 600px) {
-	.routew-app-main {
-		max-width: 640px;
-		margin: 0 auto;
-	}
-
-	.routew-card-footer .routew-button-map {
-		border-radius: 0 0 0 var(--routew-dd-radius);
-	}
-
-	.routew-card-footer .routew-button-pickup,
-	.routew-card-footer .routew-button-deliver {
-		border-radius: 0 0 var(--routew-dd-radius) 0;
-	}
+.routew-order-card .card-header {
+	background: transparent;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	padding: 12px 14px;
 }
 
-/* Focus visible for keyboard/a11y */
-.routew-tab-link:focus-visible,
-.routew-button:focus-visible {
-	outline: 2px solid var(--routew-dd-primary);
-	outline-offset: 2px;
+.routew-order-card .card-body {
+	padding: 12px 14px;
 }
 
-/* ==========================================================================
-   Native app shell (v1.4.0) — header brand, COD chips, bottom tab bar,
-   SVG icons, customer notes, toast. Layered on the styles above.
-   ========================================================================== */
+/* COD payment strip */
+.routew-cod-strip {
+	background: #FFFBEB;
+	border: 1px solid #FDE68A;
+	color: #92400E;
+	padding: 8px 14px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
 
+.routew-cod-strip--settled {
+	background: #ECFDF5;
+	border-color: #A7F3D0;
+	color: #065F46;
+}
+
+.routew-collect-amount {
+	color: var(--bs-danger);
+	font-weight: 700;
+}
+
+/* Prepaid strip */
+.routew-prepaid-strip {
+	background: #ECFDF5;
+	border: 1px solid #A7F3D0;
+	color: #065F46;
+	padding: 8px 14px;
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+/* Customer note */
+.routew-customer-note {
+	background: #EEF2FF;
+	border: 1px solid #C7D2FE;
+	border-left: 4px solid #4F46E5;
+	padding: 10px 14px;
+	margin: 0 14px 12px;
+	font-size: 0.875rem;
+	color: #312E81;
+}
+
+.routew-customer-note__title {
+	font-weight: 600;
+	color: #4338CA;
+	margin-bottom: 4px;
+}
+
+/* Card footer (action buttons). Use Bootstrap .btn + flex layout. */
+.routew-card-footer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 12px 14px;
+	border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.routew-card-footer .btn {
+	min-height: 44px;
+	flex: 1 1 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	font-weight: 600;
+}
+
+/* Button color variants beyond Bootstrap defaults */
+.routew-button-map-precise {
+	background-color: #059669;
+	border-color: #059669;
+	color: #fff;
+}
+.routew-button-map-precise:hover,
+.routew-button-map-precise:focus {
+	background-color: #047857;
+	border-color: #047857;
+	color: #fff;
+}
+
+.routew-button-map-address {
+	background-color: #2563EB;
+	border-color: #2563EB;
+	color: #fff;
+}
+.routew-button-map-address:hover,
+.routew-button-map-address:focus {
+	background-color: #1D4ED8;
+	border-color: #1D4ED8;
+	color: #fff;
+}
+
+.routew-button-map-fallback {
+	background-color: #D97706;
+	border-color: #D97706;
+	color: #fff;
+}
+.routew-button-map-fallback:hover,
+.routew-button-map-fallback:focus {
+	background-color: #B45309;
+	border-color: #B45309;
+	color: #fff;
+}
+
+/* ----------------------------------------------------------------------------
+   6. Status badges.
+   Bootstrap .badge + .text-bg-{warning|info|success|danger|secondary}.
+   ---------------------------------------------------------------------------- */
+.routew-status-badge {
+	font-size: 0.75rem;
+	font-weight: 600;
+	padding: 4px 10px;
+	border-radius: 999px;
+}
+
+/* ----------------------------------------------------------------------------
+   7. Settle bar (cash hand-over).
+   Bootstrap .alert + routew state variants.
+   ---------------------------------------------------------------------------- */
+.routew-settle-bar {
+	margin: 12px;
+	padding: 14px;
+	border-radius: var(--bs-border-radius);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	font-weight: 500;
+}
+
+.routew-settle-bar--pending {
+	background-color: #EFF6FF;
+	border: 1px solid #BFDBFE;
+	color: #1D4ED8;
+}
+
+.routew-settle-bar--active {
+	background-color: #FEF3C7;
+	border: 1px solid #FDE68A;
+	color: #B45309;
+}
+
+.routew-settle-bar--settled {
+	background-color: #ECFDF5;
+	border: 1px solid #A7F3D0;
+	color: #065F46;
+	font-weight: 400;
+}
+
+.routew-cod-summary {
+	background: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.06);
+	margin: 12px;
+	padding: 12px 14px;
+	border-radius: var(--bs-border-radius);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+/* ----------------------------------------------------------------------------
+   8. KPI tiles (top-of-screen grid).
+   ---------------------------------------------------------------------------- */
+.routew-agent-stats {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 8px;
+	margin: 12px;
+}
+
+.routew-agent-stat {
+	background: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.04);
+	border-radius: var(--bs-border-radius-sm);
+	padding: 10px 6px;
+	text-align: center;
+	min-width: 0;
+}
+
+.routew-agent-stat__value {
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: var(--bs-body-color);
+	line-height: 1.2;
+}
+
+.routew-agent-stat__label {
+	font-size: 0.6875rem;
+	color: #6B6B6B;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	margin-top: 2px;
+}
+
+.routew-agent-stat--due .routew-agent-stat__value {
+	color: var(--bs-primary);
+}
+
+/* ----------------------------------------------------------------------------
+   9. Empty state.
+   ---------------------------------------------------------------------------- */
+.routew-no-orders {
+	background: #fff;
+	border-radius: var(--bs-border-radius);
+	padding: 48px 24px;
+	text-align: center;
+	margin: 12px;
+	contain: layout style paint;
+}
+
+.routew-no-orders p {
+	margin: 0;
+	font-size: 1rem;
+	color: #6B6B6B;
+}
+
+/* ----------------------------------------------------------------------------
+   10. Toast.
+   ---------------------------------------------------------------------------- */
+.routew-toast {
+	position: fixed;
+	left: 50%;
+	bottom: calc(80px + var(--routew-dd-safe-bottom));
+	transform: translateX(-50%);
+	background: rgba(26, 26, 26, 0.92);
+	color: #fff;
+	padding: 10px 18px;
+	border-radius: 999px;
+	font-size: 0.875rem;
+	font-weight: 500;
+	z-index: 1000;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.routew-toast--visible {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
+}
+
+/* ----------------------------------------------------------------------------
+   11. Inline SVG icon helper.
+   ---------------------------------------------------------------------------- */
 .routew-svg-icon {
 	width: 20px;
 	height: 20px;
@@ -390,560 +427,44 @@
 	flex-shrink: 0;
 }
 
-/* --- App header -------------------------------------------------------- */
-.routew-app-header__row {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
+/* ----------------------------------------------------------------------------
+   12. Responsive.
+   ---------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+	.routew-agent-stats {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.routew-card-footer {
+		flex-direction: column;
+	}
+	.routew-card-footer .btn {
+		min-width: 100%;
+	}
 }
 
-.routew-app-header__brand {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	min-width: 0;
-}
-
-.routew-app-header__logo {
-	width: 42px;
-	height: 42px;
-	border-radius: 12px;
-	background: var(--routew-dd-primary);
-	color: #fff;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-}
-
-.routew-app-header__logo .routew-svg-icon {
-	width: 24px;
-	height: 24px;
-}
-
-.routew-app-header__titles {
-	min-width: 0;
-}
-
-.routew-app-header h1 {
-	font-size: 1.0625rem;
-	letter-spacing: 0.2px;
-}
-
-.routew-app-header__agent {
-	margin: 2px 0 0;
-	font-size: 0.8125rem;
-	color: var(--routew-dd-text-muted);
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	min-width: 0;
-}
-
-.routew-app-header__agent .routew-app-header__dot {
-	width: 7px;
-	height: 7px;
-	border-radius: 50%;
-	background: #059669;
-	flex-shrink: 0;
-}
-
-.routew-app-header__date {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-/* --- Agent work stats (header) ------------------------------------------ */
-.routew-agent-stats {
-	margin-top: 12px;
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
-	gap: 8px;
-}
-
-.routew-agent-stats__item {
-	background: rgba(232, 93, 4, 0.06);
-	border: 1px solid rgba(232, 93, 4, 0.15);
-	border-radius: 10px;
-	padding: 8px 6px;
-	text-align: center;
-	min-width: 0;
-}
-
-.routew-agent-stats__item--due {
-	background: #FEF3C7;
-	border-color: #FDE68A;
-}
-
-.routew-agent-stats__item--due .routew-agent-stats__value {
-	color: #B45309;
-}
-
-.routew-agent-stats__value {
-	display: block;
-	font-size: 1rem;
-	font-weight: 800;
-	color: var(--routew-dd-text);
-	line-height: 1.2;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.routew-agent-stats__label {
-	display: block;
-	font-size: 0.625rem;
-	font-weight: 600;
-	color: var(--routew-dd-text-muted);
-	text-transform: uppercase;
-	letter-spacing: 0.3px;
-	margin-top: 2px;
-}
-
-/* --- Cash hand-over bar --------------------------------------------------- */
-.routew-settle-bar {
-	margin-top: 10px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	flex-wrap: wrap;
-	gap: 10px;
-	background: #FFFBEB;
-	border: 1px solid #FDE68A;
-	border-radius: 10px;
-	padding: 10px 12px;
-}
-
-.routew-settle-bar__text {
-	font-size: 0.875rem;
-	font-weight: 600;
-	color: #92400E;
-}
-
-.routew-settle-bar form {
-	margin: 0;
-}
-
-.routew-settle-btn {
-	background: #B45309;
-	color: #fff;
-	min-height: var(--routew-dd-touch-min);
-	padding: 10px 18px;
-	border: none;
-	border-radius: 10px;
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	font-size: 0.875rem;
-	font-weight: 700;
-	cursor: pointer;
-	-webkit-tap-highlight-color: transparent;
-	touch-action: manipulation;
-}
-
-.routew-settle-btn:hover,
-.routew-settle-btn:focus {
-	background: #92400E;
-	color: #fff;
-}
-
-.routew-settle-last {
-	margin: 10px 0 0;
-	font-size: 0.8125rem;
-	color: #047857;
-	font-weight: 600;
-}
-
-.routew-settle-bar--pending {
-	background: #EFF6FF;
-	border-color: #BFDBFE;
-}
-
-.routew-settle-bar--pending .routew-settle-bar__text {
-	color: #1D4ED8;
-}
-
-/* Admin: settlement status pills */
-.routew-settle-status {
-	display: inline-block;
-	padding: 3px 10px;
-	border-radius: 12px;
-	font-size: 12px;
-	font-weight: 600;
-}
-
-.routew-settle-status--pending {
-	background: #FEF3C7;
-	color: #92400E;
-}
-
-.routew-settle-status--accepted {
-	background: #D1FAE5;
-	color: #065F46;
-}
-
-.routew-settle-status--rejected {
-	background: #FEE2E2;
-	color: #991B1B;
-}
-
-.routew-settlements .routew-settlement-pending td {
-	background: #FFFBEB;
-}
-
-.routew-reject-btn {
-	color: #b32d2e !important;
-	border-color: #b32d2e !important;
-}
-
-/* --- COD summary chip (header) ------------------------------------------ */
-.routew-cod-summary {
-	margin-top: 12px;
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	background: #FEF3C7;
-	border: 1px solid #FDE68A;
-	color: #92400E;
-	border-radius: 10px;
-	padding: 8px 12px;
-	font-size: 0.875rem;
-	font-weight: 600;
-}
-
-.routew-cod-summary .routew-svg-icon {
-	color: #B45309;
-	width: 18px;
-	height: 18px;
-}
-
-/* --- COD strip (card) --------------------------------------------------- */
-.routew-order-card--cod {
-	border: 1px solid #FDE68A;
-}
-
-.routew-cod-strip {
-	display: flex;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: 6px 10px;
-	padding: 10px 16px;
-	background: #FFFBEB;
-	border-bottom: 1px solid #FDE68A;
-	font-size: 0.875rem;
-	color: #92400E;
-}
-
-.routew-cod-strip .routew-svg-icon {
-	color: #B45309;
-	width: 18px;
-	height: 18px;
-}
-
-.routew-cod-strip__label {
-	font-weight: 600;
-}
-
-.routew-cod-strip__amount {
-	font-size: 1.125rem;
-	font-weight: 800;
-	color: #B45309;
-	margin-left: auto;
-}
-
-.routew-cod-strip__method {
-	font-size: 0.75rem;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.4px;
-	color: #A16207;
-}
-
-/* --- History (delivered) cards ------------------------------------------ */
-.routew-order-card--history {
-	opacity: 0.92;
-}
-
-.routew-order-card--history .routew-card-header h3 {
-	display: flex;
-	align-items: baseline;
-	gap: 8px;
-	flex-wrap: wrap;
-	font-size: 0.9375rem;
-}
-
-.routew-card-header__date {
-	font-size: 0.6875rem;
-	font-weight: 500;
-	color: var(--routew-dd-text-muted);
-	white-space: nowrap;
-}
-
-.routew-cod-strip--settled {
-	background: #ECFDF5;
-	border-bottom-color: #A7F3D0;
-	color: #065F46;
-}
-
-.routew-cod-strip--settled .routew-svg-icon {
-	color: #059669;
-}
-
-.routew-cod-strip--settled .routew-cod-strip__amount {
-	color: #047857;
-}
-
-.routew-cod-strip--settled .routew-cod-strip__method {
-	color: #047857;
-}
-
-.status-completed {
-	background: #059669;
-}
-
-.routew-prepaid-strip {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 8px 16px;
-	background: #ECFDF5;
-	border-bottom: 1px solid #A7F3D0;
-	font-size: 0.8125rem;
-	color: #065F46;
-}
-
-.routew-prepaid-strip .routew-svg-icon {
-	color: #059669;
-	width: 16px;
-	height: 16px;
-}
-
-/* --- Card body icons ---------------------------------------------------- */
-.routew-card-section p .routew-svg-icon {
-	width: 18px;
-	height: 18px;
-	margin-right: 10px;
-	margin-top: 2px;
-}
-
-.routew-call-link {
-	color: var(--routew-dd-primary);
-	font-weight: 600;
-	text-decoration: none;
-	border-bottom: 1px dashed rgba(232, 93, 4, 0.5);
-}
-
-/* --- Note from customer -------------------------------------------------- */
-.routew-customer-note {
-	background: #EEF2FF;
-	border: 1px solid #C7D2FE;
-	border-left: 4px solid #4F46E5;
-	border-radius: 8px;
-	padding: 10px 12px;
-	margin-top: 12px;
-}
-
-.routew-customer-note__title {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	font-size: 0.75rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.4px;
-	color: #4338CA;
-	margin-bottom: 4px;
-}
-
-.routew-customer-note__title .routew-svg-icon {
-	width: 14px;
-	height: 14px;
-}
-
-.routew-customer-note__line {
-	margin: 0;
-	font-size: 0.875rem;
-	color: #312E81;
-	line-height: 1.45;
-}
-
-.routew-customer-note__line + .routew-customer-note__line {
-	margin-top: 4px;
-}
-
-/* --- Call button in card footer ----------------------------------------- */
-.routew-button-call {
-	background: #2563EB;
-	color: #fff;
-}
-
-.routew-button-call:hover,
-.routew-button-call:focus {
-	background: #1D4ED8;
-	color: #fff;
-}
-
-.routew-button .routew-svg-icon {
-	width: 18px;
-	height: 18px;
-}
-
-/* --- Bottom tab bar (native navigation) ---------------------------------- */
-/* Flex footer of the app shell (not position:fixed): the scrollable main
-   region sits between the sticky header and this bar. */
-.routew-tabbar {
-	position: static;
-	flex-shrink: 0;
-	z-index: 200;
-	display: flex;
-	background: var(--routew-dd-card);
-	box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.1);
-	padding-bottom: var(--routew-dd-safe-bottom);
-}
-
-.routew-tabbar .routew-tab-link {
-	flex: 1;
-	min-height: 58px;
-	padding: 8px 12px 10px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 3px;
-	font-size: 0.6875rem;
-	font-weight: 600;
-	letter-spacing: 0.3px;
-	border-radius: 0;
-	border-bottom: none;
-	color: var(--routew-dd-text-muted);
-	position: relative;
-}
-
-.routew-tabbar .routew-tab-link.active {
-	background: transparent;
-	border-bottom: none;
-	color: var(--routew-dd-primary);
-}
-
-.routew-tabbar .routew-tab-link.active::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 28px;
-	height: 3px;
-	border-radius: 0 0 3px 3px;
-	background: var(--routew-dd-primary);
-}
-
-.routew-tabbar .routew-svg-icon {
-	width: 22px;
-	height: 22px;
-}
-
-.routew-tabbar__count {
-	min-width: 18px;
-	height: 18px;
-	padding: 0 5px;
-	border-radius: 9px;
-	background: rgba(0, 0, 0, 0.12);
-	color: var(--routew-dd-text);
-	font-size: 0.6875rem;
-	font-weight: 700;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.routew-tabbar .routew-tab-link.active .routew-tabbar__count {
-	background: var(--routew-dd-primary);
-	color: #fff;
-}
-
-/* Tab bar is a flex footer now — no extra body padding needed */
-
-/* --- Empty state polish --------------------------------------------------- */
-.routew-no-orders .routew-svg-icon {
-	width: 36px;
-	height: 36px;
-	color: #D1D5DB;
-	margin-bottom: 8px;
-}
-
-.routew-no-orders {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
-
-.routew-no-orders__hint {
-	font-size: 0.8125rem;
-	margin-top: 6px;
-}
-
-/* --- Toast ---------------------------------------------------------------- */
-.routew-toast {
-	position: fixed;
-	left: 50%;
-	bottom: calc(84px + var(--routew-dd-safe-bottom));
-	transform: translateX(-50%) translateY(8px);
-	background: rgba(26, 26, 26, 0.92);
-	color: #fff;
-	font-size: 0.875rem;
-	font-weight: 600;
-	padding: 10px 18px;
-	border-radius: 22px;
-	max-width: min(92vw, 420px);
-	text-align: center;
-	opacity: 0;
-	pointer-events: none;
-	transition: opacity 0.2s ease, transform 0.2s ease;
-	z-index: 300;
-}
-
-.routew-toast.routew-toast--visible {
-	opacity: 1;
-	transform: translateX(-50%) translateY(0);
-}
-
-/* Tablet+: cap the shell and tab bar width */
 @media (min-width: 600px) {
-	.routew-app-dashboard {
+	.routew-app-main {
 		max-width: 640px;
 		margin: 0 auto;
 	}
+}
 
-	.routew-tabbar {
-		border-radius: var(--routew-dd-radius) var(--routew-dd-radius) 0 0;
-		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.12);
+/* ----------------------------------------------------------------------------
+   13. Performance / accessibility.
+   ---------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
 	}
 }
 
-/* --- Admin: settlement breakdown + history (wp-admin) ---------------------- */
-.routew-settle-details summary {
-	cursor: pointer;
-	color: #2271b1;
-	font-size: 0.75rem;
-	margin-top: 2px;
-}
-
-.routew-settle-orders {
-	margin: 6px 0 0 18px;
-	list-style: disc;
-}
-
-.routew-settle-orders li {
-	margin-bottom: 2px;
-}
-
-.routew-settlements {
-	margin-top: 8px;
-}
-
-.routew-muted {
-	color: #757575;
+.routew-button:focus-visible,
+.routew-tab-link:focus-visible,
+.btn:focus-visible {
+	outline: 2px solid var(--bs-primary);
+	outline-offset: 2px;
 }

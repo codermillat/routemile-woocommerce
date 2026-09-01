@@ -14,7 +14,11 @@
 
 /* global self, caches, clients, fetch, Response */
 
-const CACHE_VERSION = 'routew-agent-v1';
+// Bumped v1 -> v2 alongside the UI overhaul (Batch 1b) — the dashboard
+// CSS is now layered on top of Bootstrap and any cached v1 CSS would
+// render with the wrong token overrides. The activate handler below
+// deletes old caches, so installed PWAs auto-refresh on next open.
+const CACHE_VERSION = 'routew-agent-v2';
 const DASHBOARD_URL = self.registration.scope;
 // WP install sees the plugin as `routemile-for-woocommerce` (matches the
 // post-rename plugin slug). The folder path is hardcoded here because the

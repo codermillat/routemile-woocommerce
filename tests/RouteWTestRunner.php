@@ -708,6 +708,83 @@ class ROUTEWTestRunner
             $this->fail('R4 session helper file missing: ' . $session_helper);
         }
 
+        // UI1 — Agent dashboard Bootstrap 5 overlay (Batch 1b).
+        // Verifies the Bootstrap CSS bundle exists, is enqueued on the agent
+        // surface, the agent JS contract is preserved verbatim in the
+        // template, the PWA manifest endpoint is still wired, and the service
+        // worker cache version was bumped for the CSS overhaul.
+        $bootstrap_css = $this->plugin_dir . '/assets/vendor/bootstrap/bootstrap.min.css';
+        if (file_exists($bootstrap_css)) {
+            $this->pass('UI1 Bootstrap 5.3 CSS bundle present at assets/vendor/bootstrap/');
+        } else {
+            $this->fail('UI1 Bootstrap CSS bundle missing at ' . $bootstrap_css);
+        }
+
+        $core_php = file_get_contents($this->plugin_dir . '/includes/class-routew-core.php');
+        // The bootstrap path may appear as 'assets/vendor/...' or
+        // '../assets/vendor/...' (the enqueue concatenates with __DIR__-relative
+        // plugin_dir_url), so match on the unique tail.
+        if (false !== strpos($core_php, "'routew-bootstrap'") && false !== strpos($core_php, "vendor/bootstrap/bootstrap.min.css'")) {
+            $this->pass('UI1 Bootstrap enqueued on agent surface (routew-bootstrap handle)');
+        } else {
+            $this->fail('UI1 Bootstrap not enqueued on agent surface — class-routew-core.php must wp_enqueue_style the bootstrap CSS');
+        }
+
+        // JS contract preserved in template.
+        $tpl = file_get_contents($this->plugin_dir . '/templates/delivery-dashboard-template.php');
+        $contract_attrs = array(
+            'data-routew-tab',
+            'data-action',
+            'data-status',
+            'data-order-id',
+            'data-nonce',
+            'data-routew-state',
+            'data-routew-counts',
+            'data-routew-settle-amount',
+        );
+        $missing_attrs = array();
+        foreach ($contract_attrs as $attr) {
+            if (false === strpos($tpl, $attr)) {
+                $missing_attrs[] = $attr;
+            }
+        }
+        if (empty($missing_attrs)) {
+            $this->pass('UI1 JS contract preserved: all 8 data-* attributes present in template');
+        } else {
+            $this->fail('UI1 JS contract broke — missing in template: ' . implode(', ', $missing_attrs));
+        }
+
+        // Required IDs preserved. Match `id="X"` rather than `#X` since
+        // the template emits them as HTML id attributes.
+        $required_ids = array('new-orders', 'in-progress', 'delivered', 'routew-toast');
+        $missing_ids = array();
+        foreach ($required_ids as $id) {
+            if (false === strpos($tpl, 'id="' . $id . '"')) {
+                $missing_ids[] = '#' . $id;
+            }
+        }
+        if (empty($missing_ids)) {
+            $this->pass('UI1 Required IDs preserved: ' . implode(', ', array_map(function ($id) { return '#' . $id; }, $required_ids)));
+        } else {
+            $this->fail('UI1 Missing required IDs in template: ' . implode(', ', $missing_ids));
+        }
+
+        // PWA manifest endpoint still wired.
+        $dbv_php = file_get_contents($this->plugin_dir . '/includes/class-routew-delivery-boy-view.php');
+        if (false !== strpos($dbv_php, "'routew_agent_manifest'") && false !== strpos($dbv_php, "'routew_agent_sw'")) {
+            $this->pass('UI1 PWA manifest + SW endpoints wired (routew_agent_manifest, routew_agent_sw)');
+        } else {
+            $this->fail('UI1 PWA manifest/SW endpoints missing from class-routew-delivery-boy-view.php');
+        }
+
+        // Service worker cache version bumped to v2.
+        $sw_js = file_get_contents($this->plugin_dir . '/assets/js/routew-agent-sw.js');
+        if (preg_match("/CACHE_VERSION\s*=\s*['\"]routew-agent-v(\\d+)['\"]/", $sw_js, $swm) && (int) $swm[1] >= 2) {
+            $this->pass('UI1 SW cache version bumped to v' . $swm[1] . ' (was v1 pre-overhaul)');
+        } else {
+            $this->fail('UI1 SW CACHE_VERSION not bumped to v2 — old PWAs will serve stale CSS');
+        }
+
         echo "\n";
     }
 

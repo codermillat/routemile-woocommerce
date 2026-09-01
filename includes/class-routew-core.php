@@ -161,7 +161,23 @@ class ROUTEW_Core
 			return;
 		}
 
-		wp_enqueue_style('routew-delivery-dashboard', plugin_dir_url(__FILE__) . '../assets/css/delivery-dashboard.css', array(), $this->version);
+		// Bootstrap 5.3 self-hosted at assets/vendor/bootstrap/. Same handle
+		// ('routew-bootstrap') is also used by the my-account enqueue site so
+		// WP dedupes the request and serves the file from the page cache once.
+		// Loaded as a dep of the agent CSS so it always precedes the override
+		// layer that sets the brand --bs-* tokens. (UI-OVERHAUL BATCH 1)
+		wp_enqueue_style(
+			'routew-bootstrap',
+			plugin_dir_url(__FILE__) . '../assets/vendor/bootstrap/bootstrap.min.css',
+			array(),
+			$this->version
+		);
+		wp_enqueue_style(
+			'routew-delivery-dashboard',
+			plugin_dir_url(__FILE__) . '../assets/css/delivery-dashboard.css',
+			array('routew-bootstrap'),
+			$this->version
+		);
 		wp_enqueue_script('routew-delivery-dashboard', plugin_dir_url(__FILE__) . '../assets/js/delivery-dashboard.js', array('jquery'), $this->version, true);
 		wp_localize_script('routew-delivery-dashboard', 'routew_checkout_params', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
