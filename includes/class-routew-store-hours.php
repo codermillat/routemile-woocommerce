@@ -344,8 +344,13 @@ class ROUTEW_Store_Hours
 
 		$hours = self::get_hours();
 		$now = current_time('timestamp');
-		$day = (int) gmdate('w', $now);
-		$minutes = (int) gmdate('G', $now) * 60 + (int) gmdate('i', $now);
+		// date_i18n formats $now (which is already a site-local timestamp from
+		// current_time('timestamp')) in the WordPress site's timezone. Previously
+		// this used gmdate(), which treated the local timestamp as UTC — for any
+		// store east or west of UTC, day-of-week and minutes-since-midnight were
+		// wrong. (AUDIT-FIXES H1)
+		$day = (int) date_i18n('w', $now);
+		$minutes = (int) date_i18n('G', $now) * 60 + (int) date_i18n('i', $now);
 
 		$today = $hours[$day];
 
@@ -434,8 +439,13 @@ class ROUTEW_Store_Hours
 
 		$hours = self::get_hours();
 		$now = current_time('timestamp');
-		$day = (int) gmdate('w', $now);
-		$minutes = (int) gmdate('G', $now) * 60 + (int) gmdate('i', $now);
+		// date_i18n formats $now (which is already a site-local timestamp from
+		// current_time('timestamp')) in the WordPress site's timezone. Previously
+		// this used gmdate(), which treated the local timestamp as UTC — for any
+		// store east or west of UTC, day-of-week and minutes-since-midnight were
+		// wrong. (AUDIT-FIXES H1)
+		$day = (int) date_i18n('w', $now);
+		$minutes = (int) date_i18n('G', $now) * 60 + (int) date_i18n('i', $now);
 
 		$day_names = array(__('Sunday', 'routemile-for-woocommerce'), __('Monday', 'routemile-for-woocommerce'), __('Tuesday', 'routemile-for-woocommerce'), __('Wednesday', 'routemile-for-woocommerce'), __('Thursday', 'routemile-for-woocommerce'), __('Friday', 'routemile-for-woocommerce'), __('Saturday', 'routemile-for-woocommerce'));
 

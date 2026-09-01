@@ -251,7 +251,7 @@ Run live on `foodxpress-for-woocommerce.local` after each fix batch.
 
 | Item | Status | Date | PR / commit |
 |---|---|---|---|
-| H1 | [ ] | | |
+| H1 | [x] | 2026-09-01 | Round 2 batch A |
 | H2 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | H3 | [x] | 2026-09-01 | quick-win #aa8fe75+ |
 | H4 | [ ] | | |
