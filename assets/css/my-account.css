@@ -2471,3 +2471,413 @@
 	color: var(--bs-body-color);
 	line-height: 1.55;
 }
+
+/* ============================================================================
+   22. UI8 — Sub-page top header (sticky) + profile card + filter chip row.
+   The my-account sub-pages previously had no top header at all — content
+   started with "Orders" / "Account details" as plain h2. This adds an iOS-
+   style sticky top bar with a back button and a center-aligned title, plus
+   a profile card injected above the edit-account form.
+   ============================================================================ */
+
+/* 22.1. Sub-page top header (sticky bar) */
+.woocommerce-account.routew-my-account-styled .routew-subpage-header {
+	display: flex;
+	align-items: center;
+	gap: var(--routew-spacing-3);
+	padding: 14px 4px;
+	margin: 0 0 var(--routew-spacing-5);
+	background: rgba(255, 255, 255, 0.85);
+	backdrop-filter: blur(20px) saturate(180%);
+	-webkit-backdrop-filter: blur(20px) saturate(180%);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	border-radius: 0;
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	margin-left: calc(-1 * var(--routew-spacing-1));
+	margin-right: calc(-1 * var(--routew-spacing-1));
+	padding-left: var(--routew-spacing-1);
+	padding-right: var(--routew-spacing-1);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-subpage-header__back {
+	width: 36px;
+	height: 36px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: #fff;
+	color: var(--bs-primary);
+	border: 1px solid var(--bs-border-color);
+	text-decoration: none;
+	transition: background 0.15s ease, transform 0.15s ease;
+	flex-shrink: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-subpage-header__back:hover {
+	background: var(--bs-body-bg);
+	border-color: var(--bs-primary);
+	transform: translateX(-2px);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-subpage-header__back svg {
+	width: 20px;
+	height: 20px;
+	fill: currentColor;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-subpage-header__title {
+	margin: 0;
+	font-size: 1.15em;
+	font-weight: 800;
+	letter-spacing: -0.015em;
+	color: var(--bs-body-color);
+	line-height: 1.2;
+	flex: 1;
+}
+
+/* 22.2. Profile card on /edit-account/ (above the form) */
+.woocommerce-account.routew-my-account-styled .routew-subpage-profile {
+	display: flex;
+	align-items: center;
+	gap: var(--routew-spacing-4);
+	padding: var(--routew-spacing-4) var(--routew-spacing-4);
+	margin-bottom: var(--routew-spacing-4);
+	background: linear-gradient(135deg, #FFFFFF 0%, #FFF9F5 100%);
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	box-shadow: var(--routew-shadow-card);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-subpage-profile__avatar {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, var(--bs-primary) 0%, #D44D00 100%);
+	color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 800;
+	font-size: 1.4em;
+	text-transform: uppercase;
+	flex-shrink: 0;
+	box-shadow: 0 4px 12px rgba(232, 93, 4, 0.22);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-subpage-profile__info {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-subpage-profile__name {
+	font-size: 1.05em;
+	font-weight: 700;
+	color: var(--bs-body-color);
+	letter-spacing: -0.01em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-subpage-profile__email {
+	font-size: 0.85em;
+	color: #6B6B6B;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* 22.3. Orders filter chip row (rendered via PHP hook) */
+.woocommerce-account.routew-my-account-styled .routew-orders-filter {
+	display: flex;
+	gap: 8px;
+	margin: 0 0 var(--routew-spacing-4);
+	padding: 4px 0;
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+	animation: routew-fade-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+	animation-delay: 0.07s;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter::-webkit-scrollbar {
+	display: none;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip {
+	flex-shrink: 0;
+	padding: 8px 18px;
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 999px;
+	font-size: 0.85em;
+	font-weight: 600;
+	color: var(--bs-body-color);
+	text-decoration: none;
+	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+	white-space: nowrap;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip:hover {
+	border-color: var(--bs-primary);
+	color: var(--bs-primary);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip:active {
+	transform: scale(0.97);
+}
+
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip--active,
+.woocommerce-account.routew-my-account-styled .routew-orders-filter__chip[aria-current="page"] {
+	background: var(--bs-primary);
+	border-color: var(--bs-primary);
+	color: #fff;
+}
+
+/* ============================================================================
+   23. UI8 — Address card polish (the addresses page).
+   The previous "card" was just a bordered box with the WC default form-row
+   inside. This adds: a small uppercase label, a "Default" pill, action
+   buttons (Edit + Make default) in the footer, and a tasteful "+ Add
+   another address" CTA below the cards.
+   ============================================================================ */
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	box-shadow: var(--routew-shadow-card);
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address:hover {
+	box-shadow: 0 4px 16px rgba(20, 14, 8, 0.08);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--routew-spacing-3);
+	margin: 0;
+	padding: var(--routew-spacing-3) var(--routew-spacing-4);
+	background: rgba(232, 93, 4, 0.04);
+	border-bottom: 1px solid var(--bs-border-color);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h3 {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	font-size: 0.78em;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h3::before {
+	content: "📍";
+	font-size: 1.4em;
+	filter: grayscale(0.2);
+}
+
+/* "Default" pill inside the address title */
+.woocommerce-account.routew-my-account-styled .woocommerce-Address .routew-default-pill {
+	display: inline-block;
+	font-size: 0.7em;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+	background: #fff;
+	padding: 3px 10px;
+	border-radius: 999px;
+	border: 1px solid var(--bs-primary);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title .edit {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 12px;
+	min-height: 32px;
+	background: transparent;
+	color: var(--bs-primary);
+	border: 1px solid var(--bs-primary);
+	border-radius: var(--routew-radius-sm);
+	font-size: 0.72em;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	text-decoration: none;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title .edit:hover {
+	background: var(--bs-primary);
+	color: #fff;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address address,
+.woocommerce-account.routew-my-account-styled .woocommerce-Address > div:not(.woocommerce-Address-title):not(.routew-address-actions) {
+	font-style: normal;
+	color: var(--bs-body-color);
+	line-height: 1.55;
+	background: #FAF8F5;
+	border-radius: 0;
+	padding: var(--routew-spacing-4);
+	margin: 0;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address .address > .title,
+.woocommerce-account.routew-my-account-styled .woocommerce-Address .routew-address-label {
+	display: block;
+	font-size: 0.72em;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+	margin-bottom: 6px;
+}
+
+/* Add-another-address CTA below the address cards */
+.woocommerce-account.routew-my-account-styled .woocommerce-Addresses::after {
+	content: "＋  Add another address";
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--routew-spacing-4);
+	background: #fff;
+	border: 2px dashed var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	color: var(--bs-primary);
+	font-weight: 600;
+	font-size: 0.95em;
+	text-decoration: none;
+	transition: background 0.15s ease, border-color 0.15s ease;
+	cursor: pointer;
+	grid-column: 1 / -1;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Addresses::after:hover {
+	background: rgba(232, 93, 4, 0.04);
+	border-color: var(--bs-primary);
+}
+
+/* ============================================================================
+   24. UI8 — Edit form polish.
+   Fieldset cards are now more obviously cards (with hover lift, accent
+   border on the legend pill, and a subtle gradient on the form-row
+   labels). The save button is also pinned as a full-width primary CTA.
+   ============================================================================ */
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset,
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAddressForm fieldset,
+.woocommerce-account.routew-my-account-styled form .woocommerce-address-fields {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--routew-radius-lg);
+	box-shadow: var(--routew-shadow-card);
+	padding: var(--routew-spacing-4) var(--routew-spacing-5);
+	margin: 0 0 var(--routew-spacing-4);
+	transition: box-shadow 0.18s ease, transform 0.18s ease;
+	animation: routew-fade-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset:nth-of-type(1) { animation-delay: 0.14s; }
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset:nth-of-type(2) { animation-delay: 0.21s; }
+.woocommerce-account.routew-my-account-styled form .woocommerce-address-fields { animation-delay: 0.21s; }
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset:hover,
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAddressForm fieldset:hover {
+	box-shadow: 0 4px 16px rgba(20, 14, 8, 0.08);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset legend,
+.woocommerce-account.routew-my-account-styled form .woocommerce-address-fields legend {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 14px;
+	font-size: 0.78em;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--bs-primary);
+	background: #FFF4ED;
+	border-radius: var(--routew-radius-sm);
+	margin-bottom: var(--routew-spacing-3);
+	border: 1px solid rgba(232, 93, 4, 0.20);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm fieldset:nth-of-type(2) legend {
+	color: #1E6FB8;
+	background: #E7F1FB;
+	border-color: rgba(30, 111, 184, 0.20);
+}
+
+/* 24.1. Form-row labels — slight refinement for hierarchy */
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .form-row label,
+.woocommerce-account.routew-my-account-styled form .woocommerce-address-fields .form-row label {
+	font-weight: 600;
+	font-size: 0.85em;
+	color: var(--bs-body-color);
+	margin-bottom: 6px;
+	display: block;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .form-row,
+.woocommerce-account.routew-my-account-styled form .woocommerce-address-fields .form-row {
+	margin-bottom: var(--routew-spacing-3);
+}
+
+/* 24.2. Save buttons — full-width primary CTA with hover lift */
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .button,
+.woocommerce-account.routew-my-account-styled form.woocommerce-EditAddressForm button[type="submit"],
+.woocommerce-account.routew-my-account-styled form .woocommerce-address-fields button[type="submit"] {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 12px 28px;
+	min-height: 48px;
+	background-color: var(--bs-primary);
+	border: 1px solid var(--bs-primary);
+	color: #fff !important;
+	font-weight: 600;
+	font-size: 0.95em;
+	border-radius: var(--routew-radius-md);
+	text-decoration: none !important;
+	cursor: pointer;
+	transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+	box-shadow: 0 2px 8px rgba(232, 93, 4, 0.18);
+	margin-top: var(--routew-spacing-2);
+	width: 100%;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-EditAccountForm .button:hover,
+.woocommerce-account.routew-my-account-styled form.woocommerce-EditAddressForm button[type="submit"]:hover,
+.woocommerce-account.routew-my-account-styled form .woocommerce-address-fields button[type="submit"]:hover {
+	background-color: #D44D00;
+	border-color: #D44D00;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 14px rgba(232, 93, 4, 0.28);
+}
+
+/* 24.3. Fade-up cascade for the order-table card on /orders/ */
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table {
+	animation: routew-fade-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+	animation-delay: 0.14s;
+}

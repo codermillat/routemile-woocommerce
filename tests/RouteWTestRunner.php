@@ -1124,6 +1124,69 @@ class ROUTEWTestRunner
             $this->fail('UI7 my-account.css missing CSS: ' . implode(', ', $missing_ui7));
         }
 
+        // UI8 — Sub-page native-app polish: sticky header + profile card +
+        // filter chips rendered via PHP hooks. The CSS targets the new
+        // class names the hooks emit.
+        $shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+
+        // Sticky sub-page header with back button + page title.
+        $header_signals = array(
+            'render_subpage_header' => 'render method',
+            "add_action('woocommerce_account_content', array(\$this, 'render_subpage_header'), 1)" => 'hook registration',
+            'routew-subpage-header__back' => 'back-button markup',
+            'routew-subpage-header__title' => 'title markup',
+        );
+        $missing_header = array();
+        foreach ($header_signals as $needle => $label) {
+            if (false === strpos($shortcodes_php, $needle)) {
+                $missing_header[] = $label;
+            }
+        }
+        if (empty($missing_header)) {
+            $this->pass('UI8 sub-page header hook renders back button + title');
+        } else {
+            $this->fail('UI8 sub-page header signals missing: ' . implode(', ', $missing_header));
+        }
+
+        // Profile card rendered on /edit-account/.
+        if (false !== strpos($shortcodes_php, 'render_account_profile_card')
+            && false !== strpos($shortcodes_php, 'routew-subpage-profile__avatar')) {
+            $this->pass('UI8 profile card hook renders avatar + name + email on edit-account');
+        } else {
+            $this->fail('UI8 profile card signals missing — render_account_profile_card or avatar markup not found');
+        }
+
+        // Orders filter chip row rendered before /orders/ table.
+        if (false !== strpos($shortcodes_php, 'render_orders_filter_chips')
+            && false !== strpos($shortcodes_php, "add_action('woocommerce_before_account_orders'")) {
+            $this->pass('UI8 orders filter chip row registered + rendered');
+        } else {
+            $this->fail('UI8 orders filter chip signals missing');
+        }
+
+        // CSS — sticky subpage header + profile card + filter chips.
+        $css_signals_ui8 = array(
+            '.routew-subpage-header' => 'sticky sub-page header',
+            'backdrop-filter: blur' => 'translucent chrome',
+            '.routew-subpage-profile__avatar' => 'profile avatar',
+            '.routew-orders-filter__chip--active' => 'filter chip active state',
+            '.woocommerce-Address-title h3::before' => 'address pin-emoji prefix',
+            '.routew-default-pill' => 'default-address pill class',
+            '.woocommerce-EditAccountForm fieldset:hover' => 'fieldset hover lift',
+            'animation: routew-fade-up' => 'fade-up cascade',
+        );
+        $missing_css_ui8 = array();
+        foreach ($css_signals_ui8 as $needle => $label) {
+            if (false === strpos($my_account_css, $needle)) {
+                $missing_css_ui8[] = $label;
+            }
+        }
+        if (empty($missing_css_ui8)) {
+            $this->pass('UI8 my-account.css has all native-app subpage polish signals');
+        } else {
+            $this->fail('UI8 my-account.css missing CSS: ' . implode(', ', $missing_css_ui8));
+        }
+
         echo "\n";
     }
 

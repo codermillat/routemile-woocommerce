@@ -26,6 +26,108 @@ class ROUTEW_Shortcodes
 		add_action('template_redirect', array($this, 'handle_reorder'));
 		add_action('wp_ajax_routew_print_receipt', array($this, 'print_receipt'));
 		add_action('woocommerce_order_details_after_order_table', array($this, 'render_order_tracking_block'), 10, 1);
+
+		// UI8 — native-app polish: sub-page header, profile card, filter chips
+		add_action('woocommerce_account_content', array($this, 'render_subpage_header'), 1);
+		add_action('woocommerce_account_edit-account_form', array($this, 'render_account_profile_card'), 5, 0);
+		add_action('woocommerce_before_account_orders', array($this, 'render_orders_filter_chips'), 5, 0);
+	}
+
+	/**
+	 * UI8 — emit a sticky top header for the current my-account sub-page.
+	 * Echoes nothing on the dashboard root (the welcome banner + nav already
+	 * fill that role). Renders a page title + back link on every other
+	 * endpoint.
+	 *
+	 * @since 1.5.0
+	 */
+	public function render_subpage_header()
+	{
+		if (!is_user_logged_in()) {
+			return;
+		}
+		// Skip the dashboard root — it has its own welcome banner.
+		if (is_wc_endpoint_url()) {
+			$endpoint = WC()->query->get_current_endpoint();
+			$titles = array(
+				'orders'           => __('Orders', 'routemile-for-woocommerce'),
+				'view-order'       => __('Order', 'routemile-for-woocommerce'),
+				'edit-address'     => __('Addresses', 'routemile-for-woocommerce'),
+				'edit-account'     => __('Account details', 'routemile-for-woocommerce'),
+				'payment-methods'  => __('Payment methods', 'routemile-for-woocommerce'),
+				'customer-logout'  => __('Sign out', 'routemile-for-woocommerce'),
+			);
+			$title = isset($titles[$endpoint]) ? $titles[$endpoint] : __('My account', 'routemile-for-woocommerce');
+			?>
+			<header class="routew-subpage-header" data-endpoint="<?php echo esc_attr($endpoint); ?>">
+				<a class="routew-subpage-header__back" href="<?php echo esc_url(wc_get_page_permalink('myaccount')); ?>" aria-label="<?php esc_attr_e('Back to My account', 'routemile-for-woocommerce'); ?>">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>
+				</a>
+				<h1 class="routew-subpage-header__title"><?php echo esc_html($title); ?></h1>
+			</header>
+			<?php
+		}
+	}
+
+	/**
+	 * UI8 — emit a profile card above the edit-account form.
+	 * Shows the user's avatar, name, and email in a compact iOS-style card.
+	 *
+	 * @since 1.5.0
+	 */
+	public function render_account_profile_card()
+	{
+		$user = wp_get_current_user();
+		if (!$user->exists()) {
+			return;
+		}
+		$name = $user->first_name ?: $user->display_name;
+		$initial = mb_substr($name, 0, 1) ?: '?';
+		?>
+		<div class="routew-subpage-profile" data-routew-section>
+			<span class="routew-subpage-profile__avatar" aria-hidden="true"><?php echo esc_html($initial); ?></span>
+			<div class="routew-subpage-profile__info">
+				<span class="routew-subpage-profile__name"><?php echo esc_html($name); ?></span>
+				<span class="routew-subpage-profile__email"><?php echo esc_html($user->user_email); ?></span>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * UI8 — emit a horizontal filter chip row above the orders table on
+	 * /my-account/orders/. Chips link to the same endpoint with a `status`
+	 * query var. We keep the row pure-CSS with a hidden scrollbar so it
+	 * degrades gracefully when the row is empty.
+	 *
+	 * @since 1.5.0
+	 */
+	public function render_orders_filter_chips()
+	{
+		$endpoint = wc_get_endpoint_url('orders');
+		$current = isset($_GET['status']) ? sanitize_text_field(wp_unslash($_GET['status'])) : '';
+		$chips = array(
+			''          => __('All', 'routemile-for-woocommerce'),
+			'pending'   => __('Pending', 'routemile-for-woocommerce'),
+			'processing' => __('Processing', 'routemile-for-woocommerce'),
+			'completed' => __('Completed', 'routemile-for-woocommerce'),
+			'cancelled' => __('Cancelled', 'routemile-for-woocommerce'),
+		);
+		?>
+		<nav class="routew-orders-filter" aria-label="<?php esc_attr_e('Filter orders', 'routemile-for-woocommerce'); ?>">
+			<?php foreach ($chips as $slug => $label) : ?>
+				<?php
+				$href = ('' === $slug) ? $endpoint : add_query_arg('status', $slug, $endpoint);
+				$is_active = ($current === $slug) ? ' routew-orders-filter__chip--active' : '';
+				?>
+				<a class="routew-orders-filter__chip<?php echo esc_attr($is_active); ?>"
+				   href="<?php echo esc_url($href); ?>"
+				   <?php echo ('' === $current && '' === $slug) ? 'aria-current="page"' : ($current === $slug ? 'aria-current="page"' : ''); ?>>
+					<?php echo esc_html($label); ?>
+				</a>
+			<?php endforeach; ?>
+		</nav>
+		<?php
 	}
 
 	/**
