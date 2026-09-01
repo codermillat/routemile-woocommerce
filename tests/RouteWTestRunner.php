@@ -262,11 +262,13 @@ class ROUTEWTestRunner
         echo GREEN . "▶ Testing Code Quality..." . RESET . "\n";
 
         // Check for unlimited queries
+        // (templates/delivery-boy-view.php removed 2026-09-01 — dead code,
+        // superseded by templates/delivery-dashboard-template.php; see
+        // plans/fluttering-toasting-volcano.md commit 1a.)
         $files_to_check = [
             'includes/class-routew-dashboard.php',
             'includes/class-routew-reporting.php',
             'templates/delivery-dashboard-template.php',
-            'templates/delivery-boy-view.php',
         ];
 
         foreach ($files_to_check as $rel_path) {
