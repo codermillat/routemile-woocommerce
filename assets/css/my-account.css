@@ -547,13 +547,15 @@
    Bootstrap card + Bootstrap .badge already cover most of it; the
    custom touches are the iOS-style row hover lift + the chevron.
    ============================================================================ */
+/* §8 row container already in .routew-ios-card __body; keep these for
+   any bare-card layout that wraps recent orders without the .card helper. */
 .woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item {
 	display: flex;
 	align-items: center;
 	gap: var(--routew-spacing-3);
-	padding: var(--routew-spacing-4);
-	border-bottom: 1px solid rgba(232, 93, 4, 0.08);
-	transition: background 0.15s ease, transform 0.18s ease;
+	padding: 14px 18px;
+	border-bottom: 1px solid var(--bs-border-color);
+	transition: background 0.15s ease;
 }
 
 .woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item:last-child {
@@ -562,19 +564,18 @@
 
 .woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item:hover {
 	background: rgba(232, 93, 4, 0.03);
-	transform: translateX(2px);
 }
 
-.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item__meta {
-	flex: 1;
+.woocommerce-account.routew-my-account-styled .routew-dashboard__order-meta {
+	flex: 1 1 auto;
 	min-width: 0;
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
 }
 
-.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item__number {
-	display: flex;
+.woocommerce-account.routew-my-account-styled .routew-dashboard__order-number {
+	display: inline-flex;
 	align-items: baseline;
 	gap: 8px;
 	font-weight: 700;
@@ -584,26 +585,35 @@
 	font-size: 0.95em;
 }
 
-.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item__date {
-	font-size: 0.78em;
-	color: #6B6B6B;
+.woocommerce-account.routew-my-account-styled .routew-dashboard__order-number:hover {
+	text-decoration: underline;
 }
 
-.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item__amount {
+.woocommerce-account.routew-my-account-styled .routew-dashboard__order-date {
+	font-size: 0.85em;
+	color: #6B6B6B;
+	margin-top: 2px;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__order-total {
 	font-weight: 700;
 	color: var(--bs-body-color);
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
+	margin-left: auto;
 }
 
-.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item__chevron {
+.woocommerce-account.routew-my-account-styled .routew-dashboard__order-chevron {
 	color: #BFBFBF;
 	font-size: 1.4em;
-	transition: transform 0.18s ease;
+	font-weight: 400;
+	line-height: 1;
+	margin-left: 4px;
+	transition: transform 0.18s ease, color 0.15s ease;
 }
 
-.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item:hover .routew-dashboard__orders-item__chevron {
-	transform: translateX(2px);
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders-item:hover .routew-dashboard__order-chevron {
+	transform: translateX(3px);
 	color: var(--bs-primary);
 }
 
@@ -647,19 +657,22 @@
 	border-bottom: 1px solid var(--bs-border-color);
 }
 
-.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h3 {
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h3,
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h2 {
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
 	margin: 0;
-	font-size: 0.78em;
+	font-family: var(--bs-body-font-family);
+	font-size: 0.82rem;
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 	color: var(--bs-primary);
 }
 
-.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h3::before {
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h3::before,
+.woocommerce-account.routew-my-account-styled .woocommerce-Address-title h2::before {
 	content: "📍";
 	font-size: 1.4em;
 	filter: grayscale(0.2);
@@ -1748,4 +1761,43 @@
 .woocommerce-account.routew-my-account-styled form.woocommerce-EditAddressForm fieldset:hover,
 .woocommerce-account.routew-my-account-styled form .woocommerce-address-fields:hover {
 	box-shadow: 0 4px 16px rgba(20, 14, 8, 0.08);
+}
+
+/* ============================================================================
+   21. UI11 — My-account visual + structural fix-up
+   Six visible issues addressed here:
+     - Hide duplicate theme-emitted H1 on my-account sub-pages
+     - Cream background on body + common theme wrappers
+     - Recent orders card surface (bg + border + shadow)
+     - Settings list row padding (matches orders card rhythm)
+     - Address body: drop cream-on-cream, sit on white card instead
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > h1,
+.woocommerce-account.routew-my-account-styled .entry-header h1.entry-title { display: none; }
+
+body.woocommerce-account.routew-my-account-styled,
+body.woocommerce-account.routew-my-account-styled .site,
+body.woocommerce-account.routew-my-account-styled .site-content,
+body.woocommerce-account.routew-my-account-styled #page,
+body.woocommerce-account.routew-my-account-styled .wp-site-content { background-color: var(--bs-body-bg); }
+
+.woocommerce-account.routew-my-account-styled .routew-dashboard__orders {
+	background: #fff;
+	border: 1px solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	box-shadow: var(--routew-shadow-card);
+	overflow: hidden;
+	padding: 4px 0;
+}
+
+.woocommerce-account.routew-my-account-styled .routew-list .routew-list-item {
+	padding: 14px 18px;
+	border-bottom: 1px solid var(--bs-border-color);
+}
+.woocommerce-account.routew-my-account-styled .routew-list .routew-list-item:last-child { border-bottom: 0; }
+
+.woocommerce-account.routew-my-account-styled .woocommerce-Address address {
+	background: transparent;
+	padding: 16px 20px 20px;
+	border-top: 1px solid var(--bs-border-color);
 }

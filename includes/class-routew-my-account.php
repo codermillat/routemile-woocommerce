@@ -367,7 +367,8 @@ class ROUTEW_My_Account
 		$order_url = $order->get_view_order_url();
 
 		?>
-		<li class="routew-dashboard__orders-item">
+		<ul class="routew-dashboard__orders-list list-unstyled mb-0">
+			<li class="routew-dashboard__orders-item">
 			<div class="routew-dashboard__order-meta">
 				<a class="routew-dashboard__order-number" href="<?php echo esc_url($order_url); ?>">
 					<?php
@@ -390,8 +391,9 @@ class ROUTEW_My_Account
 			<span class="badge routew-dashboard__status-pill <?php echo esc_attr($pill_class); ?>">
 				<?php echo esc_html($label); ?>
 			</span>
-			<span class="routew-dashboard__order-total"><?php echo wp_kses_post($total); ?></span>
+			<span class="routew-dashboard__order-total"><?php echo wp_kses_post($total); ?></span><span class="routew-dashboard__order-chevron" aria-hidden="true">&#8250;</span>
 		</li>
+		</ul>
 		<?php
 	}
 

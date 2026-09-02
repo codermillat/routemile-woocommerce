@@ -1229,6 +1229,81 @@ class ROUTEWTestRunner
             $this->fail('UI9 missing framework class compositions: ' . implode(', ', $missing_framework));
         }
 
+        // UI11 — My-account visual + structural fix-up.
+        // Re-fetch the source files defensively so the assertions below always
+        // see the current state, regardless of prior in-function reads.
+        $ui11_my_account_css = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
+        $ui11_shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+        $ui11_dashboard_php  = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
+
+        // UI11.1 — Address title targets h2 (not only h3)
+        if (preg_match('/\.woocommerce-account\.routew-my-account-styled \.woocommerce-Address-title (h3,h2|h2,h3|h2)\b[^{]*\{/', $ui11_my_account_css)) {
+            $this->pass('UI11.1 — address title targets h2 and h3 (WC 8+ emits h2)');
+        } else {
+            $this->fail('UI11.1 — address title CSS does not target h2 (h3 only — WC emits h2 in 8+)');
+        }
+
+        // UI11.2 — Duplicate theme-emitted H1 is hidden on my-account sub-pages
+        $ui11_h1_open  = '.woocommerce-MyAccount-content > h1,';
+        $ui11_h1_close = '.entry-header h1.entry-title { display: none';
+        if (false !== strpos($ui11_my_account_css, $ui11_h1_open)
+            && false !== strpos($ui11_my_account_css, $ui11_h1_close)) {
+            $this->pass('UI11.2 — duplicate theme-emitted H1 is hidden on sub-pages');
+        } else {
+            $this->fail('UI11.2 — duplicate H1 not hidden (theme H1 + sticky sub-page header both visible)');
+        }
+
+        // UI11.3 — Warm cream background painted through common theme wrappers
+        if (preg_match('/body\.woocommerce-account\.routew-my-account-styled[^}]*background-color:\s*var\(--bs-body-bg\)/', $ui11_my_account_css)) {
+            $this->pass('UI11.3 — cream background painted through body / .site / .site-content / #page');
+        } else {
+            $this->fail('UI11.3 — cream background missing (page renders on theme white)');
+        }
+
+        // UI11.4 — Recent orders card surface (bg + border + shadow)
+        if (preg_match('/\.routew-dashboard__orders\s*\{[^}]*background:\s*#fff/s', $ui11_my_account_css)) {
+            $this->pass('UI11.4 — recent orders card has visible white surface');
+        } else {
+            $this->fail('UI11.4 — recent orders card missing surface');
+        }
+
+        // UI11.5 — Settings list row rhythm (padding 14px 18px)
+        if (preg_match('/\.routew-list-item\s*\{[^}]*padding:\s*14px 18px/s', $ui11_my_account_css)) {
+            $this->pass('UI11.5 — settings list row padding set (matches orders card rhythm)');
+        } else {
+            $this->fail('UI11.5 — settings list row padding missing');
+        }
+
+        // UI11.6 — Address body bg is transparent (no cream-on-cream orphan)
+        if (preg_match('/\.woocommerce-Address address\s*\{[^}]*background:\s*transparent/s', $ui11_my_account_css)) {
+            $this->pass('UI11.6 — address body sits on white card (no cream-on-cream)');
+        } else {
+            $this->fail('UI11.6 — address body bg not transparent');
+        }
+
+        // UI11.7 — §8 selectors rewritten to PHP-emitted class names
+        if (false !== strpos($ui11_my_account_css, '.routew-dashboard__order-meta {')
+            && false !== strpos($ui11_my_account_css, '.routew-dashboard__order-chevron')) {
+            $this->pass('UI11.7 — §8 selector names now match PHP-emitted classes (__order-meta, __order-chevron)');
+        } else {
+            $this->fail('UI11.7 — §8 still uses dead __orders-item__* class names');
+        }
+
+        // UI11.8 — Tracking hero <header> properly closed by </header>
+        if (preg_match('/<header class="routew-order-tracking__hero">.*?<\/header>/s', $ui11_shortcodes_php)) {
+            $this->pass('UI11.8 — tracking block hero properly closed by </header>');
+        } else {
+            $this->fail('UI11.8 — tracking hero has broken nesting (</nav> → </header>)');
+        }
+
+        // UI11.9 — Recent orders wrapped in <ul> + chevron span added
+        if (false !== strpos($ui11_dashboard_php, '<ul class="routew-dashboard__orders-list list-unstyled mb-0">')
+            && false !== strpos($ui11_dashboard_php, 'routew-dashboard__order-chevron')) {
+            $this->pass('UI11.9 — recent orders <li> wrapped in <ul> + chevron span added');
+        } else {
+            $this->fail('UI11.9 — recent orders not wrapped in <ul> (or chevron missing)');
+        }
+
         echo "\n";
     }
 

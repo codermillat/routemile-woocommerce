@@ -436,7 +436,7 @@ foreach ($order->get_items() as $item) {
 				<span class="badge routew-order-tracking__hero-badge <?php echo esc_attr($hero_status_class); ?>">
 					<?php echo esc_html($hero_status_label); ?>
 				</span>
-			</nav>
+			</header>
 
 			<ol class="routew-status-stepper">
 				<?php
