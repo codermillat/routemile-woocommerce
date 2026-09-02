@@ -45,6 +45,11 @@ class ROUTEW_My_Account
 		// Late priority so other plugins (e.g. subscriptions, memberships)
 		// that filter the menu first still see a clean array.
 		add_filter('woocommerce_account_menu_items', array($this, 'filter_account_menu_items'), 999);
+
+		// Filter the orders table on /my-account/orders/ by the ?status= query
+		// var emitted by render_orders_filter_chips(). Without this hook the
+		// chips navigate but the table shows the unfiltered list.
+		add_filter('woocommerce_my_account_my_orders_query', array($this, 'filter_my_orders_by_chip_status'));
 	}
 
 	/**
@@ -70,6 +75,61 @@ class ROUTEW_My_Account
 			unset($items['downloads']);
 		}
 		return $items;
+	}
+
+	/**
+	 * Restrict the orders table query on /my-account/orders/ by the ?status
+	 * chip. The chip row in render_orders_filter_chips() emits links of the
+	 * form /my-account/orders/?status={slug}; this filter reads the same var
+	 * and sets WC_Query's status arg so the table only shows matching orders.
+	 *
+	 * Status → WC slug mapping:
+	 *   pending    → pending + on-hold
+	 *   processing → processing + any routew-* route-side status that's still
+	 *                in flight (routew-assigned / routew-in-kitchen /
+	 *                routew-picked-up)
+	 *   completed  → completed
+	 *   cancelled  → cancelled + failed + refunded
+	 *
+	 * Returns the array unchanged for unknown / empty slugs (the unfiltered
+	 * "All" view) and unsets the status arg so WC's default applies.
+	 *
+	 * @param array $query_args WC_Query args passed by WC core.
+	 * @return array Filtered query args with `status` set when relevant.
+	 * @since 1.5.0
+	 */
+	public function filter_my_orders_by_chip_status($query_args)
+	{
+		// Only act on the my-account orders endpoint, not on every WC_Query.
+		// The endpoint check uses global $wp to avoid loading is_wc_endpoint_url
+		// in code paths that should be untouched.
+		if (!function_exists('is_wc_endpoint_url') || !is_wc_endpoint_url('orders')) {
+			return $query_args;
+		}
+
+		// Read + sanitize the chip slug.
+		$slug = isset($_GET['status']) ? sanitize_text_field(wp_unslash($_GET['status'])) : '';
+		if ('' === $slug) {
+			// "All" chip: drop any leftover status filter that WC may have set.
+			unset($query_args['status']);
+			return $query_args;
+		}
+
+		$status_map = array(
+			'pending'    => array('pending', 'on-hold'),
+			'processing' => array('processing', 'routew-assigned', 'routew-in-kitchen', 'routew-picked-up'),
+			'completed'  => array('completed'),
+			'cancelled'  => array('cancelled', 'failed', 'refunded'),
+		);
+
+		if (isset($status_map[$slug])) {
+			$query_args['status'] = $status_map[$slug];
+		} else {
+			// Unknown slug — ignore, leave the default query.
+			unset($query_args['status']);
+		}
+
+		return $query_args;
 	}
 
 	/**

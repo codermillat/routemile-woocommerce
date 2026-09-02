@@ -1782,16 +1782,15 @@
      - Settings list row padding (matches orders card rhythm)
      - Address body: drop cream-on-cream, sit on white card instead
    ============================================================================ */
-.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > h1,
-.woocommerce-account.routew-my-account-styled .entry-header h1,
-.woocommerce-account.routew-my-account-styled .entry-header h2,
-.woocommerce-account.routew-my-account-styled .page-header h1,
+/* Universal h1 hide: the sub-page header (sticky navbar) + welcome
+   banner already serve as the page title on every my-account surface,
+   so any theme-emitted page H1 is now redundant. WC endpoints are not
+   allowed to use <h1>; everything that needs to be a heading is <h2>+. */
+.woocommerce-account.routew-my-account-styled h1,
+.woocommerce-account.routew-my-account-styled .h1,
 .woocommerce-account.routew-my-account-styled .entry-title,
 .woocommerce-account.routew-my-account-styled .page-title,
-.woocommerce-account.routew-my-account-styled .post-title,
-.woocommerce-account.routew-my-account-styled .wp-block-post-title,
-.woocommerce-account.routew-my-account-styled article > header h1,
-.woocommerce-account.routew-my-account-styled .site-content > h1:first-child { display: none; }
+.woocommerce-account.routew-my-account-styled .wp-block-post-title { display: none !important; }
 
 body.woocommerce-account.routew-my-account-styled,
 body.woocommerce-account.routew-my-account-styled .site,
@@ -1848,3 +1847,52 @@ body.woocommerce-account.routew-my-account-styled .wp-site-content { background-
 	color: #fff;
 	transform: translateY(-1px);
 }
+
+/* ============================================================================
+   22. UI12-batch1 — Orders table layout + status pills
+   ============================================================================ */
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-date,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__header-order-date { white-space: nowrap; }
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-total,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__header-order-total {
+	font-variant-numeric: tabular-nums;
+	font-weight: 700;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-actions .button,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-actions .woocommerce-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 64px;
+	max-width: 110px;
+	padding: 8px 12px;
+	margin: 2px;
+	font-size: 0.85em;
+	background-color: var(--bs-primary);
+	color: #fff;
+	border: 0;
+	border-radius: var(--bs-border-radius);
+	text-decoration: none;
+	transition: background-color 0.15s ease, transform 0.15s ease;
+	white-space: nowrap;
+}
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-actions .button:hover,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-actions .woocommerce-button:hover {
+	background-color: #C04D03;
+	color: #fff;
+	transform: translateY(-1px);
+}
+
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-status > span,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-status { display: inline-block !important; padding: 4px 10px; border-radius: 999px; font-size: 0.78em; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tr.status-completed .woocommerce-orders-table__cell-order-status { background-color: var(--bs-success); color: #fff; }
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tr.status-processing .woocommerce-orders-table__cell-order-status { background-color: var(--bs-info); color: #fff; }
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tr.status-on-hold .woocommerce-orders-table__cell-order-status { background-color: var(--bs-warning); color: #1A1A1A; }
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tr.status-pending .woocommerce-orders-table__cell-order-status { background-color: var(--bs-secondary); color: #fff; }
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tr.status-cancelled .woocommerce-orders-table__cell-order-status,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tr.status-refunded .woocommerce-orders-table__cell-order-status,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table tr.status-failed .woocommerce-orders-table__cell-order-status { background-color: var(--bs-danger); color: #fff; }

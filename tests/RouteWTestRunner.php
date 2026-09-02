@@ -1244,14 +1244,13 @@ class ROUTEWTestRunner
         }
 
         // UI11.2 — Duplicate theme-emitted H1 is hidden on my-account sub-pages.
-        // UI11 follow-up: the original selector list (.entry-header h1.entry-title)
-        // did not match the active theme (which uses .page-header / .entry-title /
-        // .wp-block-post-title). Now covers TT3/4/5 + block themes.
-        $ui11_h1_open  = '.woocommerce-MyAccount-content > h1,';
-        $ui11_h1_close = '.entry-header h1,';  // broader list now selects bare .entry-header h1
-        if (false !== strpos($ui11_my_account_css, $ui11_h1_open)
-            && false !== strpos($ui11_my_account_css, $ui11_h1_close)) {
-            $this->pass('UI11.2 — duplicate theme-emitted H1 is hidden on sub-pages (broad selector list)');
+        // UI12-batch1 replaced the broad selector list with a universal h1 hide
+        // (no legitimate h1 is needed on my-account surfaces; the sub-page
+        // header + welcome banner already convey title). Asserting the
+        // universal rule is present.
+        if (preg_match('/\.woocommerce-account\.routew-my-account-styled h1,/', $ui11_my_account_css)
+            && preg_match('/display: none !important;\s*\}\s*$/m', $ui11_my_account_css)) {
+            $this->pass('UI11.2 — duplicate theme-emitted H1 is hidden on sub-pages (universal h1 rule)');
         } else {
             $this->fail('UI11.2 — duplicate H1 not hidden (theme H1 + sticky sub-page header both visible)');
         }
@@ -1307,13 +1306,13 @@ class ROUTEWTestRunner
             $this->fail('UI11.9 — recent orders not wrapped in <ul> (or chevron missing)');
         }
 
-        // UI11 follow-up — Fix 10: broader H1 hide selector list covers block themes
+        // UI11 follow-up — Fix 10: broader H1 hide selector list covers block themes.
+// Superseded by UI12.1 (universal h1 hide). Keep the test for history but
+// relax it to check the universal rule covers the original theme classes.
         $ui11_broad_h1_selectors = array(
-            '.entry-header h1,',
-            '.page-header h1,',
             '.entry-title,',
             '.page-title,',
-            '.wp-block-post-title,',
+            '.wp-block-post-title { display: none',
         );
         $missing_broad_h1 = array();
         foreach ($ui11_broad_h1_selectors as $needle) {
@@ -1322,7 +1321,7 @@ class ROUTEWTestRunner
             }
         }
         if (empty($missing_broad_h1)) {
-            $this->pass('UI11 follow-up 10 — broader H1 hide selector list (TT3/4/5 + block themes)');
+            $this->pass('UI11 follow-up 10 — broader H1 hide selectors covered by universal h1 rule');
         } else {
             $this->fail('UI11 follow-up 10 — broader H1 hide missing selectors: ' . implode(', ', $missing_broad_h1));
         }
@@ -1339,6 +1338,48 @@ class ROUTEWTestRunner
             $this->pass('UI11 follow-up 11b — orders-table action buttons brand orange');
         } else {
             $this->fail('UI11 follow-up 11b — orders-table .button still WC black');
+        }
+
+        // UI12-batch1 — Fix 12.1: universal h1 hide on my-account pages
+        // The selector list from UI11 follow-up missed the theme variant used
+        // on edit-address. Universal rule now hides every h1 because no
+        // legitimate h1 is needed on any my-account sub-page (the sub-page
+        // header + welcome banner serve as the title).
+        if (preg_match('/\.woocommerce-account\.routew-my-account-styled h1,/', $ui11_my_account_css)
+            && preg_match('/\.woocommerce-account\.routew-my-account-styled \.entry-title,/', $ui11_my_account_css)
+            && preg_match('/\.woocommerce-account\.routew-my-account-styled \.wp-block-post-title \{ display: none/s', $ui11_my_account_css)) {
+            $this->pass('UI12.1 — universal h1 hide applied to my-account pages');
+        } else {
+            $this->fail('UI12.1 — universal h1 hide rule missing or incomplete (theme H1 still visible)');
+        }
+
+        // UI12-batch1 — Fix 12.2: filter chips actually filter the orders query
+        $ui12_shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+        $ui12_dashboard_php  = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
+        if (false !== strpos($ui12_dashboard_php, "add_filter('woocommerce_my_account_my_orders_query'")
+            && false !== strpos($ui12_dashboard_php, 'filter_my_orders_by_chip_status')
+            && preg_match("/'pending'\s*=>\s*array\('pending',\s*'on-hold'\)/", $ui12_dashboard_php)
+            && preg_match("/'cancelled'\s*=>\s*array\('cancelled',\s*'failed',\s*'refunded'\)/", $ui12_dashboard_php)) {
+            $this->pass('UI12.2 — ?status= chip now actually filters the orders query');
+        } else {
+            $this->fail('UI12.2 — chip filter not wired (orders table shows unfiltered list)');
+        }
+
+        // UI12-batch1 — Fix 12.3: orders-table status pills by row status-* class
+        if (preg_match('/tr\.status-completed \.woocommerce-orders-table__cell-order-status \{ background-color: var\(--bs-success\)/', $ui11_my_account_css)
+            && preg_match('/tr\.status-processing \.woocommerce-orders-table__cell-order-status \{ background-color: var\(--bs-info\)/', $ui11_my_account_css)
+            && preg_match('/tr\.status-pending \.woocommerce-orders-table__cell-order-status \{ background-color: var\(--bs-secondary\)/', $ui11_my_account_css)) {
+            $this->pass('UI12.3 — orders-table status pills color-coded by row status');
+        } else {
+            $this->fail('UI12.3 — orders-table status pills missing or incomplete');
+        }
+
+        // UI12-batch1 — Fix 12.4: orders-table layout (date nowrap, action buttons within max-width)
+        if (preg_match('/\.woocommerce-orders-table__cell-order-date[^{]*\{[^}]*white-space:\s*nowrap/s', $ui11_my_account_css)
+            && preg_match('/\.woocommerce-orders-table__cell-order-actions \.button[^{]*\{[^}]*max-width:\s*110px[^}]*white-space:\s*nowrap/s', $ui11_my_account_css)) {
+            $this->pass('UI12.4 — orders table layout (date nowrap, action buttons constrained, no hyphenation)');
+        } else {
+            $this->fail('UI12.4 — orders table layout not properly constrained');
         }
 
         echo "\n";
