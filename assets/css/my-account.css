@@ -1044,11 +1044,21 @@
 /* Order-again CTA — Bootstrap .btn supplies colors; we add the accent
    shadow + hover lift + full-width-on-mobile */
 .woocommerce-account.routew-my-account-styled .order-again {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
 	font-size: 1em;
+	font-weight: 700;
 	min-height: 48px;
 	padding: 14px 32px;
-	box-shadow: 0 2px 8px rgba(232, 93, 4, 0.18);
-	transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+	background-color: var(--bs-primary);
+	color: #fff;
+	border: 0;
+	border-radius: var(--bs-border-radius);
+	text-decoration: none;
+	box-shadow: 0 2px 8px rgba(232, 93, 4, 0.28);
+	transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .woocommerce-account.routew-my-account-styled .order-again:hover {
@@ -1773,7 +1783,15 @@
      - Address body: drop cream-on-cream, sit on white card instead
    ============================================================================ */
 .woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-content > h1,
-.woocommerce-account.routew-my-account-styled .entry-header h1.entry-title { display: none; }
+.woocommerce-account.routew-my-account-styled .entry-header h1,
+.woocommerce-account.routew-my-account-styled .entry-header h2,
+.woocommerce-account.routew-my-account-styled .page-header h1,
+.woocommerce-account.routew-my-account-styled .entry-title,
+.woocommerce-account.routew-my-account-styled .page-title,
+.woocommerce-account.routew-my-account-styled .post-title,
+.woocommerce-account.routew-my-account-styled .wp-block-post-title,
+.woocommerce-account.routew-my-account-styled article > header h1,
+.woocommerce-account.routew-my-account-styled .site-content > h1:first-child { display: none; }
 
 body.woocommerce-account.routew-my-account-styled,
 body.woocommerce-account.routew-my-account-styled .site,
@@ -1800,4 +1818,33 @@ body.woocommerce-account.routew-my-account-styled .wp-site-content { background-
 	background: transparent;
 	padding: 16px 20px 20px;
 	border-top: 1px solid var(--bs-border-color);
+}
+
+/* UI11 follow-up: brand color action buttons. WC emits <a class="button">
+   without Bootstrap's .btn, so .button keeps WC stock black. Override
+   background directly for the most common actions on /orders/ and
+   /view-order/. The .order-again rule above does the same for the
+   primary CTA at the bottom of view-order. */
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .button,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .woocommerce-button,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table__cell-order-actions .button,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .button,
+.woocommerce-account.routew-my-account-styled .woocommerce-order again .button,
+.woocommerce-account.routew-my-account-styled .woocommerce-view-order .button {
+	background-color: var(--bs-primary);
+	color: #fff;
+	border: 0;
+	border-radius: var(--bs-border-radius);
+	padding: 10px 18px;
+	font-weight: 700;
+	text-decoration: none;
+	transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .button:hover,
+.woocommerce-account.routew-my-account-styled .woocommerce-orders-table .woocommerce-button:hover,
+.woocommerce-account.routew-my-account-styled .woocommerce-order-details .button:hover,
+.woocommerce-account.routew-my-account-styled .woocommerce-view-order .button:hover {
+	background-color: #C04D03;
+	color: #fff;
+	transform: translateY(-1px);
 }

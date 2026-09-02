@@ -1243,12 +1243,15 @@ class ROUTEWTestRunner
             $this->fail('UI11.1 — address title CSS does not target h2 (h3 only — WC emits h2 in 8+)');
         }
 
-        // UI11.2 — Duplicate theme-emitted H1 is hidden on my-account sub-pages
+        // UI11.2 — Duplicate theme-emitted H1 is hidden on my-account sub-pages.
+        // UI11 follow-up: the original selector list (.entry-header h1.entry-title)
+        // did not match the active theme (which uses .page-header / .entry-title /
+        // .wp-block-post-title). Now covers TT3/4/5 + block themes.
         $ui11_h1_open  = '.woocommerce-MyAccount-content > h1,';
-        $ui11_h1_close = '.entry-header h1.entry-title { display: none';
+        $ui11_h1_close = '.entry-header h1,';  // broader list now selects bare .entry-header h1
         if (false !== strpos($ui11_my_account_css, $ui11_h1_open)
             && false !== strpos($ui11_my_account_css, $ui11_h1_close)) {
-            $this->pass('UI11.2 — duplicate theme-emitted H1 is hidden on sub-pages');
+            $this->pass('UI11.2 — duplicate theme-emitted H1 is hidden on sub-pages (broad selector list)');
         } else {
             $this->fail('UI11.2 — duplicate H1 not hidden (theme H1 + sticky sub-page header both visible)');
         }
@@ -1302,6 +1305,40 @@ class ROUTEWTestRunner
             $this->pass('UI11.9 — recent orders <li> wrapped in <ul> + chevron span added');
         } else {
             $this->fail('UI11.9 — recent orders not wrapped in <ul> (or chevron missing)');
+        }
+
+        // UI11 follow-up — Fix 10: broader H1 hide selector list covers block themes
+        $ui11_broad_h1_selectors = array(
+            '.entry-header h1,',
+            '.page-header h1,',
+            '.entry-title,',
+            '.page-title,',
+            '.wp-block-post-title,',
+        );
+        $missing_broad_h1 = array();
+        foreach ($ui11_broad_h1_selectors as $needle) {
+            if (false === strpos($ui11_my_account_css, $needle)) {
+                $missing_broad_h1[] = $needle;
+            }
+        }
+        if (empty($missing_broad_h1)) {
+            $this->pass('UI11 follow-up 10 — broader H1 hide selector list (TT3/4/5 + block themes)');
+        } else {
+            $this->fail('UI11 follow-up 10 — broader H1 hide missing selectors: ' . implode(', ', $missing_broad_h1));
+        }
+
+        // UI11 follow-up — Fix 11a: .order-again has brand-orange background
+        if (preg_match('/\.woocommerce-account\.routew-my-account-styled \.order-again\s*\{[^}]*background-color:\s*var\(--bs-primary\)/s', $ui11_my_account_css)) {
+            $this->pass('UI11 follow-up 11a — order-again button now brand orange (not WC black)');
+        } else {
+            $this->fail('UI11 follow-up 11a — order-again still WC black (background-color: var(--bs-primary) missing)');
+        }
+
+        // UI11 follow-up — Fix 11b: WC .button on orders table + view order is brand orange
+        if (preg_match('/\.woocommerce-account\.routew-my-account-styled \.woocommerce-orders-table \.button[^{]*\{[^}]*background-color:\s*var\(--bs-primary\)/s', $ui11_my_account_css)) {
+            $this->pass('UI11 follow-up 11b — orders-table action buttons brand orange');
+        } else {
+            $this->fail('UI11 follow-up 11b — orders-table .button still WC black');
         }
 
         echo "\n";
