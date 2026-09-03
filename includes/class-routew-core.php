@@ -394,7 +394,7 @@ class ROUTEW_Core
 			return;
 		}
 
-		$settings_url = admin_url('admin.php?page=wc-settings&tab=routemile');
+		$settings_url = admin_url('admin.php?page=wc-settings&tab=routemile-for-woocommerce');
 		?>
 		<div class="notice notice-error">
 			<p>
