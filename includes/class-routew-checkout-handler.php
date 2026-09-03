@@ -58,6 +58,7 @@ class ROUTEW_Checkout_Handler
     public function __construct()
     {
         add_action('woocommerce_after_checkout_validation', array($this, 'validate_delivery_zone'), 20, 2);
+        add_action('woocommerce_after_checkout_validation', array($this, 'validate_phone_number'), 20, 2);
         add_action('woocommerce_checkout_update_user_meta', array($this, 'save_customer_address'), 10, 2);
         add_action('woocommerce_checkout_create_order', array($this, 'save_delivery_details_to_order'), 10, 2);
 
@@ -66,6 +67,34 @@ class ROUTEW_Checkout_Handler
         // confirmation, receipt and admin screens rendered twice. Run once
         // on the next admin page load after the upgrade.
         add_action('admin_init', array($this, 'maybe_migrate_duplicated_address_2'), 20);
+    }
+
+    /**
+     * Validate the billing phone number format on the classic checkout.
+     *
+     * The field's required flag is enforced by
+     * ROUTEW_Checkout_Address::require_phone_field(); this adds a format
+     * check on non-empty values so riders never get an unusable number.
+     * Accepts 7–15 digits with common separators / leading + (E.164-ish).
+     *
+     * @param array    $data   Posted checkout data.
+     * @param WP_Error $errors Errors object.
+     * @since 1.6.0
+     */
+    public function validate_phone_number($data, $errors)
+    {
+        $phone = isset($data['billing_phone']) ? trim((string) wp_unslash($data['billing_phone'])) : '';
+        if ('' === $phone) {
+            return; // required-ness is handled by the field config
+        }
+
+        $digits = preg_replace('/[^0-9]/', '', $phone);
+        if (strlen($digits) < 7 || strlen($digits) > 15) {
+            $errors->add(
+                'billing_phone',
+                __('Please enter a valid phone number (7-15 digits) — your rider will call it on arrival.', 'routemile-for-woocommerce')
+            );
+        }
     }
 
     /**

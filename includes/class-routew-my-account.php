@@ -7,10 +7,13 @@ if (!defined('ABSPATH')) {
  *
  * Renders the RouteMile-flavored dashboard widgets on the WooCommerce
  * My Account page:
- *   - Welcome banner (greeting + reorder CTA)
- *   - Quick stats row (orders in progress, completed, saved addresses)
- *   - Recent orders card with status pills and a "view all" link
- *   - Saved address peek with an "edit" shortcut
+ *   - Greeting hero (time-aware greeting + contextual line)
+ *   - Reorder / browse-menu banner
+ *   - Quick actions grid (Orders, Addresses, Profile, Payments)
+ *   - Recent orders card with delivery-native status pills and a
+ *     first-item summary line ("Chicken Biryani ×2 +1 more")
+ *   - Saved address peek with a "manage" shortcut
+ *   - Settings list + sign out
  *
  * Hooks `woocommerce_account_dashboard` (fires inside WooCommerce's
  * templates/myaccount/dashboard.php) so the default greeting is replaced
@@ -107,7 +110,9 @@ class ROUTEW_My_Account
 			return $query_args;
 		}
 
-		// Read + sanitize the chip slug.
+		// Read + sanitize the chip slug. Read-only query var for filtering
+		// the orders table (no state change), so no nonce applies.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$slug = isset($_GET['status']) ? sanitize_text_field(wp_unslash($_GET['status'])) : '';
 		if ('' === $slug) {
 			// "All" chip: drop any leftover status filter that WC may have set.
@@ -135,10 +140,10 @@ class ROUTEW_My_Account
 	/**
 	 * Enqueue the my-account dashboard stylesheet.
 	 *
-	 * Loads only on the account page so we don't ship 4KB of CSS to the
-	 * rest of the storefront. The base my-account.css is enqueued by
-	 * ROUTEW_Shortcodes and provides the layout shell; this stylesheet adds
-	 * the dashboard-only widgets.
+	 * Loads only on the account page so we don't ship CSS to the rest of
+	 * the storefront. The base my-account.css is enqueued by
+	 * ROUTEW_Shortcodes and provides the layout shell + sub-page styling;
+	 * this stylesheet adds the dashboard-only widgets.
 	 *
 	 * @since 1.4.0
 	 */
@@ -187,128 +192,133 @@ class ROUTEW_My_Account
 		$recent_orders = $this->collect_recent_orders($customer_id, 3);
 		$default_address = $this->collect_default_address($customer_id);
 		$last_completed = $this->find_last_completed_order($customer_id);
-
+		$first_name = $this->first_name($user);
 		?>
-		<section class="routew-dashboard routew-native" aria-label="<?php esc_attr_e('Account overview', 'routemile-for-woocommerce'); ?>">
+		<section class="routew-dashboard" aria-label="<?php esc_attr_e('Account overview', 'routemile-for-woocommerce'); ?>">
 
-			<?php /* ----- Section 1: profile card (Bootstrap card) ----- */ ?>
-			<section class="routew-section">
-				<div class="card routew-profile-card">
-					<div class="card-body d-flex align-items-center gap-3 py-4">
-						<span class="routew-profile-card__avatar flex-shrink-0" aria-hidden="true">
-							<?php echo esc_html(mb_substr($this->first_name($user) ?: ($user->display_name ?: '?'), 0, 1)); ?>
+			<?php /* ----- Section 1: greeting hero ----- */ ?>
+			<section class="routew-section routew-rise routew-rise-1">
+				<header class="routew-hero">
+					<div class="routew-hero__text">
+						<span class="routew-hero__eyebrow" data-routew-greeting>
+							<?php echo esc_html($this->time_greeting()); ?>
 						</span>
-						<div class="routew-profile-card__info flex-grow-1 min-w-0">
-							<h2 class="routew-profile-card__name h5 mb-1">
-								<?php
-								/* translators: %s: customer first name */
-								printf(esc_html__('%s', 'routemile-for-woocommerce'), esc_html($this->first_name($user)));
-								?>
-							</h2>
-							<p class="routew-profile-card__email mb-0 small text-secondary"><?php echo esc_html($user->user_email); ?></p>
-						</div>
-						<a class="btn btn-sm btn-outline-primary flex-shrink-0"
-						   href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>">
-							<?php esc_html_e('Edit', 'routemile-for-woocommerce'); ?>
-						</a>
+						<h2 class="routew-hero__title">
+							<?php
+							/* translators: %s: customer first name */
+							printf(esc_html__('Hi %s', 'routemile-for-woocommerce'), esc_html($first_name));
+							?>
+							<span aria-hidden="true">👋</span>
+						</h2>
+						<p class="routew-hero__sub">
+						<?php
+						if ($stats['active'] > 0) {
+							/* translators: %d: number of orders currently being delivered. */
+							printf(esc_html(_n('%d order is on its way to you.', '%d orders are on their way to you.', (int) $stats['active'], 'routemile-for-woocommerce')), (int) $stats['active']);
+							} elseif ($stats['total'] > 0) {
+								esc_html_e('Hungry again? Reorder your favourites in a tap.', 'routemile-for-woocommerce');
+							} else {
+								esc_html_e('Browse the menu and your first order will be at your door.', 'routemile-for-woocommerce');
+							}
+							?>
+						</p>
 					</div>
-				</div>
+					<span class="routew-avatar routew-avatar--lg routew-hero__avatar" aria-hidden="true">
+						<?php echo esc_html(mb_substr($first_name, 0, 1)); ?>
+					</span>
+				</header>
 			</section>
 
-			<?php /* ----- Section 2: welcome banner / reorder ----- */ ?>
+			<?php /* ----- Section 2: reorder / browse banner ----- */ ?>
 			<?php if ($last_completed || $stats['total'] === 0) : ?>
-				<section class="routew-section">
-					<header class="routew-dashboard__welcome">
-						<div class="routew-dashboard__welcome-text">
-							<span class="routew-dashboard__greeting-eyebrow">
-								<?php esc_html_e('Welcome back', 'routemile-for-woocommerce'); ?>
-							</span>
-							<h3 class="routew-dashboard__greeting">
-								<?php
-								/* translators: %s: customer first name */
-								printf(esc_html__('Hi, %s 👋', 'routemile-for-woocommerce'), esc_html($this->first_name($user)));
-								?>
-							</h3>
-							<p class="routew-dashboard__subgreeting">
-								<?php
-								if ($stats['active'] > 0) {
-									printf(esc_html(_n('You have %d order on the way.', 'You have %d orders on the way.', (int) $stats['active'], 'routemile-for-woocommerce')), (int) $stats['active']);
-								} elseif ($stats['total'] > 0) {
-									esc_html_e('Hungry again? Reorder your favourites in a tap.', 'routemile-for-woocommerce');
-								} else {
-									esc_html_e('Browse the menu and your first order is on the way to your door.', 'routemile-for-woocommerce');
-								}
-								?>
-							</p>
-						</div>
-						<?php if ($last_completed) : ?>
-							<a class="routew-dashboard__reorder"
+				<section class="routew-section routew-rise routew-rise-2">
+					<?php if ($last_completed) : ?>
+						<div class="routew-reorder-banner">
+							<div class="routew-reorder-banner__text">
+								<span class="routew-reorder-banner__title"><?php esc_html_e('Order again', 'routemile-for-woocommerce'); ?></span>
+								<span class="routew-reorder-banner__sub"><?php esc_html_e('Your last order, one tap away.', 'routemile-for-woocommerce'); ?></span>
+							</div>
+							<a class="btn routew-btn-brand routew-reorder-banner__cta"
 							   href="<?php echo esc_url(wp_nonce_url(add_query_arg('routew_reorder', $last_completed->get_id()), 'routew_reorder')); ?>">
-								<span class="routew-dashboard__reorder-icon" aria-hidden="true">↻</span>
-								<?php esc_html_e('Reorder last order', 'routemile-for-woocommerce'); ?>
+								<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg>
+								<?php esc_html_e('Reorder', 'routemile-for-woocommerce'); ?>
 							</a>
-						<?php else : ?>
-							<a class="routew-dashboard__reorder routew-dashboard__reorder--ghost"
+						</div>
+					<?php else : ?>
+						<div class="routew-reorder-banner routew-reorder-banner--ghost">
+							<div class="routew-reorder-banner__text">
+								<span class="routew-reorder-banner__title"><?php esc_html_e('Craving something?', 'routemile-for-woocommerce'); ?></span>
+								<span class="routew-reorder-banner__sub"><?php esc_html_e('The kitchen is just a few taps away.', 'routemile-for-woocommerce'); ?></span>
+							</div>
+							<a class="btn routew-btn-brand routew-reorder-banner__cta"
 							   href="<?php echo esc_url(function_exists('wc_get_page_id') ? get_permalink(wc_get_page_id('shop')) : home_url('/shop')); ?>">
-								<span class="routew-dashboard__reorder-icon" aria-hidden="true">→</span>
+								<span aria-hidden="true">→</span>
 								<?php esc_html_e('Browse menu', 'routemile-for-woocommerce'); ?>
 							</a>
-						<?php endif; ?>
-					</header>
+						</div>
+					<?php endif; ?>
 				</section>
 			<?php endif; ?>
 
-			<?php /* ----- Section 3: quick actions grid (Bootstrap row + btn-light) ----- */ ?>
-			<section class="routew-section">
-				<div class="row g-3 routew-dashboard__quick-actions">
-					<a class="col-6 col-md-3 btn btn-light routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('orders') : home_url('/my-account/orders/')); ?>">
-						<span class="routew-dashboard__quick-action__icon" aria-hidden="true">
+			<?php /* ----- Section 3: quick actions grid ----- */ ?>
+			<section class="routew-section routew-rise routew-rise-3">
+				<div class="routew-quick-actions">
+					<a class="routew-quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('orders') : home_url('/my-account/orders/')); ?>">
+						<span class="routew-tile-icon routew-tile-icon--brand" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M5 4h14v3H5zm0 5h14v3H5zm0 5h14v3H5zm0 5h14v3H5z"/></svg>
 						</span>
-						<span class="routew-dashboard__quick-action__label"><?php esc_html_e('Orders', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-quick-action__label"><?php esc_html_e('Orders', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-quick-action__hint"><?php
+						/* translators: %d: total number of orders placed. */
+						echo esc_html(sprintf(_n('%d order', '%d orders', (int) $stats['total'], 'routemile-for-woocommerce'), (int) $stats['total']));
+						?></span>
 					</a>
-					<a class="col-6 col-md-3 btn btn-light routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>">
-						<span class="routew-dashboard__quick-action__icon" aria-hidden="true">
+					<a class="routew-quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>">
+						<span class="routew-tile-icon routew-tile-icon--transit" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7Zm0 9.6A2.6 2.6 0 1 0 12 6.4a2.6 2.6 0 0 0 0 5.2Z"/></svg>
 						</span>
-						<span class="routew-dashboard__quick-action__label"><?php esc_html_e('Addresses', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-quick-action__label"><?php esc_html_e('Addresses', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-quick-action__hint"><?php
+						/* translators: %d: number of saved addresses. */
+						echo esc_html(sprintf(_n('%d saved', '%d saved', (int) $stats['addresses'], 'routemile-for-woocommerce'), (int) $stats['addresses']));
+						?></span>
 					</a>
-					<a class="col-6 col-md-3 btn btn-light routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>">
-						<span class="routew-dashboard__quick-action__icon" aria-hidden="true">
+					<a class="routew-quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>">
+						<span class="routew-tile-icon routew-tile-icon--delivered" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-8 1.7-8 5v2h16v-2c0-3.3-4.7-5-8-5Z"/></svg>
 						</span>
-						<span class="routew-dashboard__quick-action__label"><?php esc_html_e('Profile', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-quick-action__label"><?php esc_html_e('Profile', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-quick-action__hint"><?php esc_html_e('Name, email, password', 'routemile-for-woocommerce'); ?></span>
 					</a>
-					<a class="col-6 col-md-3 btn btn-light routew-dashboard__quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('payment-methods') : home_url('/my-account/payment-methods/')); ?>">
-						<span class="routew-dashboard__quick-action__icon" aria-hidden="true">
+					<a class="routew-quick-action" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('payment-methods') : home_url('/my-account/payment-methods/')); ?>">
+						<span class="routew-tile-icon routew-tile-icon--assigned" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v3H3V6a1 1 0 0 1 1-1Zm-1 6h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7Z"/></svg>
 						</span>
-						<span class="routew-dashboard__quick-action__label"><?php esc_html_e('Payments', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-quick-action__label"><?php esc_html_e('Payments', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-quick-action__hint"><?php esc_html_e('Saved cards & wallets', 'routemile-for-woocommerce'); ?></span>
 					</a>
 				</div>
 			</section>
 
-			<?php /* ----- Section 4: recent orders (iOS-style rows) ----- */ ?>
-			<section class="routew-section" aria-labelledby="routew-dashboard-recent-orders-heading">
+			<?php /* ----- Section 4: recent orders ----- */ ?>
+			<section class="routew-section routew-rise routew-rise-4" aria-labelledby="routew-dashboard-recent-orders-heading">
 				<div class="routew-section-title">
 					<h2 class="routew-section-title__label" id="routew-dashboard-recent-orders-heading">
 						<?php esc_html_e('Recent orders', 'routemile-for-woocommerce'); ?>
 					</h2>
 					<a class="routew-section-title__action"
 					   href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('orders') : home_url('/my-account/orders/')); ?>">
-						<?php esc_html_e('View all →', 'routemile-for-woocommerce'); ?>
+						<?php esc_html_e('View all', 'routemile-for-woocommerce'); ?>
 					</a>
 				</div>
 				<?php if (empty($recent_orders)) : ?>
-					<div class="card border-0 shadow-sm routew-empty-state">
-						<div class="card-body text-center py-5">
-							<div class="routew-empty-state__icon" aria-hidden="true">🛒</div>
-							<p class="routew-empty-state__title h5 mb-1"><?php esc_html_e('No orders yet', 'routemile-for-woocommerce'); ?></p>
-							<p class="routew-empty-state__text small text-secondary mb-0"><?php esc_html_e('Browse the menu and your first order will appear here.', 'routemile-for-woocommerce'); ?></p>
-						</div>
+					<div class="routew-empty">
+						<div class="routew-empty__icon" aria-hidden="true">🛒</div>
+						<p class="routew-empty__title"><?php esc_html_e('No orders yet', 'routemile-for-woocommerce'); ?></p>
+						<p class="routew-empty__text"><?php esc_html_e('Browse the menu and your first order will appear here.', 'routemile-for-woocommerce'); ?></p>
 					</div>
 				<?php else : ?>
-					<div class="card routew-ios-card routew-dashboard__orders">
+					<div class="card routew-order-list">
 						<?php foreach ($recent_orders as $order) : ?>
 							<?php $this->render_recent_order_item($order); ?>
 						<?php endforeach; ?>
@@ -318,87 +328,86 @@ class ROUTEW_My_Account
 
 			<?php /* ----- Section 5: default address ----- */ ?>
 			<?php if (!empty($default_address)) : ?>
-				<section class="routew-section" aria-labelledby="routew-dashboard-address-heading">
+				<section class="routew-section routew-rise routew-rise-5" aria-labelledby="routew-dashboard-address-heading">
 					<div class="routew-section-title">
 						<h2 class="routew-section-title__label" id="routew-dashboard-address-heading">
 							<?php esc_html_e('Default address', 'routemile-for-woocommerce'); ?>
 						</h2>
 						<a class="routew-section-title__action"
 						   href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>">
-							<?php esc_html_e('Manage →', 'routemile-for-woocommerce'); ?>
+							<?php esc_html_e('Manage', 'routemile-for-woocommerce'); ?>
 						</a>
 					</div>
-					<div class="card routew-ios-card">
-						<div class="card-body routew-ios-card__body">
-							<address class="routew-dashboard__address mb-0">
-								<span class="routew-dashboard__address-name"><?php echo esc_html($default_address['label']); ?> · <?php echo esc_html($default_address['name']); ?></span>
-								<span class="routew-dashboard__address-line d-block"><?php echo esc_html($default_address['line1']); ?></span>
-								<?php if (!empty($default_address['line2'])) : ?>
-									<span class="routew-dashboard__address-line d-block"><?php echo esc_html($default_address['line2']); ?></span>
-								<?php endif; ?>
-								<?php if (!empty($default_address['city'])) : ?>
-									<span class="routew-dashboard__address-line d-block"><?php echo esc_html($default_address['city']); ?></span>
-								<?php endif; ?>
-							</address>
+					<div class="card routew-address-card">
+						<span class="routew-tile-icon routew-tile-icon--brand" aria-hidden="true">
+							<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7Zm0 9.6A2.6 2.6 0 1 0 12 6.4a2.6 2.6 0 0 0 0 5.2Z"/></svg>
+						</span>
+						<div class="routew-address-card__body">
+							<span class="routew-address-card__name"><?php echo esc_html($default_address['name']); ?></span>
+							<span class="routew-address-card__line"><?php echo esc_html($default_address['line1']); ?></span>
+							<?php if (!empty($default_address['line2'])) : ?>
+								<span class="routew-address-card__line"><?php echo esc_html($default_address['line2']); ?></span>
+							<?php endif; ?>
+							<?php if (!empty($default_address['city'])) : ?>
+								<span class="routew-address-card__line"><?php echo esc_html($default_address['city']); ?></span>
+							<?php endif; ?>
 						</div>
 					</div>
 				</section>
 			<?php endif; ?>
 
-			<?php /* ----- Section 6: settings list (iOS-style link rows) ----- */ ?>
+			<?php /* ----- Section 6: settings list ----- */ ?>
 			<section class="routew-section" aria-labelledby="routew-dashboard-settings-heading">
-				<h2 class="routew-section-title">
-					<span class="routew-section-title__label" id="routew-dashboard-settings-heading">
+				<div class="routew-section-title">
+					<h2 class="routew-section-title__label" id="routew-dashboard-settings-heading">
 						<?php esc_html_e('Settings', 'routemile-for-woocommerce'); ?>
-					</span>
-				</h2>
-				<div class="list-group list-group-flush routew-list" role="list">
-					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('orders') : home_url('/my-account/orders/')); ?>" role="listitem">
-						<span class="routew-list-item__icon" aria-hidden="true">
+					</h2>
+				</div>
+				<div class="list-group list-group-flush routew-list">
+					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('orders') : home_url('/my-account/orders/')); ?>">
+						<span class="routew-tile-icon routew-tile-icon--brand" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M5 4h14v3H5zm0 5h14v3H5zm0 5h14v3H5zm0 5h14v3H5z"/></svg>
 						</span>
-						<div class="routew-list-item__body">
-							<span class="routew-list-item__label"><?php esc_html_e('My orders', 'routemile-for-woocommerce'); ?></span>
-							<span class="routew-list-item__hint"><?php echo esc_html(sprintf(_n('%d order', '%d orders', (int) $stats['total'], 'routemile-for-woocommerce'), (int) $stats['total'])); ?></span>
-						</div>
-						<span class="routew-list-item__chevron" aria-hidden="true">›</span>
+						<span class="routew-list-item__label"><?php esc_html_e('My orders', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-list-item__hint"><?php
+						/* translators: %d: total number of orders placed. */
+						echo esc_html(sprintf(_n('%d order', '%d orders', (int) $stats['total'], 'routemile-for-woocommerce'), (int) $stats['total']));
+						?></span>
+						<span class="routew-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9.4 18.4 8 17l5-5-5-5 1.4-1.4L15.8 12Z"/></svg></span>
 					</a>
-					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>" role="listitem">
-						<span class="routew-list-item__icon" aria-hidden="true">
+					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-address') : home_url('/my-account/edit-address/')); ?>">
+						<span class="routew-tile-icon routew-tile-icon--transit" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7Zm0 9.6A2.6 2.6 0 1 0 12 6.4a2.6 2.6 0 0 0 0 5.2Z"/></svg>
 						</span>
-						<div class="routew-list-item__body">
-							<span class="routew-list-item__label"><?php esc_html_e('Saved addresses', 'routemile-for-woocommerce'); ?></span>
-							<span class="routew-list-item__hint"><?php echo esc_html(sprintf(_n('%d saved', '%d saved', (int) $stats['addresses'], 'routemile-for-woocommerce'), (int) $stats['addresses'])); ?></span>
-						</div>
-						<span class="routew-list-item__chevron" aria-hidden="true">›</span>
+						<span class="routew-list-item__label"><?php esc_html_e('Saved addresses', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-list-item__hint"><?php
+						/* translators: %d: number of saved addresses. */
+						echo esc_html(sprintf(_n('%d saved', '%d saved', (int) $stats['addresses'], 'routemile-for-woocommerce'), (int) $stats['addresses']));
+						?></span>
+						<span class="routew-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9.4 18.4 8 17l5-5-5-5 1.4-1.4L15.8 12Z"/></svg></span>
 					</a>
-					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>" role="listitem">
-						<span class="routew-list-item__icon" aria-hidden="true">
+					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('edit-account') : home_url('/my-account/edit-account/')); ?>">
+						<span class="routew-tile-icon routew-tile-icon--delivered" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-8 1.7-8 5v2h16v-2c0-3.3-4.7-5-8-5Z"/></svg>
 						</span>
-						<div class="routew-list-item__body">
-							<span class="routew-list-item__label"><?php esc_html_e('Personal information', 'routemile-for-woocommerce'); ?></span>
-							<span class="routew-list-item__hint"><?php echo esc_html__('Profile, email, password', 'routemile-for-woocommerce'); ?></span>
-						</div>
-						<span class="routew-list-item__chevron" aria-hidden="true">›</span>
+						<span class="routew-list-item__label"><?php esc_html_e('Personal information', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-list-item__hint"><?php esc_html_e('Profile, email, password', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9.4 18.4 8 17l5-5-5-5 1.4-1.4L15.8 12Z"/></svg></span>
 					</a>
-					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('payment-methods') : home_url('/my-account/payment-methods/')); ?>" role="listitem">
-						<span class="routew-list-item__icon" aria-hidden="true">
+					<a class="list-group-item list-group-item-action routew-list-item" href="<?php echo esc_url(function_exists('wc_get_endpoint_url') ? wc_get_endpoint_url('payment-methods') : home_url('/my-account/payment-methods/')); ?>">
+						<span class="routew-tile-icon routew-tile-icon--assigned" aria-hidden="true">
 							<svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v3H3V6a1 1 0 0 1 1-1Zm-1 6h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7Z"/></svg>
 						</span>
-						<div class="routew-list-item__body">
-							<span class="routew-list-item__label"><?php esc_html_e('Payment methods', 'routemile-for-woocommerce'); ?></span>
-							<span class="routew-list-item__hint"><?php esc_html_e('Saved cards & wallets', 'routemile-for-woocommerce'); ?></span>
-						</div>
-						<span class="routew-list-item__chevron" aria-hidden="true">›</span>
+						<span class="routew-list-item__label"><?php esc_html_e('Payment methods', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-list-item__hint"><?php esc_html_e('Saved cards & wallets', 'routemile-for-woocommerce'); ?></span>
+						<span class="routew-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9.4 18.4 8 17l5-5-5-5 1.4-1.4L15.8 12Z"/></svg></span>
 					</a>
 				</div>
 			</section>
 
 			<?php /* ----- Section 7: sign out ----- */ ?>
 			<section class="routew-section">
-				<a class="btn btn-lg btn-light w-100 d-inline-flex align-items-center justify-content-center gap-2 routew-signout" href="<?php echo esc_url(wp_logout_url(get_permalink())); ?>">
+				<a class="btn routew-btn-signout w-100" href="<?php echo esc_url(wp_logout_url(get_permalink())); ?>">
 					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17v-2H5V9h5V7l-6 5Zm5-13h-6v2h6v12h-6v2h6a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z"/></svg>
 					<?php esc_html_e('Sign out', 'routemile-for-woocommerce'); ?>
 				</a>
@@ -409,7 +418,7 @@ class ROUTEW_My_Account
 	}
 
 	/**
-	 * Render a single recent-order item row.
+	 * Render a single recent-order row inside the shared order list card.
 	 *
 	 * @param WC_Order $order Order object.
 	 * @return void
@@ -418,72 +427,113 @@ class ROUTEW_My_Account
 	private function render_recent_order_item($order)
 	{
 		$status = $order->get_status();
-		$label = wc_get_order_status_name($status);
-		$pill_class = $this->status_pill_class($status);
+		$pill = $this->order_status_pill($status);
 		$item_count = $order->get_item_count();
 		$total = $order->get_formatted_order_total();
 		$date = $order->get_date_created();
 		$date_str = $date ? $date->date_i18n(get_option('date_format')) : '';
 		$order_url = $order->get_view_order_url();
-
+		$summary = $this->order_item_summary($order);
 		?>
-		<ul class="routew-dashboard__orders-list list-unstyled mb-0">
-			<li class="routew-dashboard__orders-item">
-			<div class="routew-dashboard__order-meta">
-				<a class="routew-dashboard__order-number" href="<?php echo esc_url($order_url); ?>">
+		<a class="routew-order-row routew-order-row--<?php echo esc_attr($pill[0]); ?>" href="<?php echo esc_url($order_url); ?>">
+			<div class="routew-order-row__main">
+				<span class="routew-order-row__number">
 					<?php
 					/* translators: %d: order number */
-					printf(esc_html__('#%d', 'routemile-for-woocommerce'), (int) $order->get_order_number());
+					printf(esc_html__('Order #%d', 'routemile-for-woocommerce'), (int) $order->get_order_number());
 					?>
-				</a>
-				<span class="routew-dashboard__order-date">
+				</span>
+				<?php if ('' !== $summary) : ?>
+					<span class="routew-order-row__summary"><?php echo esc_html($summary); ?></span>
+				<?php endif; ?>
+				<span class="routew-order-row__meta">
 					<?php echo esc_html($date_str); ?>
 					<?php if ($item_count) : ?>
-						<span class="text-secondary">
-							<?php
-							/* translators: %d: item count */
-							printf(esc_html(_n('· %d item', '· %d items', (int) $item_count, 'routemile-for-woocommerce')), (int) $item_count);
-							?>
-						</span>
+						<?php
+						/* translators: %d: item count */
+						printf(esc_html(_n('· %d item', '· %d items', (int) $item_count, 'routemile-for-woocommerce')), (int) $item_count);
+						?>
 					<?php endif; ?>
 				</span>
 			</div>
-			<span class="badge routew-dashboard__status-pill <?php echo esc_attr($pill_class); ?>">
-				<?php echo esc_html($label); ?>
-			</span>
-			<span class="routew-dashboard__order-total"><?php echo wp_kses_post($total); ?></span><span class="routew-dashboard__order-chevron" aria-hidden="true">&#8250;</span>
-		</li>
-		</ul>
+			<div class="routew-order-row__side">
+				<span class="routew-pill routew-pill--<?php echo esc_attr($pill[0]); ?>">
+					<?php echo esc_html($pill[1]); ?>
+				</span>
+				<span class="routew-order-row__total"><?php echo wp_kses_post($total); ?></span>
+			</div>
+			<span class="routew-chevron routew-order-row__chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9.4 18.4 8 17l5-5-5-5 1.4-1.4L15.8 12Z"/></svg></span>
+		</a>
 		<?php
 	}
 
 	/**
-	 * Map a WC order status to a Bootstrap 5.3 utility class for status pills.
+	 * Map a WC order status to a delivery-native pill variant + label.
 	 *
-	 * Returns the tail of a `.text-bg-{variant}` Bootstrap utility, which we
-	 * compose with `.badge` + `.routew-dashboard__status-pill` in the markup.
-	 * Bootstrap variants: success / info / warning / danger / secondary / primary.
+	 * The pill vocabulary lives in the shared design system
+	 * (tools/ui/scss/_components.scss): placed / preparing / assigned /
+	 * transit / delivered / cancelled. Labels and colours come from
+	 * ROUTEW_Stage_Labels so an admin rename ("Sent to kitchen",
+	 * "Out for delivery") mirrors onto the customer dashboard, while
+	 * statuses outside the delivery flow fall back to WooCommerce's
+	 * own translated names.
 	 *
 	 * @param string $status Order status slug (e.g. "processing", "routew-in-kitchen").
-	 * @return string Bootstrap text-bg-* utility suffix (e.g. "text-bg-info").
+	 * @return array{0:string,1:string} Pill variant + label.
 	 * @since 1.4.0
-	 * @since 1.5.0 Returns Bootstrap utility class instead of bespoke modifier.
+	 * @since 1.6.0 Delivery-native labels + tinted pill variants (replaces Bootstrap text-bg-* pills).
+	 * @since 1.6.0 Admin-renameable via ROUTEW_Stage_Labels.
 	 */
-	private function status_pill_class($status)
+	private function order_status_pill($status)
 	{
-		$map = array(
-			'pending'            => 'text-bg-secondary',
-			'on-hold'            => 'text-bg-secondary',
-			'processing'         => 'text-bg-info',
-			'routew-in-kitchen'  => 'text-bg-primary',
-			'routew-assigned'    => 'text-bg-warning',
-			'routew-picked-up'   => 'text-bg-info',
-			'completed'          => 'text-bg-success',
-			'cancelled'          => 'text-bg-danger',
-			'refunded'           => 'text-bg-secondary',
-			'failed'             => 'text-bg-danger',
-		);
-		return isset($map[$status]) ? $map[$status] : 'text-bg-secondary';
+		return array(ROUTEW_Stage_Labels::status_colour($status), ROUTEW_Stage_Labels::status_label($status));
+	}
+
+	/**
+	 * One-line order summary for the recent-orders row — the first item
+	 * name plus overflow ("Chicken Biryani ×2 +2 more"), the way every
+	 * food app shows it.
+	 *
+	 * @param WC_Order $order Order object.
+	 * @return string Summary, '' when the order has no items left.
+	 * @since 1.6.0
+	 */
+	private function order_item_summary($order)
+	{
+		$items = array_values($order->get_items());
+		if (empty($items)) {
+			return '';
+		}
+		$first = $items[0];
+		$summary = $first->get_name();
+		$qty = $first->get_quantity();
+		if ($qty > 1) {
+			/* translators: %d: quantity */
+			$summary .= ' ' . sprintf(__('×%d', 'routemile-for-woocommerce'), (int) $qty);
+		}
+		if (count($items) > 1) {
+			/* translators: %d: remaining item count */
+			$summary .= ' ' . sprintf(__('+%d more', 'routemile-for-woocommerce'), count($items) - 1);
+		}
+		return $summary;
+	}
+
+	/**
+	 * Time-aware greeting for the dashboard hero.
+	 *
+	 * @return string "Good morning" / "Good afternoon" / "Good evening".
+	 * @since 1.6.0
+	 */
+	private function time_greeting()
+	{
+		$hour = (int) current_time('H');
+		if ($hour < 12) {
+			return __('Good morning', 'routemile-for-woocommerce');
+		}
+		if ($hour < 17) {
+			return __('Good afternoon', 'routemile-for-woocommerce');
+		}
+		return __('Good evening', 'routemile-for-woocommerce');
 	}
 
 	/**
@@ -668,13 +718,10 @@ class ROUTEW_My_Account
 		);
 
 		$chosen = null;
-		$label  = '';
 		if (!empty($shipping['line1'])) {
 			$chosen = $shipping;
-			$label  = __('Shipping', 'routemile-for-woocommerce');
 		} elseif (!empty($billing['line1'])) {
 			$chosen = $billing;
-			$label  = __('Billing', 'routemile-for-woocommerce');
 		} else {
 			return array();
 		}
@@ -688,7 +735,6 @@ class ROUTEW_My_Account
 		}
 
 		return array(
-			'label' => $label,
 			'name'  => $name,
 			'line1' => (string) $chosen['line1'],
 			'line2' => (string) $chosen['line2'],

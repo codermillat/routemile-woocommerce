@@ -184,44 +184,56 @@ class ROUTEW_Checkout
 
         self::render_location_picker();
         ?>
-        <div id="routew-delivery-details-container" style="margin-top: 20px;">
-            <h3><?php esc_html_e('Step 2: Enter Your Delivery Details', 'routemile-for-woocommerce'); ?></h3>
-            <p><?php esc_html_e('Please provide complete details to help our delivery agent find you easily.', 'routemile-for-woocommerce'); ?>
-            </p>
+        <div id="routew-delivery-details-container" class="routew-ui routew-checkout-card routew-checkout-card--details">
+            <div class="card-body routew-checkout-card__body">
+                <div class="routew-checkout-step">
+                    <span class="routew-checkout-step__num" aria-hidden="true">2</span>
+                    <div class="routew-checkout-step__text">
+                        <h3 class="routew-checkout-step__title"><?php esc_html_e('Address details', 'routemile-for-woocommerce'); ?></h3>
+                        <p class="routew-checkout-step__sub"><?php esc_html_e('Help your rider find the exact door.', 'routemile-for-woocommerce'); ?></p>
+                    </div>
+                </div>
 
-            <?php
-            // Exact delivery address — single line, Zomato/Swiggy-style:
-            // everything the agent needs to find the door (flat, house,
-            // building, block) in one required field next to the map pin.
-            woocommerce_form_field('routew_address_details', array(
-                'type' => 'text',
-                'class' => array('form-row-wide'),
-                'label' => __('House / Flat / Building No.', 'routemile-for-woocommerce'),
-                'placeholder' => __('e.g., Flat 4B, House 25, Tower A, Block 2', 'routemile-for-woocommerce'),
-                'required' => true,
-            ), isset($saved_profile['address_details']) ? $saved_profile['address_details'] : WC()->checkout->get_value('routew_address_details'));
+                <?php
+                // Exact delivery address — single line, Zomato/Swiggy-style:
+                // everything the agent needs to find the door (flat, house,
+                // building, block) in one required field next to the map pin.
+                woocommerce_form_field('routew_address_details', array(
+                    'type' => 'text',
+                    'class' => array('form-row-wide'),
+                    'label_class' => array('form-label'),
+                    'input_class' => array('form-control'),
+                    'label' => __('House / Flat / Building No.', 'routemile-for-woocommerce'),
+                    'placeholder' => __('e.g., Flat 4B, House 25, Tower A, Block 2', 'routemile-for-woocommerce'),
+                    'required' => true,
+                ), isset($saved_profile['address_details']) ? $saved_profile['address_details'] : WC()->checkout->get_value('routew_address_details'));
 
-            // Landmark - Optional but helpful
-            woocommerce_form_field('routew_landmark', array(
-                'type' => 'text',
-                'class' => array('form-row-wide'),
-                'label' => __('Nearby Landmark (optional)', 'routemile-for-woocommerce'),
-                'placeholder' => __('e.g., Near City Mall, Opposite Park', 'routemile-for-woocommerce'),
-                'required' => false,
-            ), isset($saved_profile['landmark']) ? $saved_profile['landmark'] : WC()->checkout->get_value('routew_landmark'));
+                // Landmark - Optional but helpful
+                woocommerce_form_field('routew_landmark', array(
+                    'type' => 'text',
+                    'class' => array('form-row-wide'),
+                    'label_class' => array('form-label'),
+                    'input_class' => array('form-control'),
+                    'label' => __('Nearby Landmark (optional)', 'routemile-for-woocommerce'),
+                    'placeholder' => __('e.g., Near City Mall, Opposite Park', 'routemile-for-woocommerce'),
+                    'required' => false,
+                ), isset($saved_profile['landmark']) ? $saved_profile['landmark'] : WC()->checkout->get_value('routew_landmark'));
 
-            // Delivery Instructions - Optional
-            woocommerce_form_field('routew_delivery_instructions', array(
-                'type' => 'textarea',
-                'class' => array('form-row-wide'),
-                'label' => __('Delivery Instructions', 'routemile-for-woocommerce'),
-                'placeholder' => __('e.g., Ring the bell twice, Leave at the door, Call before arriving...', 'routemile-for-woocommerce'),
-                'required' => false,
-                'custom_attributes' => array(
-                    'rows' => 2,
-                ),
-            ), isset($saved_profile['delivery_instructions']) ? $saved_profile['delivery_instructions'] : WC()->checkout->get_value('routew_delivery_instructions'));
-            ?>
+                // Delivery Instructions - Optional
+                woocommerce_form_field('routew_delivery_instructions', array(
+                    'type' => 'textarea',
+                    'class' => array('form-row-wide'),
+                    'label_class' => array('form-label'),
+                    'input_class' => array('form-control'),
+                    'label' => __('Delivery Instructions', 'routemile-for-woocommerce'),
+                    'placeholder' => __('e.g., Ring the bell twice, Leave at the door, Call before arriving...', 'routemile-for-woocommerce'),
+                    'required' => false,
+                    'custom_attributes' => array(
+                        'rows' => 2,
+                    ),
+                ), isset($saved_profile['delivery_instructions']) ? $saved_profile['delivery_instructions'] : WC()->checkout->get_value('routew_delivery_instructions'));
+                ?>
+            </div>
         </div>
         <?php
     }
@@ -241,30 +253,47 @@ class ROUTEW_Checkout
     {
         ob_start();
         ?>
-        <div id="routew-location-picker-container">
-            <h3><?php esc_html_e('Step 1: Select Your Location on Map', 'routemile-for-woocommerce'); ?></h3>
-            <p><?php esc_html_e('Search for your area, use current location, or drag the marker to set your exact delivery point.', 'routemile-for-woocommerce'); ?>
-            </p>
+        <div id="routew-location-picker-container" class="routew-ui routew-checkout-card routew-checkout-card--location">
+            <div class="card-body routew-checkout-card__body">
+                <div class="routew-checkout-step">
+                    <span class="routew-checkout-step__num" aria-hidden="true">1</span>
+                    <div class="routew-checkout-step__text">
+                        <h3 class="routew-checkout-step__title"><?php esc_html_e('Where should we deliver?', 'routemile-for-woocommerce'); ?></h3>
+                        <p class="routew-checkout-step__sub"><?php esc_html_e('Search your area, use your location, or drag the pin to set the exact drop point.', 'routemile-for-woocommerce'); ?></p>
+                    </div>
+                </div>
 
-            <div class="routew-location-search-wrapper">
-                <input id="routew-location-search-input" type="text"
-                    placeholder="<?php esc_attr_e('Search for your area or landmark...', 'routemile-for-woocommerce'); ?>" class="input-text"
-                    value="" />
-                <a href="#" id="routew-get-location" class="button"><?php esc_html_e('Use My Location', 'routemile-for-woocommerce'); ?></a>
+                <div class="routew-location-search-wrapper">
+                    <svg class="routew-location-search-wrapper__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19Zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14Z"/></svg>
+                    <input id="routew-location-search-input" type="text"
+                        placeholder="<?php esc_attr_e('Search area or landmark…', 'routemile-for-woocommerce'); ?>" class="form-control"
+                        value="" />
+                    <button type="button" id="routew-get-location" class="btn routew-locate-btn">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm8.94 3A9 9 0 0 0 13 3.06V1h-2v2.06A9 9 0 0 0 3.06 11H1v2h2.06A9 9 0 0 0 11 20.94V23h2v-2.06A9 9 0 0 0 20.94 13H23v-2ZM12 19a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z"/></svg>
+                        <span class="routew-locate-btn__label"><?php esc_html_e('Locate me', 'routemile-for-woocommerce'); ?></span>
+                    </button>
+                </div>
+
+                <div class="routew-map-shell">
+                    <div id="routew-map" class="routew-map" role="application" aria-label="<?php esc_attr_e('Delivery location map', 'routemile-for-woocommerce'); ?>"></div>
+                </div>
+
+                <!-- Display selected location (read-only, from map). Kept as
+                     display:none — checkout.js reveals it with slideDown(). -->
+                <div id="routew-selected-location" class="routew-location-confirm" style="display:none;">
+                    <span class="routew-location-confirm__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+                    </span>
+                    <div class="routew-location-confirm__body">
+                        <span class="routew-location-confirm__label"><?php esc_html_e('Delivering to', 'routemile-for-woocommerce'); ?></span>
+                        <span id="routew-selected-address" class="routew-location-confirm__address"></span>
+                    </div>
+                </div>
+
+                <!-- Hidden fields for POST fallback when session is empty (populated by checkout.js) -->
+                <input type="hidden" name="routew_lat" id="routew_lat" value="" />
+                <input type="hidden" name="routew_lng" id="routew_lng" value="" />
             </div>
-
-            <div id="routew-map" style="height: 300px; margin: 20px 0;"></div>
-
-            <!-- Display selected location (read-only, from map) -->
-            <div id="routew-selected-location" class="routew-selected-location"
-                style="display:none; padding: 10px; background: #f8f9fa; border-left: 3px solid #28a745; margin-bottom: 20px;">
-                <strong><?php esc_html_e('Selected Location:', 'routemile-for-woocommerce'); ?></strong>
-                <span id="routew-selected-address"></span>
-            </div>
-
-            <!-- Hidden fields for POST fallback when session is empty (populated by checkout.js) -->
-            <input type="hidden" name="routew_lat" id="routew_lat" value="" />
-            <input type="hidden" name="routew_lng" id="routew_lng" value="" />
         </div>
         <?php
         $markup = ob_get_clean();

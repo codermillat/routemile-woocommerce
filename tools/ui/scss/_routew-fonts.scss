@@ -1,0 +1,16 @@
+//
+// RouteMile UI — @font-face for the bundled variable font.
+//
+// "RouteMile Sans" = Plus Jakarta Sans (SIL OFL 1.1, bundled at
+// assets/fonts/routew-sans-var.woff2, license alongside). Self-hosted:
+// no external font CDN, no PII leak, GPL-compatible license.
+// Weight axis 400–800 in a single 27 KB file.
+//
+
+@font-face {
+	font-family: 'RouteMile Sans';
+	font-style: normal;
+	font-weight: 400 800;
+	font-display: swap;
+	src: url('../fonts/routew-sans-var.woff2') format('woff2');
+}

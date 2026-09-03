@@ -81,6 +81,15 @@ class ROUTEW_Core
 		require_once ROUTEW_PLUGIN_DIR . 'includes/class-routew-privacy.php';
 		require_once ROUTEW_PLUGIN_DIR . 'includes/class-routew-store-hours.php';
 		require_once ROUTEW_PLUGIN_DIR . 'includes/class-routew-pricing.php';
+		// Stage labels are read on every render surface (agent PWA card,
+		// tracking stepper, my-account pills, WC status dropdown), so the
+		// helper must load on all requests — not only admin.
+		require_once ROUTEW_PLUGIN_DIR . 'includes/class-routew-stage-labels.php';
+		// Brand color helper: derives the design-system ramp from the
+		// admin-picked hex. Loaded on every request — the settings
+		// fields register on admin screens (routew_settings_register_extra_fields)
+		// while the inline style prints on frontend enqueues.
+		require_once ROUTEW_PLUGIN_DIR . 'includes/class-routew-brand-color.php';
 		// Address simplification hooks the country-locale filter, which the
 		// Store API also consults for admin-created and REST orders — so it
 		// must load on every request, not only the frontend.
@@ -161,21 +170,21 @@ class ROUTEW_Core
 			return;
 		}
 
-		// Bootstrap 5.3 self-hosted at assets/vendor/bootstrap/. Same handle
-		// ('routew-bootstrap') is also used by the my-account enqueue site so
-		// WP dedupes the request and serves the file from the page cache once.
-		// Loaded as a dep of the agent CSS so it always precedes the override
-		// layer that sets the brand --bs-* tokens. (UI-OVERHAUL BATCH 1)
+		// Scoped Bootstrap design system (assets/css/routew-ui.css). Every
+		// rule is prefixed with .routew-ui so it cannot leak outside the
+		// plugin's own markup — the agent PWA is a full-page takeover, but
+		// the same build is shared with the my-account surface via the
+		// 'routew-ui' handle so it stays consistent and cache-friendly.
 		wp_enqueue_style(
-			'routew-bootstrap',
-			plugin_dir_url(__FILE__) . '../assets/vendor/bootstrap/bootstrap.min.css',
+			'routew-ui',
+			plugin_dir_url(__FILE__) . '../assets/css/routew-ui.css',
 			array(),
 			$this->version
 		);
 		wp_enqueue_style(
 			'routew-delivery-dashboard',
 			plugin_dir_url(__FILE__) . '../assets/css/delivery-dashboard.css',
-			array('routew-bootstrap'),
+			array('routew-ui'),
 			$this->version
 		);
 		wp_enqueue_script('routew-delivery-dashboard', plugin_dir_url(__FILE__) . '../assets/js/delivery-dashboard.js', array('jquery'), $this->version, true);
@@ -202,9 +211,11 @@ class ROUTEW_Core
 				'picked_up_toast' => __('Order picked up', 'routemile-for-woocommerce'),
 				'delivered_toast' => __('Order delivered. Great job!', 'routemile-for-woocommerce'),
 				'settled_toast' => __('Hand-over request sent — waiting for manager approval', 'routemile-for-woocommerce'),
-				'settle_confirm' => __('Send this cash hand-over to the manager for approval?', 'routemile-for-woocommerce'),
-				'settle_confirm_amount' => __('Send {amount} hand-over request to the manager for approval?', 'routemile-for-woocommerce'),
-			),
+			'settle_confirm' => __('Send this cash hand-over to the manager for approval?', 'routemile-for-woocommerce'),
+			'settle_confirm_amount' => __('Send {amount} hand-over request to the manager for approval?', 'routemile-for-woocommerce'),
+			'cash_to_collect' => __('Cash to collect: {total} across {count} COD order(s)', 'routemile-for-woocommerce'),
+			'holding' => __('You are holding {amount} of the store\'s cash.', 'routemile-for-woocommerce'),
+		),
 		));
 	}
 

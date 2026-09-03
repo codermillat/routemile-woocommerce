@@ -1,0 +1,1456 @@
+//
+// RouteMile — My Account shell.
+//
+// Everything around the account: the two-column layout (nav rail +
+// content), the account navigation, sub-page header + profile card,
+// filter chips, and WooCommerce's own endpoint markup (orders table,
+// address / account forms, payment methods) inside the .routew-ui scope.
+//
+// Loaded on every account page (see ROUTEW_Shortcodes::enqueue_scripts);
+// dashboard-widget styling lives in my-account-dashboard.css.
+//
+// NOTE: the account nav sits OUTSIDE the .routew-ui scope (it is WC's
+// own markup above the content column), so these rules are plain CSS —
+// no Bootstrap utilities — driven directly by the design tokens.
+//
+
+@import "tokens";
+
+// ---------------------------------------------------------------------------
+// Layout — nav rail + content column
+// ---------------------------------------------------------------------------
+.woocommerce-account.routew-my-account-styled {
+
+	// Paint the food-app canvas: warm peach-cream with a soft brand wash at
+	// the top. The theme's own header/footer keep their backgrounds — this
+	// only shows through the page body.
+	background:
+		radial-gradient(90% 340px at 50% -60px, color-mix(in srgb, var(--rm-brand) 7%, transparent) 0%, color-mix(in srgb, var(--rm-brand) 0%, transparent) 70%),
+		var(--rm-canvas);
+
+	.woocommerce {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.75rem;
+		align-items: flex-start;
+	}
+
+	.woocommerce-MyAccount-navigation {
+		flex: 0 0 240px;
+		max-width: 240px;
+		width: 100%;
+	}
+
+	.woocommerce-MyAccount-content {
+		flex: 1 1 320px;
+		min-width: 0;
+	}
+
+	@media (max-width: 782px) {
+		.woocommerce {
+			flex-direction: column;
+		}
+
+		.woocommerce-MyAccount-navigation {
+			flex: 1 1 auto;
+			max-width: none;
+		}
+
+		// Reserve space at the bottom of the page so the last content
+		// isn't hidden behind the fixed bottom nav (nav ~ 60px +
+		// safe-area-inset-bottom, padded a little).
+		padding-bottom: calc(64px + env(safe-area-inset-bottom));
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Account navigation — icon rail (desktop) / scroll pills (mobile)
+// ---------------------------------------------------------------------------
+.woocommerce-account.routew-my-account-styled .woocommerce-MyAccount-navigation {
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: .625rem;
+		background: $rm-surface;
+		border: 1px solid $rm-line;
+		border-radius: $rm-radius-card;
+		box-shadow: $rm-shadow-card;
+		display: flex;
+		flex-direction: column;
+		gap: .1875rem;
+	}
+
+	li {
+		margin: 0;
+
+		a {
+			position: relative;
+			display: flex;
+			align-items: center;
+			gap: .6875rem;
+			padding: .6875rem .875rem;
+			border-radius: $rm-radius-field;
+			font-size: .875rem;
+			font-weight: 600;
+			color: $rm-body;
+			text-decoration: none;
+			transition: background .14s ease-out, color .14s ease-out;
+
+			// Icon per endpoint (WC ships .woocommerce-MyAccount-navigation-link--{slug})
+			&::before {
+				content: "";
+				width: 1.25rem;
+				height: 1.25rem;
+				flex: 0 0 auto;
+				background-color: $rm-muted;
+				-webkit-mask: var(--routew-nav-icon) center/contain no-repeat;
+				mask: var(--routew-nav-icon) center/contain no-repeat;
+			}
+
+			&:hover {
+				background: $rm-wash;
+				color: $rm-ink;
+
+				&::before {
+					background-color: $rm-ink;
+				}
+			}
+		}
+
+		&.is-active {
+			a {
+				background: var(--rm-brand-soft);
+				color: var(--rm-brand-strong);
+				font-weight: 700;
+
+				&::before {
+					background-color: var(--rm-brand-strong);
+				}
+
+				// brand indicator bar on the rail's left edge
+				&::after {
+					content: "";
+					position: absolute;
+					left: -.625rem;
+					top: 20%;
+					bottom: 20%;
+					width: 3.5px;
+					border-radius: 0 4px 4px 0;
+					background: var(--rm-brand);
+				}
+			}
+		}
+	}
+
+	// Fallback icon — every nav link gets one so the icon-only mobile
+	// bottom bar never renders a blank button. Endpoints without a
+	// specific glyph (third-party plugins adding Subscriptions, Wishlist,
+	// loyalty endpoints, …) fall back to this generic link badge; the
+	// endpoint rules below override it.
+	li a {
+		--routew-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10.6 13.4a1 1 0 0 1 0-1.4l4.6-4.6L13 5.6 8.4 10.2a3 3 0 0 0 0 4.2l4.6 4.6 2.2-1.8-4.6-4.6a1 1 0 0 1 0-.2Z'/%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16Z'/%3E%3C/svg%3E");
+	}
+
+	// Endpoint icons
+	.woocommerce-MyAccount-navigation-link--dashboard a {
+		--routew-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z'/%3E%3C/svg%3E");
+	}
+
+	.woocommerce-MyAccount-navigation-link--orders a {
+		--routew-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 4h14v3H5zm0 5h14v3H5zm0 5h14v3H5zm0 5h14v3H5z'/%3E%3C/svg%3E");
+	}
+
+	.woocommerce-MyAccount-navigation-link--edit-address a {
+		--routew-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7Zm0 9.6A2.6 2.6 0 1 0 12 6.4a2.6 2.6 0 0 0 0 5.2Z'/%3E%3C/svg%3E");
+	}
+
+	.woocommerce-MyAccount-navigation-link--edit-account a {
+		--routew-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-8 1.7-8 5v2h16v-2c0-3.3-4.7-5-8-5Z'/%3E%3C/svg%3E");
+	}
+
+	.woocommerce-MyAccount-navigation-link--payment-methods a {
+		--routew-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5h16a1 1 0 0 1 1 1v3H3V6a1 1 0 0 1 1-1Zm-1 6h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7Zm3 3v2h5v-2H6Z'/%3E%3C/svg%3E");
+	}
+
+	.woocommerce-MyAccount-navigation-link--customer-logout a {
+		--routew-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 17v-2H5V9h5V7l-6 5Zm5-13h-6v2h6v12h-6v2h6a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z'/%3E%3C/svg%3E");
+	}
+
+	// Mobile: fixed bottom tab bar (icons only) — the same WC nav rail
+	// becomes a native-app bottom bar, no text labels, just the endpoint
+	// icon. Safe-area aware for notched devices.
+	@media (max-width: 782px) {
+		// Pin the nav to the bottom of the viewport
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 50;
+		flex: none; // override the desktop flex sizing
+		max-width: none;
+		width: 100%;
+
+		ul {
+			display: flex;
+			flex-direction: row;
+			gap: 0;
+			padding: .4375rem 0 calc(.4375rem + env(safe-area-inset-bottom));
+			background: $rm-surface;
+			border: none;
+			border-top: 1px solid $rm-line;
+			border-radius: 0;
+			box-shadow: 0 -6px 24px rgba(28, 25, 23, .08);
+			overflow: visible;
+			margin: 0;
+		}
+
+		li {
+			flex: 1 1 0;
+			margin: 0;
+		}
+
+		li a {
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: .25rem;
+			padding: .4375rem .125rem;
+			border-radius: .625rem;
+			background: transparent;
+			color: $rm-muted;
+			font-size: 0; // hide the label — icon-only nav
+			line-height: 1;
+			text-align: center;
+			min-height: 52px; // thumb-friendly target
+
+			&::before {
+				display: block;
+				width: 1.375rem;
+				height: 1.375rem;
+				background-color: $rm-muted;
+				margin: 0;
+			}
+		}
+
+		li.is-active a {
+			background: var(--rm-brand-soft);
+			color: var(--rm-brand-strong);
+
+			// The desktop rule draws a brand bar at left:-10px — inside the
+			// bottom bar it would stick outside the rounded pill. Replace it
+			// with a small centered top tick, native-tab style.
+			&::after {
+				left: 50%;
+				transform: translateX(-50%);
+				top: .1875rem;
+				bottom: auto;
+				width: 1.25rem;
+				height: 3px;
+				border-radius: 0 0 4px 4px;
+				background: var(--rm-brand);
+			}
+
+			&::before {
+				background-color: var(--rm-brand-strong);
+			}
+		}
+	}
+}
+
+
+// Everything below renders inside the .routew-ui account scope — wrapping
+// gives component rules parity with scoped Bootstrap (specificity + order).
+.routew-ui {
+// ---------------------------------------------------------------------------
+// Content column — shared rhythm
+// ---------------------------------------------------------------------------
+// The scope wrapper carries .routew-account itself, so it must be matched
+// with `&.routew-account` (same-element) — a plain `.routew-account`
+// descendant selector would never match after the .routew-ui prefix.
+&.routew-account {
+	font-size: .9375rem;
+}
+
+.routew-section {
+	margin-bottom: 1.75rem;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+// WC's dashboard.php prints its OWN greeting ("Hello user (not user?
+// Log out)") AND the dashboard description paragraph ("From your account
+// dashboard you can view your recent orders…") before our widgets render.
+// The greeting hero replaces both — hide every <p> the core template
+// prints before the .routew-dashboard section. The wrapper carries
+// .routew-account--dashboard on the dashboard root only (see
+// open_account_ui_scope), so sub-page content is untouched.
+&.routew-account--dashboard > p {
+	display: none;
+}
+
+// Section titles inside the scope get a brand accent tick — the food-app
+// "block header" rhythm. The shared component already sets the row; this
+// layer strengthens it for the account surfaces.
+.routew-section-title {
+	&__label {
+		display: inline-flex;
+		align-items: center;
+		gap: .5rem;
+		font-size: 1.125rem;
+
+		// brand tick
+		&::before {
+			content: "";
+			width: 4px;
+			height: 1.0625rem;
+			border-radius: 2px;
+			background: linear-gradient(180deg, var(--rm-brand) 0%, var(--rm-brand-strong) 100%);
+			flex: 0 0 auto;
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Sub-page header — back button + title
+// ---------------------------------------------------------------------------
+.routew-subpage-header {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	margin-bottom: 1.25rem;
+
+	&__back {
+		display: inline-grid;
+		place-items: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 50%;
+		background: $rm-surface;
+		border: 1px solid $rm-line;
+		color: $rm-ink;
+		text-decoration: none;
+		transition: background .14s ease-out, border-color .14s ease-out;
+
+		svg {
+			width: 1.125rem;
+			height: 1.125rem;
+			fill: currentColor;
+		}
+
+		&:hover {
+			background: $rm-wash;
+			border-color: #D6D3D1;
+			color: $rm-ink;
+		}
+	}
+
+	&__title {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: $rm-ink;
+		letter-spacing: -.015em;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Profile card (edit-account)
+// ---------------------------------------------------------------------------
+.routew-subpage-profile {
+	display: flex;
+	align-items: center;
+	gap: .875rem;
+	background: $rm-surface;
+	border: 1px solid $rm-line;
+	border-radius: $rm-radius-card;
+	box-shadow: $rm-shadow-card;
+	padding: 1.125rem 1.25rem;
+	margin-bottom: 1.5rem;
+
+	&__name {
+		display: block;
+		font-size: 1rem;
+		font-weight: 700;
+		color: $rm-ink;
+	}
+
+	&__email {
+		display: block;
+		font-size: .8438rem;
+		color: $rm-muted;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Orders filter chips
+// ---------------------------------------------------------------------------
+.routew-orders-filter {
+	display: flex;
+	gap: .375rem;
+	overflow-x: auto;
+	padding: .25rem .125rem .625rem;
+	margin-bottom: .875rem;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	&__chip {
+		display: inline-flex;
+		align-items: center;
+		padding: .4375rem .9375rem;
+		border-radius: $rm-radius-pill;
+		background: $rm-surface;
+		border: 1px solid $rm-line;
+		color: $rm-body;
+		font-size: .8438rem;
+		font-weight: 600;
+		text-decoration: none;
+		white-space: nowrap;
+		transition: all .14s ease-out;
+
+		&:hover {
+			border-color: #D6D3D1;
+			background: $rm-wash;
+			color: $rm-ink;
+		}
+
+		&--active,
+		&--active:hover {
+			background: $rm-ink;
+			border-color: $rm-ink;
+			color: #fff;
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// WooCommerce endpoint markup inside the scope — orders table, forms,
+// addresses, payment methods, notices. `&.routew-account` = the scope
+// wrapper itself (same-element match, see note above).
+// ---------------------------------------------------------------------------
+&.routew-account {
+
+	// Orders table
+	table.woocommerce-orders-table {
+		width: 100%;
+		border: 1px solid $rm-line;
+		border-radius: $rm-radius-card;
+		box-shadow: $rm-shadow-card;
+		background: $rm-surface;
+		overflow: hidden;
+		margin-bottom: 1.25rem;
+
+		th {
+			font-size: .6875rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			color: $rm-muted;
+			padding: .8125rem 1rem;
+			border-bottom: 1px solid $rm-line;
+			background: $rm-surface;
+		}
+
+		td {
+			padding: .9375rem 1rem;
+			font-size: .875rem;
+			color: $rm-body;
+			border-bottom: 1px solid $rm-line;
+			vertical-align: middle;
+		}
+
+		tr:last-child td {
+			border-bottom: none;
+		}
+
+		a {
+			color: var(--rm-brand-strong);
+			font-weight: 600;
+			text-decoration: none;
+
+			&:hover {
+				color: var(--rm-brand-deep);
+				text-decoration: underline;
+				text-underline-offset: .2em;
+			}
+		}
+
+		.woocommerce-button,
+		.button {
+			// Row action links (View / Re-order) as quiet pills
+			display: inline-block;
+			padding: .2813rem .75rem;
+			border-radius: $rm-radius-pill;
+			border: 1px solid $rm-line;
+			background: $rm-wash;
+			color: $rm-ink;
+			font-size: .7813rem;
+			font-weight: 600;
+			line-height: 1.5;
+			transition: all .14s ease-out;
+
+			&:hover {
+				background: var(--rm-brand-soft);
+				border-color: var(--rm-brand-line);
+				color: var(--rm-brand-strong);
+				text-decoration: none;
+			}
+		}
+	}
+
+	// WC order status badges in the table → tinted pills
+	.woocommerce-orders-table__cell-order-status mark {
+		display: inline-flex;
+		align-items: center;
+		border-radius: $rm-radius-pill;
+		padding: .2188rem .625rem;
+		font-size: .6875rem;
+		font-weight: 700;
+		background: $rm-wash;
+		color: $rm-body;
+	}
+
+	// Form fields (edit-account, edit-address)
+	form {
+		input[type="text"],
+		input[type="email"],
+		input[type="tel"],
+		input[type="password"],
+		input[type="url"],
+		textarea,
+		select {
+			width: 100%;
+			border-radius: $rm-radius-field;
+			border: 1.5px solid #D6D3D1;
+			background: $rm-surface;
+			padding: .625rem .875rem;
+			font-size: .9375rem;
+			color: $rm-ink;
+			transition: border-color .16s ease-out, box-shadow .16s ease-out;
+
+			&:focus {
+				border-color: var(--rm-brand);
+				box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--rm-brand-strong) 15%, transparent);
+				outline: none;
+			}
+		}
+
+		label {
+			font-size: .875rem;
+			font-weight: 600;
+			color: $rm-ink;
+		}
+
+		fieldset {
+			border: 1px solid $rm-line;
+			border-radius: $rm-radius-card;
+			padding: 1rem 1.25rem 1.25rem;
+			margin-bottom: 1.25rem;
+			background: $rm-surface;
+		}
+
+		legend {
+			font-size: 1rem;
+			font-weight: 700;
+			color: $rm-ink;
+			padding: 0 .375rem;
+		}
+
+		.form-row {
+			margin-bottom: 1rem;
+		}
+
+		.button {
+			display: inline-flex;
+			align-items: center;
+			gap: .4375rem;
+			border-radius: $rm-radius-pill;
+			background: var(--rm-brand-strong);
+			color: var(--rm-on-brand, #fff);
+			border: none;
+			font-size: .875rem;
+			font-weight: 600;
+			padding: .625rem 1.375rem;
+			cursor: pointer;
+			transition: background .16s ease-out, transform .16s ease-out;
+
+			&:hover {
+				background: var(--rm-brand-deep);
+				color: var(--rm-on-brand, #fff);
+			}
+
+			&:active {
+				transform: scale(.98);
+			}
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Address book (my-account/edit-address) — plugin-owned markup from
+	// templates/woocommerce/myaccount/my-address.php. No .col2-set/.u-column
+	// overrides needed: the grid and the cards are entirely ours.
+	// -------------------------------------------------------------------
+
+	// Lead paragraph above the grid
+	.routew-lead {
+		font-size: .9375rem;
+		color: $rm-muted;
+		margin: 0 0 1.25rem;
+		line-height: 1.55;
+	}
+
+	.routew-address-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.25rem;
+		margin-bottom: 1.25rem;
+
+		// 2-up from tablets up. minmax(0,1fr) keeps the tracks shrinkable
+		// so a long landmark line wraps inside the card instead of
+		// overflowing the track.
+		@media (min-width: 560px) {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	// The card IS the grid item (stretches to equal height by default).
+	.routew-address-col {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		background: $rm-surface;
+		border: 1px solid $rm-line;
+		border-radius: $rm-radius-card;
+		box-shadow: $rm-shadow-card;
+		padding: 1.25rem 1.25rem 1.125rem;
+		overflow: hidden;
+		min-width: 0;
+
+		// color-coded left accent bar — the matching pair's tell
+		&::before {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 4px;
+			background: $rm-transit; // billing = blue
+		}
+
+		&--shipping::before {
+			background: $rm-assigned; // shipping = amber
+		}
+
+		header.routew-address-card-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: .75rem;
+			margin: 0 0 .875rem;
+			padding-bottom: .875rem;
+			border-bottom: 1px solid $rm-wash;
+
+			h2 {
+				font-size: 1.0625rem;
+				font-weight: 800;
+				color: $rm-ink;
+				margin: 0;
+				letter-spacing: -.01em;
+				display: flex;
+				align-items: center;
+				gap: .5625rem;
+				min-width: 0;
+			}
+
+			// type icon chip — credit card (billing) / truck (shipping)
+			h2::before {
+				content: "";
+				width: 2rem;
+				height: 2rem;
+				border-radius: .5rem;
+				background-color: $rm-transit;
+				flex: 0 0 auto;
+				-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5h16a1 1 0 0 1 1 1v3H3V6a1 1 0 0 1 1-1Zm-1 6h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7Zm3 3v2h5v-2H6Z'/%3E%3C/svg%3E") center/58% no-repeat;
+				mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5h16a1 1 0 0 1 1 1v3H3V6a1 1 0 0 1 1-1Zm-1 6h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7Zm3 3v2h5v-2H6Z'/%3E%3C/svg%3E") center/58% no-repeat;
+			}
+		}
+
+		&--shipping header.routew-address-card-header h2::before {
+			background-color: $rm-assigned;
+			-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 4h2v8h14V4h2v9l-2 1v3h-3v-2H8v2H5v-3l-2-1V4Zm5 9v1h2v-1H8Zm6 0v1h2v-1h-2Z'/%3E%3C/svg%3E");
+			mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 4h2v8h14V4h2v9l-2 1v3h-3v-2H8v2H5v-3l-2-1V4Zm5 9v1h2v-1H8Zm6 0v1h2v-1h-2Z'/%3E%3C/svg%3E");
+		}
+
+		// Edit / Add pill with pencil icon
+		a.routew-address-edit {
+			display: inline-flex;
+			align-items: center;
+			gap: .3438rem;
+			font-size: .75rem;
+			font-weight: 700;
+			color: var(--rm-brand-strong);
+			background: var(--rm-brand-soft);
+			padding: .4063rem .8125rem;
+			border: 1px solid transparent;
+			border-radius: $rm-radius-pill;
+			text-decoration: none;
+			white-space: nowrap;
+			transition: background .14s ease-out, border-color .14s ease-out, transform .14s ease-out;
+
+			&::before {
+				content: "";
+				width: .8125rem;
+				height: .8125rem;
+				flex: 0 0 auto;
+				background-color: var(--rm-brand-strong);
+				-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a1 1 0 0 0 0-1.41l-2.5-2.5a1 1 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.99-1.67Z'/%3E%3C/svg%3E") center/contain no-repeat;
+				mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a1 1 0 0 0 0-1.41l-2.5-2.5a1 1 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.99-1.67Z'/%3E%3C/svg%3E") center/contain no-repeat;
+			}
+
+			&:hover {
+				background: var(--rm-brand-line);
+				border-color: var(--rm-brand);
+				color: var(--rm-brand-deep);
+
+				&::before {
+					background-color: var(--rm-brand-deep);
+				}
+			}
+
+			&:active {
+				transform: scale(.97);
+			}
+		}
+
+		// Address body — grows to fill the card so the pair stays balanced;
+		// break-word so a long landmark line wraps instead of clipping.
+		address {
+			font-style: normal;
+			font-size: .875rem;
+			color: $rm-body;
+			line-height: 1.6;
+			flex: 1 1 auto;
+			min-width: 0;
+			overflow-wrap: break-word;
+			word-break: break-word;
+
+			a {
+				color: inherit;
+				text-decoration: underline;
+				text-underline-offset: .15em;
+			}
+		}
+
+		// Empty state ("You have not set up this type of address yet.")
+		&--empty {
+			border-style: dashed;
+			box-shadow: none;
+			background: rgba(#fff, .6);
+
+			address {
+				color: $rm-muted;
+			}
+
+			&::before {
+				background: $rm-line;
+			}
+		}
+	}
+
+	// Payment methods table
+	table.woocommerce-MyAccount-paymentMethods {
+		border: 1px solid $rm-line;
+		border-radius: $rm-radius-card;
+		overflow: hidden;
+		background: $rm-surface;
+
+		th {
+			font-size: .6875rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			color: $rm-muted;
+			padding: .8125rem 1rem;
+			border-bottom: 1px solid $rm-line;
+		}
+
+		td {
+			padding: .9375rem 1rem;
+			font-size: .875rem;
+			border-bottom: 1px solid $rm-line;
+
+			&:last-child {
+				text-align: right;
+			}
+		}
+
+		tr:last-child td {
+			border-bottom: none;
+		}
+	}
+
+	// View Order — overview strip + items table + order-again CTA
+	.woocommerce-order-overview {
+		background: $rm-surface;
+		border: 1px solid $rm-line;
+		border-radius: $rm-radius-card;
+		box-shadow: $rm-shadow-card;
+		overflow: hidden;
+		list-style: none;
+		margin: 0 0 1.25rem;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+
+		li {
+			padding: .875rem 1rem;
+			border-right: 1px solid $rm-line;
+			border-bottom: 1px solid $rm-line;
+			margin: 0;
+
+			strong {
+				display: block;
+				font-size: .6875rem;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: .08em;
+				color: $rm-muted;
+				margin-bottom: .1875rem;
+			}
+
+			&.woocommerce-order-overview__order .email,
+			> span {
+				font-size: .9375rem;
+				font-weight: 600;
+				color: $rm-ink;
+				word-break: break-word;
+			}
+		}
+
+		// WC prints the order status as a bare <mark> — give it the same
+		// delivery-native pill treatment as the dashboard status pills.
+		// Text stays WooCommerce's own (the true status name); only the
+		// colors come from our per-state tokens.
+		mark.order-status {
+			display: inline-flex;
+			align-items: center;
+			border-radius: $rm-radius-pill;
+			padding: .2188rem .625rem;
+			font-size: .6875rem;
+			font-weight: 700;
+			background: $rm-wash;
+			color: $rm-body;
+
+			&.status-pending,
+			&.status-on-hold {
+				background: $rm-wash;
+				color: $rm-body;
+			}
+
+			&.status-processing,
+			&.status-routew-in-kitchen {
+				background: $rm-preparing-tint;
+				color: $rm-preparing;
+			}
+
+			&.status-routew-assigned {
+				background: $rm-assigned-tint;
+				color: $rm-assigned;
+			}
+
+			&.status-routew-picked-up {
+				background: $rm-transit-tint;
+				color: $rm-transit;
+			}
+
+			&.status-completed {
+				background: $rm-delivered-tint;
+				color: $rm-delivered;
+			}
+
+			&.status-cancelled,
+			&.status-failed,
+			&.status-refunded {
+				background: $rm-cancelled-tint;
+				color: $rm-cancelled;
+			}
+		}
+	}
+
+	table.woocommerce-table--order-details {
+		border: 1px solid $rm-line;
+		border-radius: $rm-radius-card;
+		box-shadow: $rm-shadow-card;
+		background: $rm-surface;
+		overflow: hidden;
+		margin-bottom: 1.25rem;
+		width: 100%;
+		border-collapse: separate;
+		border-spacing: 0;
+
+		th {
+			font-size: .6875rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			color: $rm-muted;
+			padding: .8125rem 1rem;
+			border-bottom: 1px solid $rm-line;
+			text-align: left;
+		}
+
+		td {
+			padding: .8125rem 1rem;
+			font-size: .875rem;
+			color: $rm-body;
+			border-bottom: 1px solid $rm-line;
+			vertical-align: top;
+		}
+
+		tr:last-child td {
+			border-bottom: none;
+		}
+
+		.woocommerce-Price-amount {
+			font-weight: 700;
+			color: $rm-ink;
+		}
+
+		// The tfoot "Actions:" row — WC renders our Re-order link (plus
+		// core pay/cancel actions on unpaid orders) as bare
+		// .order-actions-button anchors that otherwise fall back to the
+		// theme's button styling. Base = quiet pill; the Re-order CTA
+		// gets the full brand treatment with a refresh glyph, matching
+		// the dashboard reorder banner.
+		td a.order-actions-button {
+			display: inline-flex;
+			align-items: center;
+			gap: .3438rem;
+			border-radius: $rm-radius-pill;
+			border: 1px solid $rm-line;
+			background: $rm-surface;
+			color: $rm-ink;
+			font-size: .7813rem;
+			font-weight: 600;
+			line-height: 1.5;
+			padding: .2813rem .75rem;
+			text-decoration: none;
+			transition: all .14s ease-out;
+
+			&:hover {
+				border-color: #D6D3D1;
+				background: $rm-wash;
+				color: $rm-ink;
+			}
+		}
+
+		td a.routew_reorder {
+			border: none;
+			background: var(--rm-brand-strong);
+			color: var(--rm-on-brand, #fff);
+			font-size: .875rem;
+			padding: .625rem 1.375rem;
+
+			// Refresh glyph (same shape as the dashboard reorder CTA).
+			&::before {
+				content: "";
+				width: 1rem;
+				height: 1rem;
+				flex: 0 0 auto;
+				background-color: #fff;
+				-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z'/%3E%3C/svg%3E") center/contain no-repeat;
+				mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z'/%3E%3C/svg%3E") center/contain no-repeat;
+			}
+
+			&:hover {
+				background: var(--rm-brand-deep);
+				color: var(--rm-on-brand, #fff);
+			}
+
+			&:active {
+				transform: scale(0.98);
+			}
+
+			@media (max-width: 600px) {
+				width: 100%;
+				justify-content: center;
+			}
+		}
+	}
+
+	.order-again {
+		margin: 0 0 1.25rem;
+
+		.button {
+			display: inline-flex;
+			align-items: center;
+			gap: .4375rem;
+			border-radius: $rm-radius-pill;
+			background: var(--rm-brand-strong);
+			color: var(--rm-on-brand, #fff);
+			border: none;
+			font-size: .875rem;
+			font-weight: 600;
+			padding: .625rem 1.375rem;
+			cursor: pointer;
+			text-decoration: none;
+			transition: background .16s ease-out;
+
+			&:hover {
+				background: var(--rm-brand-deep);
+				color: var(--rm-on-brand, #fff);
+			}
+		}
+	}
+
+	.woocommerce-customer-details {
+		> section {
+			background: $rm-surface;
+			border: 1px solid $rm-line;
+			border-radius: $rm-radius-card;
+			box-shadow: $rm-shadow-card;
+			padding: 1.25rem;
+			margin-bottom: 1.25rem;
+		}
+
+		address {
+			font-style: normal;
+			font-size: .875rem;
+			color: $rm-body;
+			line-height: 1.6;
+		}
+
+		h2 {
+			font-size: 1rem;
+			font-weight: 700;
+			color: $rm-ink;
+		}
+	}
+
+	// Notices
+	.woocommerce-message,
+	.woocommerce-info,
+	.woocommerce-error {
+		border-radius: $rm-radius-field;
+		border: 1px solid $rm-line;
+		background: $rm-wash;
+		color: $rm-body;
+		padding: .875rem 1rem;
+		font-size: .875rem;
+		list-style: none;
+		margin-bottom: 1.25rem;
+
+		&::before {
+			display: none;
+		}
+
+		a {
+			color: var(--rm-brand-strong);
+			font-weight: 600;
+		}
+	}
+
+	.woocommerce-message {
+		background: $rm-delivered-tint;
+		border-color: #BBE7CB;
+		color: $rm-delivered;
+	}
+
+	.woocommerce-error {
+		background: $rm-cancelled-tint;
+		border-color: #F5C6C6;
+		color: $rm-cancelled;
+	}
+
+	// Page titles WC prints on endpoints (hidden — the subpage header
+	// already carries the title)
+	.woocommerce-MyAccount-content > h2 {
+		display: none;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Order-received (thank-you) page — the scope wrapper carries
+// routew-account + routew-account--thankyou (see
+// ROUTEW_Shortcodes::open_thankyou_scope), so the overview strip, order
+// details table, notices and tracking block reuse the account styles
+// above. This block adds the thank-you-specific hero treatment.
+// Same-element match on the scope root.
+// ---------------------------------------------------------------------------
+&.routew-account--thankyou {
+
+	// The success moment — a proper hero card instead of WC's bare
+	// <p class="woocommerce-notice--success">.
+	.woocommerce-thankyou-order-received {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		border-radius: $rm-radius-card;
+		border: 1px solid #BBE7CB;
+		background:
+			radial-gradient(120% 150% at 100% 0%, rgba(21, 128, 61, .14) 0%, rgba(21, 128, 61, 0) 55%),
+			$rm-delivered-tint;
+		color: $rm-delivered;
+		font-size: 1.0625rem;
+		font-weight: 700;
+		letter-spacing: -.01em;
+		padding: 1.375rem 1.375rem;
+		margin: 0 0 1.25rem;
+		box-shadow: $rm-shadow-card;
+
+		// Celebration check glyph.
+		&::before {
+			content: "";
+			flex: 0 0 auto;
+			width: 2.5rem;
+			height: 2.5rem;
+			border-radius: 50%;
+			background-color: $rm-delivered;
+			-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.2 14.2L6 11.4l1.4-1.4 3.4 3.4 7.8-7.8L20 7Z'/%3E%3C/svg%3E") center/62% no-repeat;
+			mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.2 14.2L6 11.4l1.4-1.4 3.4 3.4 7.8-7.8L20 7Z'/%3E%3C/svg%3E") center/62% no-repeat;
+		}
+	}
+
+	// Failed-payment notices — error card treatment.
+	.woocommerce-thankyou-order-failed {
+		border-radius: $rm-radius-field;
+		border: 1px solid #F5C6C6;
+		background: $rm-cancelled-tint;
+		color: $rm-cancelled;
+		font-size: .9375rem;
+		padding: .9375rem 1.0625rem;
+		margin: 0 0 .75rem;
+
+		&-actions {
+			margin-bottom: 1.25rem;
+
+			a.button.pay {
+				display: inline-flex;
+				align-items: center;
+				border-radius: $rm-radius-pill;
+				background: var(--rm-brand-strong);
+				color: #fff;
+				font-size: .875rem;
+				font-weight: 600;
+				padding: .5313rem 1.125rem;
+				text-decoration: none;
+				margin-right: .5rem;
+
+				&:hover {
+					background: var(--rm-brand-deep);
+					color: #fff;
+				}
+			}
+		}
+	}
+
+	// -----------------------------------------------------------------------
+	// WooCommerce BLOCKIFIED order-confirmation template — every block
+	// (`-status`, `-summary`, `-totals`, `-shipping-address`,
+	// `-billing-address`, `-additional-information` …) renders into its
+	// own wrapper div. ROUTEW_Shortcodes::wrap_thankyou_block injects
+	// `.routew-ui .routew-account .routew-account--thankyou` onto each
+	// wrapper so these selectors take over from the WC defaults.
+	//
+	// DS4b NOTE: the scope classes live ON the block-root wrapper divs,
+	// so rules targeting a block ROOT must use same-element selectors
+	// (`&.wc-block-…`) — a descendant selector would never match. Rules
+	// for markup INSIDE a block (the summary ul, the totals table, the
+	// h2s, our tracking section) are plain descendants and work as-is.
+	// -----------------------------------------------------------------------
+
+	// Status block — success hero card. The blocks version outputs
+	// `<h1>Order completed</h1><p>…fulfilled…</p>` directly inside the
+	// block root (see WC Status::render_content, status==='completed'),
+	// so the root itself IS the scope root — same-element match.
+	&.wc-block-order-confirmation-status {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: .25rem;
+		border-radius: $rm-radius-card;
+		border: 1px solid #BBE7CB;
+		background:
+			radial-gradient(120% 150% at 100% 0%, rgba(21, 128, 61, .14) 0%, rgba(21, 128, 61, 0) 55%),
+			$rm-delivered-tint;
+		color: $rm-delivered;
+		padding: 1.375rem 1.375rem 1.3125rem;
+		margin: 0 0 1.25rem;
+		box-shadow: $rm-shadow-card;
+
+		// Celebration check glyph.
+		&::before {
+			content: "";
+			width: 2.5rem;
+			height: 2.5rem;
+			border-radius: 50%;
+			background-color: $rm-delivered;
+			-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.2 14.2L6 11.4l1.4-1.4 3.4 3.4 7.8-7.8L20 7Z'/%3E%3C/svg%3E") center/62% no-repeat;
+			mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.2 14.2L6 11.4l1.4-1.4 3.4 3.4 7.8-7.8L20 7Z'/%3E%3C/svg%3E") center/62% no-repeat;
+			margin-bottom: .625rem;
+		}
+
+		h1 {
+			margin: 0;
+			font-size: 1.5rem;
+			font-weight: 800;
+			letter-spacing: -.015em;
+			color: $rm-delivered;
+		}
+		p {
+			margin: 0;
+			font-size: .9375rem;
+			font-weight: 500;
+			color: $rm-delivered;
+		}
+	}
+
+	// "Great news / Log in here" notice appended for permissioned users —
+	// a sibling of the block root, so no scope ancestor; style it plainly
+	// via the thank-you body context if the theme exposes one. (Left to
+	// the theme defaults — it only shows for unpermissioned guests.)
+
+	// Summary block — the ul is INSIDE the scoped block root, so a
+	// descendant selector matches. Tokenised overview grid (Order # /
+	// Date / Total / Email / Payment).
+	.wc-block-order-confirmation-summary-list {
+		list-style: none;
+		margin: 0 0 1.25rem;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		border: 1px solid $rm-line;
+		border-radius: $rm-radius-card;
+		box-shadow: $rm-shadow-card;
+		background: $rm-surface;
+		overflow: hidden;
+
+		& > li {
+			margin: 0;
+			padding: .875rem 1rem;
+			border-right: 1px solid $rm-line;
+			border-bottom: 1px solid $rm-line;
+			display: flex;
+			flex-direction: column;
+			gap: .1875rem;
+
+			&:last-child {
+				border-bottom: none;
+			}
+		}
+
+		.wc-block-order-confirmation-summary-list-item__key {
+			font-size: .6875rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			color: $rm-muted;
+		}
+		.wc-block-order-confirmation-summary-list-item__value {
+			font-size: .9375rem;
+			font-weight: 600;
+			color: $rm-ink;
+			word-break: break-word;
+		}
+	}
+
+	// Totals wrapper — block ROOT (same element as the scope).
+	&.wc-block-order-confirmation-totals-wrapper {
+		margin: 0 0 1.25rem;
+
+		h2.wp-block-heading {
+			font-size: 1.125rem;
+			font-weight: 800;
+			color: $rm-ink;
+			letter-spacing: -.015em;
+			margin: 0 0 .875rem;
+		}
+	}
+
+	// Totals table — inside the scoped totals block (descendant).
+	.wc-block-order-confirmation-totals__table {
+		border: 1px solid $rm-line;
+		border-radius: $rm-radius-card;
+		box-shadow: $rm-shadow-card;
+		background: $rm-surface;
+		overflow: hidden;
+		margin: 0 0 1.25rem;
+		width: 100%;
+		border-collapse: separate;
+		border-spacing: 0;
+
+		th, td {
+			padding: .8125rem 1rem;
+			font-size: .875rem;
+			border-bottom: 1px solid $rm-line;
+		}
+		thead th {
+			font-size: .6875rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			color: $rm-muted;
+			background: $rm-surface;
+			text-align: left;
+		}
+		tbody td {
+			color: $rm-body;
+		}
+		tfoot th {
+			font-size: .8125rem;
+			font-weight: 600;
+			text-transform: none;
+			letter-spacing: 0;
+			color: $rm-ink;
+			text-align: left;
+		}
+		tfoot .wc-block-order-confirmation-totals__total {
+			font-weight: 700;
+			color: $rm-ink;
+		}
+		tr:last-child th, tr:last-child td {
+			border-bottom: none;
+		}
+	}
+
+	// Address cards (shipping + billing) — each wrapper block is its own
+	// ROOT with the scope on it (same element). The two-up layout comes
+	// from the theme's own columns block, so only the card treatment is
+	// ours.
+	&.wc-block-order-confirmation-shipping-wrapper,
+	&.wc-block-order-confirmation-billing-wrapper {
+		position: relative;
+		background: $rm-surface;
+		border: 1px solid $rm-line;
+		border-radius: $rm-radius-card;
+		box-shadow: $rm-shadow-card;
+		padding: 1.25rem;
+		overflow: hidden;
+
+		&::before {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 4px;
+			background: $rm-transit;
+		}
+
+		h2.wp-block-heading {
+			font-size: .6875rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			color: $rm-muted;
+			margin: 0 0 .625rem;
+		}
+
+		address {
+			font-style: normal;
+			font-size: .875rem;
+			color: $rm-body;
+			line-height: 1.6;
+		}
+	}
+
+	&.wc-block-order-confirmation-billing-wrapper::before {
+		background: $rm-preparing;
+	}
+
+	// Our tracking section (rendered via
+	// woocommerce_order_details_after_order_table inside the totals
+	// block). The .routew-ui ancestor comes from the totals block's own
+	// wrapper class injection, so the existing tracking styles already
+	// match — but the order-confirmation-totals tfoot cell the section
+	// sits in needs zero padding so the section card fills its column.
+	.wc-block-order-confirmation-totals__table tfoot td {
+		padding: 0;
+
+		&:last-child {
+			padding: .8125rem 1rem;
+		}
+	}
+	.routew-order-tracking {
+		margin: 0 0 .5rem;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Mobile — orders table becomes stacked cards
+// ---------------------------------------------------------------------------
+@media (max-width: 600px) {
+	&.routew-account table.woocommerce-orders-table {
+		thead {
+			display: none;
+		}
+
+		tbody tr {
+			display: block;
+			border-bottom: 1px solid $rm-line;
+
+			&:last-child {
+				border-bottom: none;
+			}
+		}
+
+		td {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: .75rem;
+			border: none;
+			padding: .4375rem 1rem;
+
+			&::before {
+				content: attr(data-title);
+				font-size: .75rem;
+				font-weight: 600;
+				color: $rm-muted;
+			}
+
+			&.woocommerce-orders-table__cell-order-actions {
+				padding-bottom: 1rem;
+
+				&::before {
+					display: none;
+				}
+			}
+		}
+	}
+}
+
+}
+
+// ---------------------------------------------------------------------------
+// Theme page-title hygiene — the sub-page header (back button + title) and
+// the dashboard greeting hero already carry the page identity, so the
+// theme's own <h1> / entry-title on account pages is hidden instead of
+// rendering twice. Scoped to the account page via the body class only.
+// ---------------------------------------------------------------------------
+.woocommerce-account.routew-my-account-styled {
+
+	h1,
+	.entry-title,
+	.page-title,
+	.wp-block-post-title {
+		display: none;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Focus visibility + reduced motion (targets nav + scoped content alike)
+// ---------------------------------------------------------------------------
+.routew-my-account-styled {
+
+	.routew-account a:focus-visible,
+	.woocommerce-MyAccount-navigation a:focus-visible {
+		outline: 2px solid var(--rm-brand-strong);
+		outline-offset: 2px;
+	}
+}

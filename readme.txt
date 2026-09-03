@@ -4,7 +4,7 @@ Tags: woocommerce, delivery, food delivery, restaurant, local delivery
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.0
+Stable tag: 1.6.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -28,7 +28,10 @@ RouteMile turns a single-restaurant WooCommerce store into a full delivery opera
 * Deliveries dashboard listing unassigned, assigned, and out-for-delivery orders, including the customer's kitchen note
 * Custom order statuses: In Kitchen → Assigned → Picked Up → Completed, each with its own WooCommerce email notification
 * One-click assignment of delivery riders, with automatic reassignment handling
+* "Accept Order" action to move new orders into the kitchen with one click
 * Admin-bar toggle to open/close ordering instantly
+* Rename the five order stages (labels, colours, icons) to match your restaurant's wording — shown in the admin, the rider app and customer tracking; order data itself is untouched
+* Set a brand colour once and every plugin surface (checkout, tracking, My Account, rider app) recolours automatically, with WCAG-checked text contrast
 
 = Delivery rider app =
 
@@ -153,6 +156,13 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 
 == Changelog ==
 
+= 1.6.0 =
+* Mile Zero design system: every customer and rider surface (checkout, order tracking, order-received, My Account, delivery-rider app) rebuilt on a fast, self-contained design system with bundled fonts — no more theme conflicts from generic Bootstrap styling.
+* Order stage labels: rename the five delivery stages (label, colour, icon) from the settings screen; renames apply everywhere instantly and never touch stored order data.
+* Brand colour: pick one colour and the whole plugin UI recolours, including the rider app's PWA theme; text contrast is checked automatically.
+* Manager "Accept Order" action for newly placed orders; rider actions update the app in place with no page reloads; cash settlement banners update live.
+* WordPress Plugin Check compliance: zero errors and warnings on the shipped zip.
+
 = 1.5.0 =
 * Plugin renamed to "RouteMile for WooCommerce" (plugin slug `routemile-woocommerce`) — distinct from the existing commercial "FoodXpress" food-ordering plugin per the WP.org review feedback.
 * WP.org plugin-directory compliance: text domain unified to the plugin slug; inline script/style extracted to external files; `[order_number]` in the receipt title now escaped (defence against merchant-controlled sequential-order-number formats); explicit capability check added to all admin-side data-migration paths; menu moved under the WooCommerce top-level (was a top-level item at a high position); map-provider "Powered by ..." credit is now an opt-in checkbox; readme's privacy section links each provider's Terms of Service and Privacy Policy and discloses Project OSRM.
@@ -171,6 +181,9 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 Earlier releases: see CHANGELOG.md in the repository.
 
 == Upgrade Notice ==
+
+= 1.6.0 =
+New design system across all customer and rider pages, renameable order stages, and a custom brand colour. No settings migration needed — existing settings, riders and orders are untouched.
 
 = 1.5.0 =
 Plugin renamed (display name, slug, folder) and WP.org review-blockers resolved. Settings, rider assignments, and order statuses migrate automatically on update from 1.4.x; no manual steps required.

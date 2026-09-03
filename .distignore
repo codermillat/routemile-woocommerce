@@ -39,6 +39,11 @@ node_modules/
 package.json
 package-lock.json
 
+# Design-system build toolchain (tools/ui/build.mjs + Sass sources + postcss
+# config). The compiled CSS in assets/css/ is committed; the build itself is
+# dev-only, and .sh/.mjs build scripts must never ship in the wp.org zip.
+tools/
+
 # Documentation kept for maintainers; not part of the user-facing plugin.
 docs/
 

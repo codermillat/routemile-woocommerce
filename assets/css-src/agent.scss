@@ -1,0 +1,841 @@
+//
+// RouteMile — delivery agent PWA.
+//
+// Driver-app presentation (Uber Eats Driver / Swiggy Rider register):
+// a dark ink app header with the agent identity + day stats, cash
+// settlement bar, white order cards with big pill actions, and a fixed
+// bottom tab bar with live counts. Full-bleed single column (phone
+// first), safe-area aware, offline toast.
+//
+// Markup: templates/delivery-dashboard-template.php. The root carries
+// .routew-ui so scoped Bootstrap (cards, buttons, utilities) applies.
+// JS contract (delivery-dashboard.js): [data-routew-tab], #routew-toast,
+// .routew-tab-content.active, .routew-action-btn, .routew-settle-btn.
+//
+
+@import "tokens";
+
+
+// ---------------------------------------------------------------------------
+// Page + app shell
+// ---------------------------------------------------------------------------
+body.routew-delivery-dashboard-page {
+	background: var(--rm-canvas);
+	margin: 0;
+	// WP admin bar is disabled for agents (ROUTEW_Core::disable_admin_bar),
+	// so the app starts at the viewport edge.
+}
+
+.routew-ui {
+
+// The app shell carries the .routew-ui scope class on the SAME element
+// (<div class="routew-ui routew-app-dashboard">), so it must be matched
+// with `&.` (same-element) — a plain descendant selector would never
+// match after the scope prefix.
+&.routew-app-dashboard {
+	min-height: 100vh;
+	min-height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	max-width: 46rem;
+	margin: 0 auto;
+	background: var(--rm-canvas);
+	box-shadow: 0 0 0 1px rgba(28, 25, 23, .04);
+}
+
+// ---------------------------------------------------------------------------
+// App header — dark, driver-app
+// ---------------------------------------------------------------------------
+.routew-app-header {
+	background:
+		radial-gradient(130% 120% at 85% -10%, color-mix(in srgb, var(--rm-brand) 35%, transparent) 0%, transparent 55%),
+		linear-gradient(160deg, #2A2724 0%, $rm-ink 70%);
+	color: #fff;
+	padding: calc(1rem + env(safe-area-inset-top)) 1rem 1rem;
+
+	h1 {
+		font-size: 1.0625rem;
+		font-weight: 800;
+		letter-spacing: -.02em;
+		margin: 0;
+		color: #fff;
+	}
+}
+
+.routew-app-header__row {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+}
+
+.routew-app-header__brand {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	min-width: 0;
+}
+
+.routew-app-header__logo {
+	flex: 0 0 auto;
+	width: 2.75rem;
+	height: 2.75rem;
+	border-radius: $rm-radius-field;
+	background: var(--rm-brand);
+	display: grid;
+	place-items: center;
+	box-shadow: 0 6px 18px color-mix(in srgb, var(--rm-brand) 45%, transparent);
+
+	svg {
+		width: 1.375rem;
+		height: 1.375rem;
+		fill: #fff;
+	}
+}
+
+.routew-app-header__agent {
+	margin: .1875rem 0 0;
+	font-size: .8438rem;
+	color: rgba(255, 255, 255, .72);
+	display: flex;
+	align-items: center;
+	gap: .4375rem;
+}
+
+.routew-app-header__dot {
+	width: .25rem;
+	height: .25rem;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .4);
+}
+
+.routew-app-header__date {
+	font-variant-numeric: tabular-nums;
+}
+
+// ---------------------------------------------------------------------------
+// Stats strip
+// ---------------------------------------------------------------------------
+.routew-agent-stats {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: .5rem;
+	margin-top: 1rem;
+
+	@media (max-width: 420px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.routew-agent-stat {
+	background: rgba(255, 255, 255, .08);
+	border: 1px solid rgba(255, 255, 255, .12);
+	border-radius: $rm-radius-field;
+	padding: .625rem .75rem;
+	display: flex;
+	flex-direction: column;
+	gap: .0625rem;
+
+	&__icon {
+		width: 1.75rem;
+		height: 1.75rem;
+		margin-bottom: .375rem;
+		border-radius: .625rem;
+		display: grid;
+		place-items: center;
+
+		svg {
+			width: 1rem;
+			height: 1rem;
+			fill: currentColor;
+		}
+	}
+
+	// Per-stat colored icon chips (fixed order: delivered / active /
+	// collected / due / all-time)
+	&:nth-child(1) .routew-agent-stat__icon { background: rgba(34, 197, 94, .22); color: #6EE7A0; }
+	&:nth-child(2) .routew-agent-stat__icon { background: rgba(96, 165, 250, .22); color: #93C5FD; }
+	&:nth-child(3) .routew-agent-stat__icon { background: rgba(251, 191, 36, .22); color: #FCD34D; }
+	&:nth-child(4) .routew-agent-stat__icon { background: color-mix(in srgb, var(--rm-brand) 30%, transparent); color: var(--rm-brand-strong); }
+	&:nth-child(5) .routew-agent-stat__icon { background: rgba(255, 255, 255, .12); color: rgba(255, 255, 255, .7); }
+
+	&__value {
+		font-size: 1.125rem;
+		font-weight: 800;
+		color: #fff;
+		letter-spacing: -.02em;
+		line-height: 1.2;
+
+		// wc_price markup
+		.woocommerce-Price-amount,
+		.woocommerce-Price-currencySymbol {
+			color: inherit;
+			font-size: .875rem;
+			font-weight: 700;
+		}
+	}
+
+	&__label {
+		font-size: .6875rem;
+		font-weight: 600;
+		color: rgba(255, 255, 255, .6);
+		letter-spacing: .02em;
+	}
+
+	// "To hand over" — money the agent is holding: brand highlight
+	&--due {
+		background: color-mix(in srgb, var(--rm-brand) 25%, transparent);
+		border-color: color-mix(in srgb, var(--rm-brand) 45%, transparent);
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Cash settlement bar + COD summary
+// ---------------------------------------------------------------------------
+.routew-settle-bar {
+	margin-top: .75rem;
+	border-radius: $rm-radius-field;
+	background: rgba(255, 255, 255, .08);
+	border: 1px solid rgba(255, 255, 255, .12);
+	color: rgba(255, 255, 255, .85);
+	font-size: .8438rem;
+	padding: .625rem .75rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: .75rem;
+	flex-wrap: wrap;
+
+	&--pending {
+		background: rgba(#F59E0B, .18);
+		border-color: rgba(#F59E0B, .4);
+	}
+
+	form {
+		display: flex;
+		margin: 0;
+	}
+}
+
+.routew-settle-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: .375rem;
+	border: none;
+	border-radius: $rm-radius-pill;
+	background: #fff;
+	color: $rm-ink;
+	font-size: .8125rem;
+	font-weight: 700;
+	padding: .4375rem .9375rem;
+	cursor: pointer;
+	transition: transform .14s ease-out;
+
+	svg {
+		width: .9375rem;
+		height: .9375rem;
+		fill: currentColor;
+	}
+
+	&:active {
+		transform: scale(.97);
+	}
+}
+
+.routew-settle-last {
+	color: rgba(255, 255, 255, .55);
+	font-size: .75rem;
+	margin: .625rem 0 0;
+}
+
+.routew-cod-summary {
+	margin-top: .75rem;
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+	border-radius: $rm-radius-pill;
+	background: color-mix(in srgb, var(--rm-brand) 22%, transparent);
+	border: 1px solid color-mix(in srgb, var(--rm-brand) 45%, transparent);
+	color: #FFD3B0;
+	font-size: .8125rem;
+	font-weight: 600;
+	padding: .4375rem .875rem;
+
+	svg {
+		width: 1rem;
+		height: 1rem;
+		fill: currentColor;
+		flex: 0 0 auto;
+	}
+
+	b,
+	.woocommerce-Price-amount {
+		color: #fff;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Main column
+// ---------------------------------------------------------------------------
+.routew-app-main {
+	flex: 1 1 auto;
+	padding: 1.125rem 1rem calc(5.75rem + env(safe-area-inset-bottom));
+
+	.routew-tab-content {
+		display: none;
+
+		&.active {
+			display: flex;
+			flex-direction: column;
+			gap: .875rem;
+			animation: routew-agent-tab .3s $rm-ease;
+		}
+	}
+}
+
+@keyframes routew-agent-tab {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Order card
+// ---------------------------------------------------------------------------
+.routew-order-card {
+	border: 1px solid $rm-line;
+	border-radius: $rm-radius-card;
+	box-shadow: $rm-shadow-card;
+	background: $rm-surface;
+	overflow: hidden;
+}
+
+.routew-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: .75rem;
+	background: $rm-surface;
+	border-bottom: 1px solid $rm-line;
+	padding: .8125rem 1rem;
+
+	h3 {
+		font-size: .9375rem;
+		font-weight: 700;
+		letter-spacing: -.01em;
+		color: $rm-ink;
+	}
+
+	.routew-card-header__date {
+		color: $rm-muted;
+		font-weight: 500;
+	}
+}
+
+// COD strip — amber, the money the agent must collect
+.routew-cod-strip {
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+	background: $rm-assigned-tint;
+	border-bottom: 1px solid #F3E2C4;
+	padding: .5625rem 1rem;
+	font-size: .8125rem;
+	font-weight: 600;
+	color: $rm-assigned;
+
+	svg {
+		width: 1rem;
+		height: 1rem;
+		fill: currentColor;
+		flex: 0 0 auto;
+	}
+
+	&__label {
+		flex: 1 1 auto;
+	}
+
+	&__amount {
+		font-size: .9375rem;
+		font-weight: 800;
+		color: $rm-ink;
+
+		.woocommerce-Price-amount,
+		.woocommerce-Price-currencySymbol {
+			color: inherit;
+		}
+	}
+
+	&__method {
+		flex: 0 0 auto;
+		font-size: .6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .06em;
+		color: $rm-muted;
+		background: $rm-surface;
+		border-radius: $rm-radius-pill;
+		padding: .1563rem .5rem;
+	}
+
+	&--settled {
+		background: $rm-delivered-tint;
+		border-bottom-color: #BBE7CB;
+		color: $rm-delivered;
+	}
+
+	// Cash physically confirmed by the agent (this delivery cycle) —
+	// green like settled, with the confirmation time in the label.
+	&--collected {
+		background: $rm-delivered-tint;
+		border-bottom-color: #BBE7CB;
+		color: $rm-delivered;
+	}
+}
+
+// Prepaid strip — quiet neutral
+.routew-prepaid-strip {
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+	background: $rm-wash;
+	border-bottom: 1px solid $rm-line;
+	padding: .5625rem 1rem;
+	font-size: .8125rem;
+	color: $rm-muted;
+
+	svg {
+		width: 1rem;
+		height: 1rem;
+		fill: currentColor;
+		flex: 0 0 auto;
+	}
+}
+
+// Card body — customer info rows
+.routew-card-body {
+	padding: .875rem 1rem;
+
+	.routew-card-section {
+		p {
+			display: flex;
+			align-items: baseline;
+			gap: .5rem;
+			margin: 0 0 .5rem;
+			font-size: .875rem;
+			color: $rm-body;
+			line-height: 1.45;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+
+			strong {
+				color: $rm-ink;
+				font-weight: 600;
+			}
+		}
+	}
+}
+
+.routew-svg-icon {
+	width: 1rem;
+	height: 1rem;
+	fill: $rm-faint;
+	flex: 0 0 auto;
+	transform: translateY(2px);
+}
+
+.routew-call-link {
+	color: $rm-transit;
+	font-weight: 700;
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+		text-underline-offset: .2em;
+	}
+}
+
+// Delivery instructions
+.routew-customer-note {
+	margin-top: .75rem;
+	background: $rm-wash;
+	border-radius: $rm-radius-field;
+	padding: .625rem .75rem;
+
+	&__title {
+		display: flex;
+		align-items: center;
+		gap: .375rem;
+		font-size: .6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .08em;
+		color: $rm-muted;
+		margin-bottom: .25rem;
+
+		svg {
+			width: .875rem;
+			height: .875rem;
+			fill: currentColor;
+		}
+	}
+
+	&__line {
+		font-size: .8438rem;
+		color: $rm-body;
+		margin: 0;
+		line-height: 1.5;
+	}
+}
+
+// Card footer — actions
+.routew-card-footer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+	padding: .875rem 1rem;
+	background: $rm-surface;
+	border-top: 1px solid $rm-line;
+
+	.routew-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: .375rem;
+		border-radius: $rm-radius-pill;
+		font-size: .8125rem;
+		font-weight: 600;
+		padding: .5313rem 1rem;
+		cursor: pointer;
+		text-decoration: none;
+		border: 1.5px solid transparent;
+		transition: all .16s ease-out;
+		min-height: 44px; // thumb-friendly
+
+		svg {
+			width: .9375rem;
+			height: .9375rem;
+			fill: currentColor;
+		}
+	}
+
+	.routew-button-map {
+		flex: 1 1 auto;
+		background: $rm-surface;
+		border-color: $rm-line;
+		color: $rm-ink;
+
+		&:hover {
+			background: $rm-wash;
+			border-color: #D6D3D1;
+		}
+	}
+
+	.routew-button-call {
+		background: $rm-ink;
+		color: #fff;
+
+		&:hover {
+			background: #33302D;
+			color: #fff;
+		}
+	}
+
+	.routew-button-pickup {
+		flex: 1 1 100%;
+		background: var(--rm-brand-strong);
+		color: var(--rm-on-brand, #fff);
+		box-shadow: 0 6px 16px color-mix(in srgb, var(--rm-brand-strong) 28%, transparent);
+
+		&:hover {
+			background: var(--rm-brand-deep);
+			color: var(--rm-on-brand, #fff);
+		}
+
+		&:active {
+			transform: scale(.98);
+		}
+	}
+
+	.routew-button-deliver {
+		flex: 1 1 100%;
+		background: $rm-delivered;
+		color: #fff;
+		box-shadow: 0 6px 16px rgba(21, 128, 61, .28);
+
+		&:hover {
+			background: #116632;
+			color: #fff;
+		}
+
+		&:active {
+			transform: scale(.98);
+		}
+
+		// COD gate: visible but inert until the agent confirms the cash.
+		&--locked,
+		&--locked:hover {
+			background: #E7E5E4;
+			color: $rm-faint;
+			box-shadow: none;
+			cursor: not-allowed;
+		}
+	}
+
+	// COD cash-confirmation CTA — amber, the "money step".
+	.routew-button-cash {
+		flex: 1 1 100%;
+		background: $rm-assigned;
+		color: #fff;
+		box-shadow: 0 6px 16px rgba(146, 64, 14, .25);
+
+		&:hover {
+			background: #7C3508;
+			color: #fff;
+		}
+
+		&:active {
+			transform: scale(.98);
+		}
+	}
+
+	.routew-cash-hint {
+		flex: 1 1 100%;
+		margin: 0;
+		font-size: .75rem;
+		color: $rm-muted;
+		text-align: center;
+	}
+}
+
+// History cards — calmer
+.routew-order-card--history {
+	.routew-card-header {
+		border-bottom: none;
+		padding-bottom: .4375rem;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Empty states
+// ---------------------------------------------------------------------------
+.routew-no-orders {
+	text-align: center;
+	padding: 3rem 1.5rem;
+	background: $rm-surface;
+	border: 1px dashed #D6D3D1;
+	border-radius: $rm-radius-card;
+
+	svg {
+		width: 2.25rem;
+		height: 2.25rem;
+		fill: $rm-faint;
+	}
+
+	p {
+		margin: .75rem 0 0;
+		font-size: .9375rem;
+		font-weight: 600;
+		color: $rm-ink;
+	}
+
+	.routew-no-orders__hint {
+		margin-top: .25rem;
+		font-size: .8438rem;
+		font-weight: 400;
+		color: $rm-muted;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Bottom tab bar
+// ---------------------------------------------------------------------------
+.routew-tabbar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	display: flex;
+	justify-content: center;
+	gap: .25rem;
+	background: rgba(255, 255, 255, .92);
+	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(12px);
+	border-top: 1px solid $rm-line;
+	box-shadow: 0 -4px 24px rgba(28, 25, 23, .08);
+	padding: .375rem .5rem calc(.375rem + env(safe-area-inset-bottom));
+
+	// keep the bar within the app column on wide screens
+	max-width: 46rem;
+	margin: 0 auto;
+}
+
+.routew-tab-link {
+	flex: 1 1 0;
+	max-width: 10rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: .1875rem;
+	background: none;
+	border: none;
+	border-radius: $rm-radius-field;
+	padding: .4375rem .25rem;
+	cursor: pointer;
+	color: $rm-muted;
+	font-family: inherit;
+	position: relative;
+	transition: color .16s ease-out, background .16s ease-out;
+
+	svg {
+		width: 1.375rem;
+		height: 1.375rem;
+		fill: currentColor;
+	}
+
+	.routew-tabbar__label {
+		font-size: .6875rem;
+		font-weight: 700;
+		letter-spacing: .01em;
+	}
+
+	.routew-tabbar__count {
+		position: absolute;
+		top: .125rem;
+		right: calc(50% - 1.625rem);
+		min-width: 1.125rem;
+		height: 1.125rem;
+		border-radius: $rm-radius-pill;
+		background: $rm-line;
+		color: $rm-body;
+		font-size: .625rem;
+		font-weight: 700;
+		display: grid;
+		place-items: center;
+		padding: 0 .25rem;
+
+		// Native-app "new item" cue: the badge pops when a count grows
+		// (live counter updates — see delivery-dashboard.js pulseBadge).
+		&--pulse {
+			animation: routew-badge-pop .45s $rm-ease;
+		}
+	}
+
+	&.active {
+		color: var(--rm-brand-strong);
+		background: var(--rm-brand-soft);
+
+		.routew-tabbar__count {
+			background: var(--rm-brand-strong);
+			color: #fff;
+		}
+	}
+}
+
+@keyframes routew-badge-pop {
+	0% {
+		transform: scale(1);
+	}
+
+	40% {
+		transform: scale(1.35);
+		background: var(--rm-brand);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
+// ---------------------------------------------------------------------------
+// In-place card transitions (no-reload actions — see delivery-dashboard.js
+// applyActionResponse): a card slides away when it moves tabs and the
+// fresh card in the destination tab arrives with a soft brand flash.
+// ---------------------------------------------------------------------------
+.routew-order-card {
+	transition: opacity .18s ease-out, transform .18s ease-out, box-shadow .2s ease-out;
+}
+
+.routew-card--removing {
+	opacity: 0;
+	transform: scale(.97);
+	pointer-events: none;
+}
+
+.routew-card--arriving {
+	animation: routew-card-arrive .42s $rm-ease;
+}
+
+@keyframes routew-card-arrive {
+	0% {
+		opacity: 0;
+		transform: translateY(-10px) scale(.98);
+	}
+
+	60% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Toast
+// ---------------------------------------------------------------------------
+.routew-toast {
+	position: fixed;
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: calc(5.25rem + env(safe-area-inset-bottom));
+	z-index: 200;
+	background: $rm-ink;
+	color: #fff;
+	font-size: .8438rem;
+	font-weight: 600;
+	border-radius: $rm-radius-pill;
+	padding: .625rem 1.125rem;
+	box-shadow: $rm-shadow-pop;
+	max-width: min(92vw, 26rem);
+	text-align: center;
+	animation: routew-toast-in .3s $rm-ease;
+}
+
+@keyframes routew-toast-in {
+	from {
+		opacity: 0;
+		transform: translate(-50%, 8px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Reduced motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+	.routew-app-main .routew-tab-content.active,
+	.routew-toast,
+	.routew-card--arriving,
+	.routew-tabbar__count--pulse {
+		animation: none;
+	}
+
+	.routew-order-card {
+		transition: none;
+	}
+}
+}

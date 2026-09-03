@@ -1,0 +1,38 @@
+//
+// RouteMile UI — scoped Bootstrap 5.3 build.
+//
+// Compiles a trimmed Bootstrap component set re-skinned with the
+// RouteMile tokens. The output is post-processed by postcss-prefix-selector
+// (see postcss.config.js) so every rule only applies inside `.routew-ui` —
+// the storefront theme can never collide with Bootstrap's globals again.
+//
+// Trimmed on purpose: no carousel, modal, dropdown, offcanvas, tooltip,
+// popover, accordion, breadcrumb, pagination, spinner, toast, progress.
+// Add a component here only when a surface actually uses it.
+//
+
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "tokens";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/images";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/list-group";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/utilities";
+@import "bootstrap/scss/utilities/api";
+
+// RouteMile shared component layer (pills, avatars, tiles, empty states)
+// — same scope, same build.
+@import "components";

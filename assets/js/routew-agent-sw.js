@@ -14,11 +14,12 @@
 
 /* global self, caches, clients, fetch, Response */
 
-// Bumped v1 -> v2 alongside the UI overhaul (Batch 1b) — the dashboard
-// CSS is now layered on top of Bootstrap and any cached v1 CSS would
-// render with the wrong token overrides. The activate handler below
-// deletes old caches, so installed PWAs auto-refresh on next open.
-const CACHE_VERSION = 'routew-agent-v2';
+// Bumped v2 -> v3 alongside the Mile Zero design-system overhaul — the
+// dashboard now loads the scoped routew-ui.css build instead of the raw
+// Bootstrap bundle, and any cached v2 CSS would render unstyled. The
+// activate handler below deletes old caches, so installed PWAs
+// auto-refresh on next open.
+const CACHE_VERSION = 'routew-agent-v3';
 const DASHBOARD_URL = self.registration.scope;
 // WP install sees the plugin as `routemile-for-woocommerce` (matches the
 // post-rename plugin slug). The folder path is hardcoded here because the

@@ -70,7 +70,21 @@ class ROUTEW_Checkout_Maps
             return;
         }
 
-        wp_enqueue_style('routew-frontend', ROUTEW_PLUGIN_URL . 'assets/css/frontend.css', array(), ROUTEW_VERSION);
+        // Design system + checkout surface styles. routew-ui is the scoped
+        // Bootstrap re-skin (safe next to any theme); checkout.css adds the
+        // location-picker + delivery-field styling.
+        wp_enqueue_style(
+            'routew-ui',
+            ROUTEW_PLUGIN_URL . 'assets/css/routew-ui.css',
+            array(),
+            ROUTEW_VERSION
+        );
+        wp_enqueue_style(
+            'routew-checkout',
+            ROUTEW_PLUGIN_URL . 'assets/css/checkout.css',
+            array('routew-ui'),
+            ROUTEW_VERSION
+        );
 
         if ('leaflet' === $provider['engine']) {
             $this->enqueue_leaflet($provider, $options);

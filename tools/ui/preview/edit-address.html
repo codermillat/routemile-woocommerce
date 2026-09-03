@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RouteMile — Edit Address (preview)</title>
+<link rel="stylesheet" href="../../../assets/css/routew-ui.css">
+<link rel="stylesheet" href="../../../assets/css/my-account.css">
+<style>
+	body { margin: 0; background: #FDFDFC; font-family: Georgia, serif; }
+	.site { max-width: 1160px; margin: 0 auto; padding: 24px 20px 120px; }
+	.site-header { border-bottom: 1px solid #e5e5e5; padding: 14px 0 18px; margin-bottom: 26px; font-size: 21px; }
+</style>
+</head>
+<body class="woocommerce-account routew-my-account-styled">
+<div class="site">
+	<div class="site-header"><b>Bella Cucina</b> — fake theme</div>
+
+	<div class="woocommerce">
+		<nav class="woocommerce-MyAccount-navigation">
+			<ul>
+				<li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--dashboard"><a href="#">Dashboard</a></li>
+				<li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--orders"><a href="#">Orders</a></li>
+				<li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--edit-address is-active"><a href="#">Addresses</a></li>
+				<li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--edit-account"><a href="#">Account details</a></li>
+				<li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--payment-methods"><a href="#">Payment methods</a></li>
+				<li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--customer-logout"><a href="#">Log out</a></li>
+			</ul>
+		</nav>
+
+		<div class="woocommerce-MyAccount-content">
+						<div class="routew-ui routew-account">
+				<nav class="routew-subpage-header" data-endpoint="edit-address">
+					<a class="routew-subpage-header__back" href="#" aria-label="Back to My account">
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>
+					</a>
+					<span class="routew-subpage-header__title">Addresses</span>
+				</nav>
+
+				<p class="routew-lead">The following addresses will be used on the checkout page by default.</p>
+
+				<div class="routew-address-grid">
+					<div class="routew-address-col routew-address-col--billing">
+						<header class="routew-address-card-header">
+							<h2>Billing address</h2>
+							<a href="#" class="routew-address-edit">Edit Billing address</a>
+						</header>
+						<address>
+							<strong>Mohd MILLAT</strong><br>
+							Flat 3B, Aster Apartments<br>
+							Landmark: Near Sector Alpha park<br>
+							Chattogram Division, Rangamati, 4530
+						</address>
+					</div>
+					<div class="routew-address-col routew-address-col--shipping routew-address-col--empty">
+						<header class="routew-address-card-header">
+							<h2>Shipping address</h2>
+							<a href="#" class="routew-address-edit">Add Shipping address</a>
+						</header>
+						<address>You have not set up this type of address yet.</address>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

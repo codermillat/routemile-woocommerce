@@ -10,11 +10,11 @@
 - **Project:** RouteMile for WooCommerce — a delivery-management plugin for single-restaurant WooCommerce stores
 - **Current version:** **v1.5.0** (released 2026-09-01 — see CHANGELOG.md). Highlights: customer /my-account dashboard overhaul (`ROUTEW_My_Account`, `my-account-dashboard.css`), delivery-rider PWA (manifest/SW via query-string endpoints, heartbeat auto-refresh, COD strips, bottom tabs), cash settlement workflow (`ROUTEW_Agent_Cash` ledger: agent requests → manager/admin accept/reject with audit trail), work-tracking table (`ROUTEW_Dashboard_Agents`), settings redesign for non-tech admins (conditional visibility via `data-routew-show-when` contract in `admin-settings.js`, masked keys, Google fields under Map Provider section), open-all-day + special-occasion override hours, admin-bar toggle acts on effective state, kitchen-note privacy split (riders see delivery instructions only; Kitchen Note column for managers), `post_status_exists()` → `get_post_status_object()` fix at 3 sites, receipt bill rebuild (`wc_price` line totals, full breakdown, comma-separated address). readme.txt with external-service disclosure + setup/API-key/security docs. Tests: **147/147** (PHP 8.5 CLI and live PHP 7.4.30 both verified). Mimosa deep scan 0 findings. Repo public, GPL-3.0-or-later. See CHANGELOG.md. Historical notes below.
 
-- **In progress:** **Phase 1** of an 8-phase backport — porting 17 premium features from two archived sibling repos (`RestroReach` and `restaurant-delivery-manager`, both archived on GitHub but not deleted)
+- **In progress:** **Mile Zero design system** (unreleased, in working tree — see CHANGELOG "[Unreleased]"). All customer + agent UI rebuilt on a compiled, **scoped** Bootstrap 5.3 re-skin (`assets/css/routew-ui.css`, built from `tools/ui/scss/` via `node tools/ui/build.mjs`). Root fix: v1.5.0 loaded full unscoped Bootstrap on themed pages and broke layouts; every rule now lives under `.routew-ui`. Design tokens + bundled Plus Jakarta Sans (OFL) in `assets/fonts/`. Surface stylesheets: `my-account.css`, `my-account-dashboard.css`, `checkout.css`, `tracking.css`, `delivery-dashboard.css` (sources in `assets/css-src/*.scss`). Old `frontend.css` + `assets/vendor/bootstrap/` deleted. Tests rewritten UI1–UI12 → DS1–DS16: **303/303** (PHP 8.5 CLI + live PHP 7.4.30). Round 13 landed: admin-configurable **brand color** (`includes/class-routew-brand-color.php`) — one admin-picked hex re-derives the full brand ramp (strong/deep/soft/line/canvas/canvas-2/tint/canvas-wash + `--rm-on-brand`) in pure PHP and prints as ONE inline custom-property rule on the shared `routew-ui` handle; root fix: the compiled stylesheets now CONSUME `var(--rm-brand*)` (~90 previously-literal sites across `_components.scss` + the 5 surface sheets, alpha tints → `color-mix`), so with no override saved the rendering is identical to before; WCAG AA guardrail flips solid-fill text to ink when the derived strong shade is too light for white (pale-yellow brands) and keeps white for dark ones (wired via `var(--rm-on-brand, #fff)`); PWA manifest `theme_color` + dashboard `<meta name=theme-color>` read the admin color; settings field rides the existing WC tab + `routew_sanitize_settings_extra` with `sanitize_hex_color` + 3-digit expansion + default-equals-no-override semantics; live preview swatches in admin (`admin-settings.js` `brandPreview()`). Round 12 landed: admin-renameable order stages (`includes/class-routew-stage-labels.php`) — admins rename the 5 delivery stages + pick colour (curated pill palette) + icon (fixed SVG palette) from WooCommerce → Settings → RouteMile, with a live preview pill per row; display-only (status slugs + `_routew_status_at_*` + order data untouched, no migration), and every surface reads the shared helper (WC status dropdown + order lists via `ROUTEW_Order_Statuses`, agent PWA card pills, customer tracking stepper labels + icons + hero pills, my-account pills, deliveries dashboard cells; terminal states keep the fixed red pill); saves go through the Settings API extension points with whitelisted keys/colours/icons + `sanitize_text_field` + empty→default fallback, `statuses` mapping never form-writable. Plus a manager **Accept Order** button on pending orders in the deliveries dashboard (pending → routew-in-kitchen) reusing the nonce-verified `routew_update_order_status` handler — completes the manager workflow (Order placed → accept → assign rider → rider picks up → on the way → cash if COD → delivered). Also: the agent PWA "To hand over" tile now updates with a pre-formatted `wc_price()` string (`unsettled_formatted` in `build_action_response()`) instead of a raw float, and the `cash_to_collect`/`holding` i18n strings are properly localized. Round 11 landed: agent PWA polish — Cash Collected orders no longer count toward the "Cash to collect" banner (server-side `build_dashboard_state` excludes them + signature tracks the collected/uncollected state); `build_action_response()` returns `cash` too so the JS in-place-updates the **"Cash to collect"** + **"You are holding ৳X"** banners + the **"To hand over"** stat tile from the AJAX response (no reload needed after Mark Picked Up / Cash Collected / Mark Delivered); heartbeat re-reads `data-routew-state` from the shell on every poll so the agent's own action no longer triggers a spurious hard reload 30s later (verified live: 32s wait after Mark Delivered → navigation count stays at 1); same-tab card refresh for COD cash confirm no longer drops the card from the DOM (the idempotency remove ran before `insertBefore($card)` and left the new card parented to the now-detached `$card` — fixed by prepending directly into the destination panel + skipping the animate-out for same-tab refreshes). Round 10: WordPress Plugin Check (PCP) compliance — 0 errors on the shipping zip (5 `_n()` translators comments, `esc_html()` on the cash-collected total, WC-domain `phpcs:ignore` annotations in the my-address override, `routew_`-prefixed template vars, read-only `$_GET` reads annotated, `.DS_Store` purge, `build.sh` → `build.mjs` Node build with byte-identical output, `tools/` distignored). Round 9: agent PWA native-app flow. Round 8.1: order-received page fixed for the BLOCKIFIED WC template (`render_block` scope injection per block — the classic thankyou hooks split the wrapper across sibling blocks; also a 30-vs-32 strncmp bug made the filter a no-op). Round 8: creation-status stamping via `woocommerce_new_order` (WC never fires the changed-hook for the initial status), 4-step sequential tracking timeline (assigned = still in the kitchen; rider card shows assignment time; current step shows "Started …"), COD cash-collection gate on the agent PWA (server-enforced on AJAX + admin_post paths; `_routew_cash_collected` meta + `date_paid`), order-received page scoped via `woocommerce_before_thankyou`/`woocommerce_thankyou` wrapper with a thank-you hero. Round 7: per-status transition timestamps, full 10-status tracking map, mandatory phone (option filter for Checkout block + `woocommerce_billing_fields` for classic + 7–15-digit server-side validation), view-order Re-order button + WC status `<mark>` pill styling. Phase 1 data-layer backport is next after this ships.
 - **User profile:** Freelance web developer. The plugin is a **general open-source release for everyone** (GPL-3.0-or-later) — not tied to any specific restaurant or client. It is the **primary project**; everything else on the machine is secondary.
 - **Repo location:** `~/Desktop/RouteMile-for-WooCommerce/` (moved here from `~/.minimax-agent/projects/repo-merge-analysis/fx/` on 2026-08-17 so non-Mavis tools can access it directly)
 - **Remote:** `https://github.com/codermillat/routemile-woocommerce` (public since v1.2.1, GPL-3.0-or-later)
-- **Test runner:** `php tests/RouteWTestRunner.php` → must report **138/138 pass** before any commit (v1.3.8 added two SHA-256 integrity checks for the bundled Leaflet JS/CSS)
+- **Test runner:** `php tests/RouteWTestRunner.php` → must report **303/303 pass** before any commit (includes Leaflet SHA-256 integrity + the DS1–DS16 design-system suite)
 
 ---
 
@@ -115,7 +115,7 @@ RouteMile-for-WooCommerce/
 │       └── class-routew-email-picked-up.php
 ├── templates/                      ← frontend templates (delivery dashboard, delivery-boy view, receipt)
 ├── assets/
-│   ├── css/                        ← frontend.css, delivery-dashboard.css, my-account.css, my-account-dashboard.css (v1.4.0)
+│   ├── css/                        ← routew-ui.css (scoped Bootstrap build), my-account.css, my-account-dashboard.css, checkout.css, tracking.css, delivery-dashboard.css, receipt.css, admin-settings.css (compiled — sources in assets/css-src/ + tools/ui/scss/)
 │   └── js/                         ← checkout.js, delivery-dashboard.js, admin.js, admin-dashboard.js
 ├── tests/
 │   └── RouteWTestRunner.php           ← static analysis + security checks
@@ -189,8 +189,12 @@ RouteMile-for-WooCommerce/
 
 ### CSS
 
-1. **Scope styles to plugin classes** — never style `html, body` or other global selectors.
-2. Mobile-first responsive design.
+1. **All plugin UI lives in the Mile Zero design system.** Framework styling comes from the compiled, **scoped** Bootstrap 5.3 re-skin (`assets/css/routew-ui.css`) — never enqueue raw Bootstrap. Surface-specific styling goes in `assets/css-src/*.scss` (compiled by `node tools/ui/build.mjs`, output committed to `assets/css/`).
+2. **Inside surface SCSS files, nest rules under `.routew-ui {}`** so they match scoped-Bootstrap specificity. Never use `&--modifier &__element` inside the wrapper (Sass expands `&` to the full parent chain and duplicates the scope — write flat `.block--mod .block__el` selectors at wrapper level instead).
+3. **Use the tokens** (`--rm-*` custom properties / `$rm-*` Sass vars in `tools/ui/scss/_tokens.scss`) — never hard-code brand colors, radii, or shadows.
+4. Never style `html`, `body`, or other global selectors. The only exception is the account-nav/layout rules in `my-account.scss`, which target WC's own markup *outside* the scope via the `routew-my-account-styled` body class.
+5. Mobile-first responsive design. Interactive targets ≥44px on the agent PWA, ≥24px elsewhere.
+6. Guard all motion with `prefers-reduced-motion`.
 
 ### Distance Matrix data shape (Google Maps)
 
@@ -225,7 +229,7 @@ cd ~/Desktop/RouteMile-for-WooCommerce   # or wherever the project lives
 php tests/RouteWTestRunner.php
 ```
 
-Expected: `Passed: 138, Failed: 0`. The runner checks:
+Expected: `Passed: 278, Failed: 0`. The runner checks:
 
 - File structure (all required files exist, including the 3 checkout split files)
 - Bundled vendor integrity (SHA-256 of the bundled Leaflet JS/CSS matches the pinned hashes — v1.3.8)
@@ -234,7 +238,7 @@ Expected: `Passed: 138, Failed: 0`. The runner checks:
 - Hooks & filters (registered correctly, custom statuses registered)
 - Security patterns (ABSPATH check, nonce verification)
 
-**Run the test runner after every change. It must report 118/118 before commit.**
+**Run the test runner after every change. It must report 278/278 before commit.**
 
 ---
 

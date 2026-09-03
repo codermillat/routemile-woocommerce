@@ -59,6 +59,65 @@ class ROUTEW_Checkout_Address
 		add_action('woocommerce_checkout_update_order_meta', array($this, 'noop'), 5);
 		add_filter('woocommerce_checkout_posted_data', array($this, 'fill_posted_data'), 20);
 		add_action('woocommerce_store_api_checkout_update_order_from_request', array($this, 'fill_block_order'), 5, 2);
+
+		// The customer's phone is how the rider reaches them at the door —
+		// for a delivery store it can never be optional. Two official
+		// mechanisms, one per checkout surface:
+		//  - the woocommerce_checkout_phone_field option (read by the
+		//    Checkout BLOCK contact panel: 'required' | 'optional' | 'hidden')
+		//  - woocommerce_billing_fields (the classic checkout's own filter)
+		// Filtering at read time (option_ + default_option_) means the
+		// requirement holds even if the merchant never touched the setting.
+		add_filter('option_woocommerce_checkout_phone_field', array($this, 'force_phone_required'));
+		add_filter('default_option_woocommerce_checkout_phone_field', array($this, 'force_phone_required'));
+		add_filter('woocommerce_billing_fields', array($this, 'require_phone_field'), 20);
+	}
+
+	/**
+	 * Force the checkout phone-field state option to 'required'.
+	 *
+	 * Applies to both a stored value (option_ filter) and the default
+	 * for stores that never saved one (default_option_ filter) — this is
+	 * WooCommerce's documented configuration surface for the Checkout
+	 * block's core phone field.
+	 *
+	 * @param string|mixed $value Stored or default option value.
+	 * @return string
+	 * @since 1.6.0
+	 */
+	public function force_phone_required($value)
+	{
+		return 'required';
+	}
+
+	/**
+	 * Make the classic checkout's billing phone required + helpful.
+	 *
+	 * Runs on woocommerce_billing_fields (WC's documented filter for
+	 * billing-field properties). Required-ness applies everywhere the
+	 * billing fields render; the delivery-flavoured label / placeholder
+	 * are only applied on the checkout page itself so the My Account
+	 * address forms keep WooCommerce's own wording.
+	 *
+	 * @param array $fields Billing fields.
+	 * @return array
+	 * @since 1.6.0
+	 */
+	public function require_phone_field($fields)
+	{
+		if (!isset($fields['billing_phone']) || !is_array($fields['billing_phone'])) {
+			return $fields;
+		}
+
+		$fields['billing_phone']['required'] = true;
+
+		if (function_exists('is_checkout') && is_checkout()) {
+			$fields['billing_phone']['label'] = __('Phone number', 'routemile-for-woocommerce');
+			$fields['billing_phone']['placeholder'] = __('Your rider will call this number', 'routemile-for-woocommerce');
+			$fields['billing_phone']['autocomplete'] = 'tel';
+		}
+
+		return $fields;
 	}
 
 	/**

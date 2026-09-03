@@ -1,0 +1,216 @@
+//
+// RouteMile UI — design tokens.
+//
+// Single source of truth for the delivery-app design language
+// ("Mile Zero"). These tokens drive both the Bootstrap re-skin
+// (Sass variables below) and the plugin's own component layer
+// (CSS custom properties emitted at the bottom of this file).
+//
+// Palette: warm charcoal ink + burnt delivery-orange on a warm
+// peach-cream canvas — the Uber Eats / Swiggy register, tuned to
+// WCAG AA (all text pairs verified >= 4.5:1).
+//
+// Shared by the scoped Bootstrap build (tools/ui/scss/) and every
+// surface stylesheet (assets/css-src/) via the build's --load-path.
+//
+
+// ---------------------------------------------------------------------------
+// Brand ramp
+// ---------------------------------------------------------------------------
+$rm-brand:        #E85D04; // bright orange — accents, icons, active markers
+$rm-brand-strong: #C2410C; // AA on white (4.6:1) — buttons, links
+$rm-brand-deep:   #9A3412; // hover / pressed
+$rm-brand-soft:   #FFF1E7; // tinted chip / icon backgrounds
+$rm-brand-line:   #FFD9BE; // tinted borders
+
+// ---------------------------------------------------------------------------
+// Neutral ramp (warm stone)
+// ---------------------------------------------------------------------------
+$rm-ink:      #1C1917; // headings, near-black
+$rm-body:     #44403C; // body copy (8.9:1 on white)
+$rm-muted:    #78716C; // secondary copy (4.7:1 on white)
+$rm-faint:    #A8A29E; // hairline icons, placeholders
+$rm-line:     #E7E5E4; // borders, dividers
+$rm-wash:     #F5F4F2; // subtle fills, table stripes
+$rm-surface:  #FFFFFF; // cards, sheets
+
+// Canvas — the food-app page bg. Warm cream, faintly peach, so the white
+// cards visibly float (painted on body + the WC wrapper via my-account.css).
+$rm-canvas:   #FFF8F2;
+$rm-canvas-2: #FEF0E4; // deeper peach, radial accent behind the hero
+
+// Extra-tint surfaces — colored quick-action tiles, hero washes.
+$rm-tint-orange: #FFEBDD;
+$rm-tint-blue:   #E8EFFD;
+$rm-tint-green:  #E6F6EC;
+$rm-tint-amber:  #FEF0DC;
+$rm-tint-pink:   #FDE6EC;
+
+// Brand-derived washes (runtime-overridable companions to the ramp).
+// `--rm-brand-canvas-wash` is the near-white end of the quick-action
+// tile gradient: slightly warmer than plain white so tiles read as
+// brand-tinted. The runtime brand override redefines it alongside the
+// ramp (see includes/class-routew-brand-color.php).
+$rm-brand-canvas-wash: #FFF6EF;
+
+// ---------------------------------------------------------------------------
+// Status ramp — delivery states (tint = soft background, strong = AA text)
+// ---------------------------------------------------------------------------
+$rm-preparing:        $rm-brand-strong;
+$rm-preparing-tint:   #FFEBDD;
+$rm-assigned:         #92400E;
+$rm-assigned-tint:    #FEF0DC;
+$rm-transit:          #1D4ED8;
+$rm-transit-tint:     #E8EFFD;
+$rm-delivered:        #15803D;
+$rm-delivered-tint:   #E6F6EC;
+$rm-cancelled:        #B91C1C;
+$rm-cancelled-tint:   #FDEAEA;
+
+// ---------------------------------------------------------------------------
+// Typography
+// ---------------------------------------------------------------------------
+$rm-font: 'RouteMile Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+          Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+// ---------------------------------------------------------------------------
+// Shape + depth
+// ---------------------------------------------------------------------------
+$rm-radius-card:  1rem;    // 16px — cards, sheets
+$rm-radius-field: .75rem;  // 12px — inputs, selects
+$rm-radius-chip:  .625rem; // 10px — small tiles
+$rm-radius-pill:  50rem;   // buttons, pills
+
+$rm-shadow-card: 0 1px 2px rgba(28, 25, 23, .05), 0 4px 16px rgba(28, 25, 23, .05);
+$rm-shadow-pop:  0 2px 4px rgba(28, 25, 23, .06), 0 12px 32px rgba(28, 25, 23, .12);
+$rm-shadow-inset: inset 0 0 0 1px rgba(28, 25, 23, .06);
+
+$rm-ease: cubic-bezier(.2, .8, .2, 1);
+
+// ---------------------------------------------------------------------------
+// Bootstrap 5.3 re-skin — components inherit the language natively
+// ---------------------------------------------------------------------------
+$primary:   $rm-brand-strong;
+$secondary: $rm-muted;
+$success:   $rm-delivered;
+$info:      $rm-transit;
+$warning:   $rm-assigned;
+$danger:    $rm-cancelled;
+$dark:      $rm-ink;
+$light:     $rm-wash;
+
+$font-family-sans-serif: $rm-font;
+$font-family-base:       $rm-font;
+$body-color:             $rm-body;
+$body-bg:                $rm-canvas;
+$headings-color:         $rm-ink;
+$headings-font-weight:   700;
+
+$link-color:            $rm-brand-strong;
+$link-hover-color:      $rm-brand-deep;
+$link-decoration:       none;
+$link-shade-percentage: 12%;
+
+$border-color: $rm-line;
+$border-width: 1px;
+
+$border-radius:      $rm-radius-field;
+$border-radius-sm:   .5rem;
+$border-radius-lg:   $rm-radius-card;
+$border-radius-xl:   1.25rem;
+$border-radius-2xl:  1.5rem;
+$border-radius-pill: $rm-radius-pill;
+
+$btn-border-radius:      $rm-radius-pill;
+$btn-border-radius-sm:   $rm-radius-pill;
+$btn-border-radius-lg:   $rm-radius-pill;
+$btn-padding-x:          1.25rem;
+$btn-font-weight:        600;
+$btn-focus-box-shadow:   0 0 0 .25rem rgba($rm-brand-strong, .25);
+
+$card-border-color:    $rm-line;
+$card-border-radius:   $rm-radius-card;
+$card-cap-bg:          $rm-surface;
+$card-bg:              $rm-surface;
+$card-box-shadow:      $rm-shadow-card;
+$card-inner-border-radius: subtract($rm-radius-card, $border-width);
+
+$form-label-font-weight: 600;
+$form-label-margin-bottom: .375rem;
+$input-border-color:      #D6D3D1;
+$input-border-radius:     $rm-radius-field;
+$input-focus-border-color: $rm-brand;
+$input-focus-box-shadow:  0 0 0 .25rem rgba($rm-brand-strong, .18);
+$input-placeholder-color: $rm-faint;
+$form-text-color:         $rm-muted;
+
+$badge-border-radius: $rm-radius-pill;
+$badge-font-weight:   600;
+
+$list-group-border-color: $rm-line;
+$list-group-bg:            transparent;
+$list-group-active-bg:     $rm-brand-soft;
+$list-group-active-color:  $rm-brand-strong;
+$list-group-active-border-color: $rm-brand-line;
+
+$alert-border-radius: $rm-radius-card;
+$alert-border-width:  1px;
+$alert-bg-scale:      -88%;
+$alert-border-scale:  -78%;
+$alert-color-scale:   -20%;
+
+$table-border-color:   $rm-line;
+$table-bg:             $rm-surface;
+$table-striped-bg:     $rm-wash;
+$table-border-radius:  $rm-radius-card;
+
+$grid-gutter-width: 1rem;
+$spacer: 1rem;
+$enable-negative-margins: true;
+$enable-cssgrid: false;
+$caret-width: 0px;
+
+// ---------------------------------------------------------------------------
+// Emitted CSS custom properties (used by the plugin component layer)
+// ---------------------------------------------------------------------------
+:root {
+	--rm-brand: #{$rm-brand};
+	--rm-brand-strong: #{$rm-brand-strong};
+	--rm-brand-deep: #{$rm-brand-deep};
+	--rm-brand-soft: #{$rm-brand-soft};
+	--rm-brand-line: #{$rm-brand-line};
+	--rm-ink: #{$rm-ink};
+	--rm-body: #{$rm-body};
+	--rm-muted: #{$rm-muted};
+	--rm-faint: #{$rm-faint};
+	--rm-line: #{$rm-line};
+	--rm-wash: #{$rm-wash};
+	--rm-surface: #{$rm-surface};
+	--rm-canvas: #{$rm-canvas};
+	--rm-canvas-2: #{$rm-canvas-2};
+	--rm-tint-orange: #{$rm-tint-orange};
+	--rm-tint-blue: #{$rm-tint-blue};
+	--rm-tint-green: #{$rm-tint-green};
+	--rm-tint-amber: #{$rm-tint-amber};
+	--rm-tint-pink: #{$rm-tint-pink};
+	--rm-brand-canvas-wash: #{$rm-brand-canvas-wash};
+	--rm-preparing: #{$rm-preparing};
+	--rm-preparing-tint: #{$rm-preparing-tint};
+	--rm-assigned: #{$rm-assigned};
+	--rm-assigned-tint: #{$rm-assigned-tint};
+	--rm-transit: #{$rm-transit};
+	--rm-transit-tint: #{$rm-transit-tint};
+	--rm-delivered: #{$rm-delivered};
+	--rm-delivered-tint: #{$rm-delivered-tint};
+	--rm-cancelled: #{$rm-cancelled};
+	--rm-cancelled-tint: #{$rm-cancelled-tint};
+	--rm-radius-card: #{$rm-radius-card};
+	--rm-radius-field: #{$rm-radius-field};
+	--rm-radius-chip: #{$rm-radius-chip};
+	--rm-radius-pill: #{$rm-radius-pill};
+	--rm-shadow-card: #{$rm-shadow-card};
+	--rm-shadow-pop: #{$rm-shadow-pop};
+	--rm-shadow-inset: #{$rm-shadow-inset};
+	--rm-ease: #{$rm-ease};
+	--rm-font: #{$rm-font};
+}

@@ -1,0 +1,377 @@
+//
+// RouteMile UI — shared component layer.
+//
+// Signature components composed on top of Bootstrap, driven by the
+// design tokens. Compiled into routew-ui.css (inside the .routew-ui
+// scope) so every surface — account, tracking, checkout, agent —
+// shares the same vocabulary.
+//
+
+@import "tokens";
+
+// ---------------------------------------------------------------------------
+// Card depth — every scoped card floats on the warm canvas with the soft
+// brand shadow (Bootstrap 5.3 .card has no default box-shadow).
+// ---------------------------------------------------------------------------
+.card {
+	box-shadow: $rm-shadow-card;
+}
+
+// ---------------------------------------------------------------------------
+// Brand pill button — the primary CTA (reorder, track, submit). Composes
+// with Bootstrap's .btn (which resets via --bs-btn-* vars) and overrides
+// them with the brand ramp.
+// ---------------------------------------------------------------------------
+.routew-btn-brand {
+	--bs-btn-bg: var(--rm-brand-strong);
+	// Text on solid brand fills defaults to white; a runtime brand that
+	// is too light for AA flips --rm-on-brand to ink (contrast guardrail
+	// — see includes/class-routew-brand-color.php).
+	--bs-btn-color: var(--rm-on-brand, #fff);
+	--bs-btn-border-color: var(--rm-brand-strong);
+	--bs-btn-hover-bg: var(--rm-brand-deep);
+	--bs-btn-hover-color: var(--rm-on-brand, #fff);
+	--bs-btn-hover-border-color: var(--rm-brand-deep);
+	--bs-btn-active-bg: var(--rm-brand-deep);
+	--bs-btn-active-color: var(--rm-on-brand, #fff);
+	--bs-btn-active-border-color: var(--rm-brand-deep);
+	--bs-btn-disabled-bg: var(--rm-brand-strong);
+	--bs-btn-disabled-color: var(--rm-on-brand, #fff);
+	--bs-btn-disabled-border-color: var(--rm-brand-strong);
+	box-shadow: 0 6px 16px color-mix(in srgb, var(--rm-brand-strong) 28%, transparent);
+
+	display: inline-flex;
+	align-items: center;
+	gap: .4375rem;
+
+	svg {
+		width: 1rem;
+		height: 1rem;
+		fill: currentColor;
+	}
+
+	&:hover {
+		box-shadow: 0 8px 20px color-mix(in srgb, var(--rm-brand-strong) 35%, transparent);
+	}
+
+	&:active {
+		transform: scale(.98);
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Quiet pill button — secondary actions (row links, sub-page buttons)
+// ---------------------------------------------------------------------------
+.routew-btn-quiet {
+	--bs-btn-bg: #{$rm-wash};
+	--bs-btn-color: #{$rm-ink};
+	--bs-btn-border-color: #{$rm-line};
+	--bs-btn-hover-bg: var(--rm-brand-soft);
+	--bs-btn-hover-color: var(--rm-brand-strong);
+	--bs-btn-hover-border-color: var(--rm-brand-line);
+	--bs-btn-active-bg: var(--rm-brand-soft);
+	--bs-btn-active-color: var(--rm-brand-strong);
+	--bs-btn-active-border-color: var(--rm-brand-line);
+}
+
+// ---------------------------------------------------------------------------
+// Status pill — tinted, delivery-native. Variants mirror the delivery
+// states (see _tokens.scss "Status ramp").
+// ---------------------------------------------------------------------------
+.routew-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: .3125rem;
+	border-radius: $rm-radius-pill;
+	padding: .2188rem .625rem;
+	font-size: .6875rem;
+	font-weight: 700;
+	letter-spacing: .02em;
+	line-height: 1.25;
+	white-space: nowrap;
+
+	&::before {
+		content: "";
+		width: .375rem;
+		height: .375rem;
+		border-radius: 50%;
+		background: currentColor;
+		flex: 0 0 auto;
+	}
+
+	&--placed {
+		color: $rm-body;
+		background: $rm-wash;
+	}
+
+	&--preparing {
+		color: $rm-preparing;
+		background: $rm-preparing-tint;
+	}
+
+	&--assigned {
+		color: $rm-assigned;
+		background: $rm-assigned-tint;
+	}
+
+	&--transit {
+		color: $rm-transit;
+		background: $rm-transit-tint;
+
+		&::before {
+			animation: routew-pill-pulse 1.6s $rm-ease infinite;
+		}
+	}
+
+	&--delivered {
+		color: $rm-delivered;
+		background: $rm-delivered-tint;
+	}
+
+	&--cancelled {
+		color: $rm-cancelled;
+		background: $rm-cancelled-tint;
+	}
+
+	// Larger inline variant (hero badges)
+	&--lg {
+		font-size: .7813rem;
+		padding: .3125rem .75rem;
+	}
+}
+
+@keyframes routew-pill-pulse {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	50% {
+		opacity: .45;
+		transform: scale(.75);
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Section title — label + trailing action link
+// ---------------------------------------------------------------------------
+.routew-section-title {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: .75rem;
+	margin: 0 0 .75rem;
+
+	&__label {
+		font-size: 1.0625rem;
+		font-weight: 700;
+		color: $rm-ink;
+		letter-spacing: -.01em;
+		margin: 0;
+	}
+
+	&__action {
+		display: inline-flex;
+		align-items: center;
+		font-size: .8438rem;
+		font-weight: 600;
+		color: var(--rm-brand-strong);
+		text-decoration: none;
+		padding: .3125rem .25rem; // ≥24px hit area (WCAG 2.5.8)
+		margin: -.3125rem -.25rem; // optically neutral
+
+		&:hover {
+			color: var(--rm-brand-deep);
+			text-decoration: underline;
+			text-underline-offset: .2em;
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Avatar — brand gradient disc with the initial
+// ---------------------------------------------------------------------------
+.routew-avatar {
+	display: inline-grid;
+	place-items: center;
+	border-radius: 50%;
+	background: linear-gradient(135deg, var(--rm-brand) 0%, var(--rm-brand-strong) 55%, var(--rm-brand-deep) 100%);
+	color: #fff;
+	font-weight: 700;
+	user-select: none;
+	flex: 0 0 auto;
+
+	&--sm {
+		width: 2.25rem;
+		height: 2.25rem;
+		font-size: .875rem;
+	}
+
+	&--md {
+		width: 3rem;
+		height: 3rem;
+		font-size: 1.125rem;
+	}
+
+	&--lg {
+		width: 3.5rem;
+		height: 3.5rem;
+		font-size: 1.375rem;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Tile icon — tinted square chip for quick-action grids and list rows
+// ---------------------------------------------------------------------------
+.routew-tile-icon {
+	display: inline-grid;
+	place-items: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: $rm-radius-chip;
+	flex: 0 0 auto;
+
+	svg {
+		width: 1.25rem;
+		height: 1.25rem;
+		fill: currentColor;
+	}
+
+	&--brand {
+		background: var(--rm-brand-soft);
+		color: var(--rm-brand-strong);
+	}
+
+	&--transit {
+		background: $rm-transit-tint;
+		color: $rm-transit;
+	}
+
+	&--delivered {
+		background: $rm-delivered-tint;
+		color: $rm-delivered;
+	}
+
+	&--assigned {
+		background: $rm-assigned-tint;
+		color: $rm-assigned;
+	}
+
+	&--neutral {
+		background: $rm-wash;
+		color: $rm-body;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Empty state — icon tile + title + text
+// ---------------------------------------------------------------------------
+.routew-empty {
+	text-align: center;
+	padding: 2.5rem 1.5rem;
+
+	&__icon {
+		width: 3.5rem;
+		height: 3.5rem;
+		margin: 0 auto .875rem;
+		border-radius: $rm-radius-card;
+		background: $rm-wash;
+		display: grid;
+		place-items: center;
+		font-size: 1.5rem;
+		line-height: 1;
+	}
+
+	&__title {
+		font-size: 1rem;
+		font-weight: 700;
+		color: $rm-ink;
+		margin: 0 0 .25rem;
+	}
+
+	&__text {
+		font-size: .8438rem;
+		color: $rm-muted;
+		margin: 0;
+		line-height: 1.5;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Chevron used by tappable rows
+// ---------------------------------------------------------------------------
+.routew-chevron {
+	flex: 0 0 auto;
+	width: 1.25rem;
+	height: 1.25rem;
+	border-radius: 50%;
+	background: $rm-wash;
+	display: grid;
+	place-items: center;
+	color: $rm-muted;
+
+	svg {
+		width: .75rem;
+		height: .75rem;
+		fill: currentColor;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Entrance motion — surfaces opt in per section (staggered fade-up).
+// Disabled under prefers-reduced-motion.
+// ---------------------------------------------------------------------------
+@keyframes routew-rise {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.routew-rise {
+	animation: routew-rise .5s $rm-ease both;
+
+	&-1 {
+		animation-delay: .04s;
+	}
+
+	&-2 {
+		animation-delay: .08s;
+	}
+
+	&-3 {
+		animation-delay: .12s;
+	}
+
+	&-4 {
+		animation-delay: .16s;
+	}
+
+	&-5 {
+		animation-delay: .2s;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.routew-pill--transit::before {
+		animation: none;
+	}
+
+	.routew-rise {
+		animation: none;
+
+		&-1,
+		&-2,
+		&-3,
+		&-4,
+		&-5 {
+			animation: none;
+		}
+	}
+}

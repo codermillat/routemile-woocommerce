@@ -1,0 +1,507 @@
+//
+// RouteMile — order tracking surface.
+//
+// Zomato-style live tracking: hero headline in delivery language, a
+// vertical stepper with a progress rail + per-step timestamps, and a
+// rider card with call / message actions. Rendered on the my-account
+// order view (inside the account scope) and the [routew_track_order]
+// shortcode page (own .routew-ui wrapper).
+//
+// Markup: ROUTEW_Shortcodes::output_tracking_ui() + track_order_form().
+//
+
+@import "tokens";
+
+.routew-ui {
+
+// ---------------------------------------------------------------------------
+// Track-order shortcode page — this class sits ON the .routew-ui scope
+// root (the shortcode emits <div class="routew-ui routew-track-order-page">),
+// so it must be matched with `&.` (same-element) — a plain descendant
+// selector would never match after the scope prefix.
+// ---------------------------------------------------------------------------
+&.routew-track-order-page {
+	max-width: 34rem;
+	margin-inline: auto;
+}
+
+.routew-track-form {
+	border: 1px solid $rm-line;
+	border-radius: $rm-radius-card;
+	box-shadow: $rm-shadow-card;
+	background: $rm-surface;
+
+	&__body {
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: .375rem;
+
+		@media (min-width: 576px) {
+			padding: 1.75rem;
+		}
+	}
+
+	&__title {
+		font-size: 1.375rem;
+		font-weight: 800;
+		letter-spacing: -.02em;
+		color: $rm-ink;
+		margin: 0;
+	}
+
+	&__sub {
+		font-size: .875rem;
+		color: $rm-muted;
+		margin: 0 0 1rem;
+	}
+
+	&__fields {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	&__row {
+		display: flex;
+		flex-direction: column;
+		gap: .375rem;
+
+		label {
+			font-size: .875rem;
+			font-weight: 600;
+			color: $rm-ink;
+		}
+
+		input {
+			border-radius: $rm-radius-field;
+			border: 1.5px solid #D6D3D1;
+			padding: .625rem .875rem;
+			font-size: .9375rem;
+			transition: border-color .16s ease-out, box-shadow .16s ease-out;
+
+			&:focus {
+				border-color: var(--rm-brand);
+				box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--rm-brand-strong) 15%, transparent);
+				outline: none;
+			}
+		}
+	}
+
+	&__submit {
+		align-self: flex-start;
+		margin-top: .25rem;
+
+		svg {
+			width: 1rem;
+			height: 1rem;
+			fill: currentColor;
+		}
+	}
+}
+
+.routew-track-error {
+	display: block;
+	border-radius: $rm-radius-field;
+	background: $rm-cancelled-tint;
+	border: 1px solid #F5C6C6;
+	color: $rm-cancelled;
+	font-size: .875rem;
+	font-weight: 500;
+	padding: .75rem .9375rem;
+	margin: 1rem 0;
+}
+
+// Shortcode result wrapper
+.routew-order-status-wrapper {
+	margin-top: 1.25rem;
+}
+
+.routew-order-status-header {
+	h3 {
+		font-size: 1.125rem;
+		font-weight: 700;
+		color: $rm-ink;
+		letter-spacing: -.015em;
+		margin: 0 0 .875rem;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Tracking section (shared: order view + shortcode result)
+// ---------------------------------------------------------------------------
+.routew-order-tracking {
+	background: $rm-surface;
+	border: 1px solid $rm-line;
+	border-radius: $rm-radius-card;
+	box-shadow: $rm-shadow-card;
+	overflow: hidden;
+	margin-bottom: 1.5rem;
+}
+
+// ---------------------------------------------------------------------------
+// Hero — status-tinted gradient banner (the "where is my food" moment)
+// ---------------------------------------------------------------------------
+.routew-tracking-hero {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1.375rem 1.375rem 1.3125rem;
+	overflow: hidden;
+	border-bottom: 1px solid $rm-line;
+	background:
+		radial-gradient(120% 150% at 100% 0%, color-mix(in srgb, var(--rm-brand) 12%, transparent) 0%, color-mix(in srgb, var(--rm-brand) 0%, transparent) 50%),
+		linear-gradient(160deg, var(--rm-canvas-2) 0%, $rm-surface 70%);
+
+	@media (min-width: 576px) {
+		padding: 1.625rem 1.75rem 1.5625rem;
+	}
+
+	&__eyebrow {
+		display: inline-block;
+		font-size: .6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .12em;
+		color: var(--rm-brand-strong);
+		background: var(--rm-brand-soft);
+		border: 1px solid var(--rm-brand-line);
+		border-radius: $rm-radius-pill;
+		padding: .2188rem .6875rem;
+		margin-bottom: .5625rem;
+	}
+
+	&__title {
+		font-size: clamp(1.375rem, 4vw, 1.75rem);
+		font-weight: 800;
+		color: $rm-ink;
+		letter-spacing: -.03em;
+		line-height: 1.1;
+		margin: 0 0 .3125rem;
+	}
+
+	&__sub {
+		font-size: .8438rem;
+		color: $rm-muted;
+		margin: 0;
+	}
+
+	.routew-pill--lg {
+		font-size: .8125rem;
+		padding: .4063rem .875rem;
+	}
+
+	@media (max-width: 480px) {
+		flex-direction: column;
+		gap: .625rem;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Stepper — vertical rail with filled progress + pulsing current dot
+// ---------------------------------------------------------------------------
+.routew-status-stepper {
+	list-style: none;
+	margin: 0;
+	padding: 1.25rem;
+	display: flex;
+	flex-direction: column;
+}
+
+.routew-status-step {
+	position: relative;
+	display: flex;
+	gap: .875rem;
+	padding-bottom: 1.625rem;
+
+	// Rail segment
+	&::before {
+		content: "";
+		position: absolute;
+		left: .9375rem;
+		top: 2.125rem;
+		bottom: .1875rem;
+		width: 2px;
+		border-radius: 1px;
+		background: $rm-line;
+	}
+
+	&:last-child {
+		padding-bottom: 0;
+
+		&::before {
+			display: none;
+		}
+	}
+
+	// Filled rail for completed segments
+	&--completed::before {
+		background: $rm-delivered;
+	}
+
+	&__dot {
+		position: relative;
+		z-index: 1;
+		flex: 0 0 auto;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 50%;
+		display: grid;
+		place-items: center;
+		background: $rm-surface;
+		border: 2px solid $rm-line;
+		color: $rm-faint;
+		transition: all .2s $rm-ease;
+	}
+
+	&__icon {
+		width: 1rem;
+		height: 1rem;
+		fill: currentColor;
+
+		&--stroke {
+			width: .9375rem;
+			height: .9375rem;
+		}
+	}
+
+	&__body {
+		display: flex;
+		flex-direction: column;
+		gap: .125rem;
+		padding-top: .0625rem;
+		min-width: 0;
+	}
+
+	&__label {
+		font-size: .9375rem;
+		font-weight: 600;
+		color: $rm-muted;
+		line-height: 1.35;
+	}
+
+	&__time {
+		font-size: .7813rem;
+		color: $rm-faint;
+
+		&--pending {
+			color: $rm-faint;
+		}
+
+		&--live {
+			color: var(--rm-brand-strong);
+			font-weight: 600;
+		}
+	}
+
+	// State styling lives at the wrapper level below (flat selectors) —
+	// `&--modifier &__element` inside the wrapped block would duplicate
+	// the .routew-ui parent chain in the compiled selector.
+}
+
+.routew-status-step--completed .routew-status-step__dot {
+	background: $rm-delivered;
+	border-color: $rm-delivered;
+	color: #fff;
+}
+
+.routew-status-step--completed .routew-status-step__label {
+	color: $rm-body;
+}
+
+.routew-status-step--completed .routew-status-step__time {
+	color: $rm-muted;
+}
+
+// Current step — brand ring + pulse
+.routew-status-step--current .routew-status-step__dot {
+	background: var(--rm-brand-soft);
+	border-color: var(--rm-brand);
+	color: var(--rm-brand-strong);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--rm-brand) 15%, transparent);
+}
+
+.routew-status-step--current .routew-status-step__dot::after {
+	content: "";
+	position: absolute;
+	inset: -6px;
+	border-radius: 50%;
+	border: 2px solid color-mix(in srgb, var(--rm-brand) 40%, transparent);
+	animation: routew-step-pulse 1.8s $rm-ease infinite;
+}
+
+.routew-status-step--current .routew-status-step__label {
+	color: $rm-ink;
+	font-weight: 700;
+}
+
+// Delivered finale
+.routew-status-step--delivered .routew-status-step__dot {
+	background: $rm-delivered;
+	border-color: $rm-delivered;
+	color: #fff;
+}
+
+@keyframes routew-step-pulse {
+	0% {
+		transform: scale(.9);
+		opacity: 1;
+	}
+
+	70%,
+	100% {
+		transform: scale(1.35);
+		opacity: 0;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Rider card
+// ---------------------------------------------------------------------------
+.routew-rider-card {
+	border-top: 1px solid $rm-line;
+	padding: 1.125rem 1.25rem 1.25rem;
+
+	&__title {
+		font-size: .6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .1em;
+		color: $rm-muted;
+		margin: 0 0 .75rem;
+	}
+
+	&__body {
+		display: flex;
+		align-items: center;
+		gap: .875rem;
+	}
+
+	&__info {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+
+	&__name {
+		display: block;
+		font-size: .9375rem;
+		font-weight: 700;
+		color: $rm-ink;
+	}
+
+	&__role {
+		display: inline-flex;
+		align-items: center;
+		gap: .25rem;
+		font-size: .7813rem;
+		color: $rm-muted;
+		margin-top: .125rem;
+	}
+
+	// When this rider was assigned (recorded transition time).
+	&__assigned {
+		display: block;
+		font-size: .75rem;
+		color: $rm-faint;
+		margin-top: .1875rem;
+	}
+
+	&__star {
+		width: .8125rem;
+		height: .8125rem;
+		fill: #F59E0B;
+	}
+
+	&__actions {
+		display: flex;
+		gap: .5rem;
+		flex: 0 0 auto;
+	}
+
+	&__btn {
+		display: inline-flex;
+		align-items: center;
+		gap: .375rem;
+		border-radius: $rm-radius-pill;
+		font-size: .8438rem;
+		font-weight: 600;
+		padding: .5rem 1rem;
+		text-decoration: none;
+		transition: all .16s ease-out;
+
+		svg {
+			width: .9375rem;
+			height: .9375rem;
+			fill: currentColor;
+		}
+
+		&--call {
+			background: var(--rm-brand-strong);
+			color: #fff;
+
+			&:hover {
+				background: var(--rm-brand-deep);
+				color: #fff;
+			}
+		}
+
+		&--msg {
+			background: $rm-surface;
+			border: 1.5px solid $rm-line;
+			color: $rm-ink;
+
+			&:hover {
+				border-color: #D6D3D1;
+				background: $rm-wash;
+			}
+		}
+	}
+
+	&__no-phone {
+		font-size: .8438rem;
+		color: $rm-muted;
+		background: $rm-wash;
+		border-radius: $rm-radius-pill;
+		padding: .5rem 1rem;
+	}
+
+	@media (max-width: 480px) {
+		&__body {
+			flex-wrap: wrap;
+		}
+
+		&__actions {
+			width: 100%;
+
+			.routew-rider-card__btn {
+				flex: 1;
+				justify-content: center;
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Rider placeholder note — shown when an order is at (or past) the
+// assigned step but no rider is linked yet, or when a delivered order
+// was handled by the store team. Muted strip, same rhythm as the card.
+// ---------------------------------------------------------------------------
+.routew-rider-note {
+	border-top: 1px solid $rm-line;
+	padding: 1rem 1.25rem;
+	font-size: .8438rem;
+	color: $rm-muted;
+}
+
+// ---------------------------------------------------------------------------
+// Reduced motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+	.routew-status-step--current .routew-status-step__dot::after {
+		animation: none;
+		display: none;
+	}
+}
+}

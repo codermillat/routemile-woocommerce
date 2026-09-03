@@ -3,6 +3,9 @@
 # Last updated: 1.2.1
 # =====================================================================
 
+# Release archives (built locally; wp.org carries the shipped zip)
+routemile-woocommerce.*.zip
+
 # OS
 .DS_Store
 .DS_Store?

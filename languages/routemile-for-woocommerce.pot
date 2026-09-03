@@ -1,1181 +1,2420 @@
-# FoodXpress for WooCommerce translation template.
-# Copyright (C) 2026 MD Millat Hosen
-# This file is distributed under GPL-3.0-or-later.
+# Copyright (C) 2026 MD MILLAT HOSEN
+# This file is distributed under the GPL-3.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodXpress for WooCommerce 1.2.6\n"
-"Report-Msgid-Bugs-To: https://github.com/codermillat/FoodXpress-for-WooCommerce/issues\n"
-"POT-Creation-Date: 2026-08-16 23:43+0000\n"
+"Project-Id-Version: RouteMile for WooCommerce 1.6.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/routemile-for-woocommerce\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: fxw-pot-generator\n"
+"POT-Creation-Date: 2026-09-03T17:39:52+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: routemile-for-woocommerce\n"
 
-#: includes/class-fxw-core.php:370
-msgid " and "
+#. Plugin Name of the plugin
+#: routemile-woocommerce.php
+msgid "RouteMile for WooCommerce"
 msgstr ""
 
-#: templates/receipt-template.php:379
-msgid "%d × %s"
+#. Plugin URI of the plugin
+#: routemile-woocommerce.php
+msgid "https://github.com/codermillat/routemile-woocommerce"
 msgstr ""
 
-#: includes/emails/class-fxw-email-assigned.php:106
-#: includes/emails/class-fxw-email-assigned.php:129
-msgid "A delivery driver is on their way to pick up your order."
+#. Description of the plugin
+#: routemile-woocommerce.php
+msgid "Map-based delivery management for single-restaurant WooCommerce stores."
 msgstr ""
 
-#: includes/emails/class-fxw-email-assigned.php:27
-msgid "A driver has been assigned!"
+#. Author of the plugin
+#: routemile-woocommerce.php
+msgid "MD MILLAT HOSEN"
 msgstr ""
 
-#: includes/emails/class-fxw-email-assigned.php:62
-msgid "A driver is on the way! 🚗"
+#. Author URI of the plugin
+#: routemile-woocommerce.php
+msgid "https://millat.is-a.dev/"
 msgstr ""
 
-#: includes/class-fxw-dashboard.php:135
-#: includes/class-fxw-dashboard.php:206
-#: includes/class-fxw-dashboard.php:277
-msgid "Actions"
-msgstr ""
-
-#: includes/class-fxw-settings.php:141
-msgid "Add delivery fee as a separate cart fee when FoodXpress shipping is not selected"
-msgstr ""
-
-#: templates/delivery-boy-view.php:57
-#: templates/delivery-dashboard-template.php:129
-msgid "Address:"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:225
-msgid "Amount to Collect:"
-msgstr ""
-
-#: includes/class-fxw-checkout-maps.php:139
-msgid "An error occurred. Please try again."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:180
-msgid "Assign"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:230
-msgid "Assign Delivery Boy"
-msgstr ""
-
-#: includes/class-fxw-order-statuses.php:43
-#: includes/class-fxw-order-statuses.php:79
-#: includes/class-fxw-order-statuses.php:88
-#: includes/class-fxw-shortcodes.php:197
-msgid "Assigned"
-msgstr ""
-
-#: includes/class-fxw-order-statuses.php:48
-msgid "Assigned <span class=\"count\">(%s)</span>"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:197
-msgid "Assigned Orders"
-msgstr ""
-
-#: includes/class-fxw-settings.php:163
-msgid "Auto-Set Status on Assign"
-msgstr ""
-
-#: includes/class-fxw-settings.php:167
-msgid "Automatically set order status to \"Assigned\" when a delivery boy is assigned from the order edit page"
-msgstr ""
-
-#: includes/class-fxw-settings.php:119
-msgid "Base Fee"
-msgstr ""
-
-#: templates/receipt-template.php:82
-msgid "Bill - Order #%s"
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:317
-msgid "Billing Email"
-msgstr ""
-
-#: templates/receipt-template.php:417
-msgid "COLLECT: %s"
-msgstr ""
-
-#: includes/class-fxw-checkout-maps.php:137
-msgid "Calculating delivery fee..."
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:267
-msgid "Call"
-msgstr ""
-
-#: templates/receipt-template.php:415
-msgid "Cash on Delivery"
-msgstr ""
-
-#: templates/delivery-boy-view.php:72
-#: templates/delivery-dashboard-template.php:143
-msgid "Collect:"
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:270
-msgid "Contact via store"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:214
-msgid "Coordinates:"
-msgstr ""
-
-#: includes/api/class-fxw-rest-checkout-controller.php:126
-msgid "Could not calculate delivery distance."
-msgstr ""
-
-#: includes/class-fxw-checkout-handler.php:269
-msgid "Could not calculate delivery distance. Please try again."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:143
-#: includes/services/class-fxw-mapping-service.php:152
-msgid "Could not calculate distance."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:132
-#: includes/class-fxw-dashboard.php:202
-#: includes/class-fxw-dashboard.php:273
-msgid "Customer"
-msgstr ""
-
-#: templates/delivery-boy-view.php:54
-#: templates/receipt-template.php:335
-msgid "Customer Details"
-msgstr ""
-
-#: templates/delivery-dashboard-template.php:111
-msgid "Customer:"
-msgstr ""
-
-#: includes/class-fxw-settings.php:241
-msgid "Customize your delivery receipts with your restaurant branding. These settings are used only for printed receipts."
-msgstr ""
-
-#: templates/receipt-template.php:318
-msgid "Date:"
-msgstr ""
-
-#: includes/class-fxw-settings.php:102
-msgid "Default Preparation Time (minutes)"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:315
-#: includes/class-fxw-shortcodes.php:199
-msgid "Delivered"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:42
-msgid "Deliveries"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:41
-msgid "Deliveries Dashboard"
-msgstr ""
-
-#: includes/class-fxw-admin-bar.php:41
-#: includes/class-fxw-admin-bar.php:83
-msgid "Deliveries: Closed"
-msgstr ""
-
-#: includes/class-fxw-admin-bar.php:41
-#: includes/class-fxw-admin-bar.php:83
-msgid "Deliveries: Open"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:205
-#: templates/delivery-dashboard-template.php:120
-#: templates/receipt-template.php:342
-msgid "Delivery Address:"
-msgstr ""
-
-#: templates/receipt-template.php:308
-msgid "Delivery Bill"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:203
-#: includes/class-fxw-dashboard.php:274
-#: includes/class-fxw-roles.php:46
-msgid "Delivery Boy"
-msgstr ""
-
-#: templates/receipt-template.php:327
-msgid "Delivery By:"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:209
-msgid "Delivery Distance:"
-msgstr ""
-
-#: includes/services/class-fxw-delivery-fee.php:94
-msgid "Delivery Fee"
-msgstr ""
-
-#: includes/class-fxw-settings.php:112
-msgid "Delivery Fee Settings"
-msgstr ""
-
-#: includes/class-fxw-checkout.php:125
-msgid "Delivery Instructions"
-msgstr ""
-
-#: includes/class-fxw-settings.php:154
-msgid "Delivery Radius (km)"
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:229
-msgid "Delivery Status"
-msgstr ""
-
-#: includes/class-fxw-settings.php:147
-msgid "Delivery Zone Settings"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:331
-msgid "Delivery boy assigned (status unchanged)."
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:60
-msgid "Delivery boy has been unassigned."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:375
-#: includes/class-fxw-dashboard.php:536
-msgid "Delivery boy unassigned."
-msgstr ""
-
-#: includes/class-fxw-checkout-handler.php:249
-msgid "Delivery service is not properly configured. Please contact support."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:121
-msgid "Delivery service temporarily unavailable. Please try again later."
-msgstr ""
-
-#: templates/delivery-dashboard-template.php:50
-msgid "Delivery status filters"
-msgstr ""
-
-#: templates/delivery-dashboard-template.php:124
-msgid "Distance:"
-msgstr ""
-
-#: includes/emails/class-fxw-email-assigned.php:25
-msgid "Driver Assigned"
-msgstr ""
-
-#: includes/class-fxw-shipping-method.php:30
-msgid "Dynamic distance-based shipping for FoodXpress."
-msgstr ""
-
-#: includes/services/class-fxw-delivery-fee.php:131
-msgid "ETA ~ %d mins"
-msgstr ""
-
-#: includes/class-fxw-core.php:316
-msgid "Edit the checkout page"
-msgstr ""
-
-#: includes/class-fxw-settings.php:137
-msgid "Enable Extra Delivery Fee (as Cart Fee)"
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:308
-msgid "Enter your order details below to see its current status."
-msgstr ""
-
-#: includes/class-fxw-core.php:118
-msgid "Error!"
-msgstr ""
-
-#: includes/class-fxw-delivery-boy-view.php:72
-msgid "Failed to update order status."
-msgstr ""
-
-#: includes/class-fxw-settings.php:128
-msgid "Fee Per Kilometer"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:219
-msgid "Flat/House/Unit:"
-msgstr ""
-
-#: includes/class-fxw-settings.php:27
-msgid "FoodXpress"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:158
-#: includes/class-fxw-shipping-method.php:29
-#: includes/class-fxw-shipping-method.php:67
-msgid "FoodXpress Delivery"
-msgstr ""
-
-#: includes/class-fxw-privacy.php:100
-#: includes/class-fxw-privacy.php:134
-#: includes/class-fxw-privacy.php:84
-msgid "FoodXpress Delivery Profile"
-msgstr ""
-
-#: includes/class-fxw-settings.php:26
-msgid "FoodXpress Settings"
-msgstr ""
-
-#: foodxpress-for-woocommerce.php:71
-msgid "FoodXpress for WooCommerce requires PHP 7.4 or higher."
-msgstr ""
-
-#: foodxpress-for-woocommerce.php:98
-msgid "FoodXpress for WooCommerce requires WooCommerce 7.0 or higher."
-msgstr ""
-
-#: foodxpress-for-woocommerce.php:44
-msgid "FoodXpress for WooCommerce requires WooCommerce to be installed and active."
-msgstr ""
-
-#: foodxpress-for-woocommerce.php:82
-msgid "FoodXpress for WooCommerce requires WordPress 6.0 or higher."
-msgstr ""
-
-#: includes/class-fxw-core.php:311
-#: includes/class-fxw-core.php:365
-msgid "FoodXpress:"
-msgstr ""
-
-#: includes/class-fxw-settings.php:202
-msgid "Full address as it appears on receipts"
-msgstr ""
-
-#: includes/class-fxw-settings.php:65
-msgid "General Settings"
-msgstr ""
-
-#: includes/class-fxw-checkout-maps.php:140
-msgid "Geolocation is not supported by your browser."
-msgstr ""
-
-#: includes/emails/class-fxw-email-picked-up.php:146
-msgid "Get ready to receive your delicious order!"
-msgstr ""
-
-#: includes/class-fxw-settings.php:72
-msgid "Google Maps API Key"
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:268
-#: includes/services/class-fxw-mapping-service.php:70
-msgid "Google Maps API key is missing."
-msgstr ""
-
-#: includes/class-fxw-checkout.php:107
-msgid "House / Flat / Building No."
-msgstr ""
-
-#: includes/class-fxw-core.php:141
-#: templates/delivery-dashboard-template.php:55
-msgid "In Progress"
-msgstr ""
-
-#: includes/class-fxw-order-statuses.php:34
-#: includes/class-fxw-order-statuses.php:78
-#: includes/class-fxw-order-statuses.php:87
-#: includes/class-fxw-shortcodes.php:196
-msgid "In the Kitchen"
-msgstr ""
-
-#: includes/class-fxw-order-statuses.php:39
-msgid "In the Kitchen <span class=\"count\">(%s)</span>"
-msgstr ""
-
-#: includes/api/class-fxw-rest-checkout-controller.php:100
-msgid "Invalid coordinates provided."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:247
-msgid "Invalid location array. Expected lat,lng."
-msgstr ""
-
-#: includes/class-fxw-checkout-handler.php:228
-msgid "Invalid location coordinates detected. Please select your location again using the map."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:262
-msgid "Invalid location type."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:344
-#: includes/class-fxw-dashboard.php:404
-#: includes/class-fxw-delivery-boy-view.php:138
-#: includes/class-fxw-order-admin.php:43
-#: includes/class-fxw-shortcodes.php:113
-msgid "Invalid nonce."
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:53
-msgid "Invalid order ID."
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:343
-msgid "Invalid order details."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:352
-#: includes/class-fxw-dashboard.php:412
-#: includes/class-fxw-dashboard.php:511
-#: includes/class-fxw-dashboard.php:574
-#: includes/class-fxw-delivery-boy-view.php:145
-#: includes/class-fxw-delivery-boy-view.php:57
-msgid "Invalid order."
-msgstr ""
-
-#: includes/class-fxw-delivery-boy-view.php:51
-msgid "Invalid status transition."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:579
-msgid "Invalid status."
-msgstr ""
-
-#: templates/receipt-template.php:352
-msgid "Items Ordered"
-msgstr ""
-
-#: includes/class-fxw-checkout-handler.php:127
-msgid "Landmark"
-msgstr ""
-
-#: includes/api/class-fxw-rest-checkout-controller.php:170
-msgid "Latitude coordinate (-90 to 90)."
-msgstr ""
-
-#: includes/class-fxw-settings.php:193
-msgid "Leave empty to use site name"
-msgstr ""
-
-#: includes/class-fxw-checkout-maps.php:141
-msgid "Locating…"
-msgstr ""
-
-#: includes/class-fxw-checkout-maps.php:142
-msgid "Location permission denied. Please allow access in your browser settings."
-msgstr ""
-
-#: includes/class-fxw-checkout-maps.php:144
-msgid "Location request timed out. Please try again."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:304
-msgid "Location service temporarily unavailable. Please try again later."
-msgstr ""
-
-#: includes/class-fxw-checkout-maps.php:143
-msgid "Location unavailable. Please try again."
-msgstr ""
-
-#: includes/api/class-fxw-rest-checkout-controller.php:179
-msgid "Longitude coordinate (-180 to 180)."
-msgstr ""
-
-#: templates/delivery-boy-view.php:96
-#: templates/delivery-dashboard-template.php:184
-msgid "Mark Delivered"
-msgstr ""
-
-#: templates/delivery-boy-view.php:87
-#: templates/delivery-dashboard-template.php:176
-msgid "Mark Picked Up"
-msgstr ""
-
-#: templates/delivery-boy-view.php:69
-msgid "Method:"
-msgstr ""
-
-#: includes/class-fxw-delivery-boy-view.php:45
-msgid "Missing order ID or status."
-msgstr ""
-
-#: templates/delivery-boy-view.php:22
-msgid "My Assigned Deliveries"
-msgstr ""
-
-#: templates/delivery-dashboard-template.php:47
-msgid "My Deliveries"
-msgstr ""
-
-#: templates/receipt-template.php:319
-msgid "N/A"
-msgstr ""
-
-#: templates/delivery-boy-view.php:55
-msgid "Name:"
-msgstr ""
-
-#: includes/class-fxw-checkout.php:116
-msgid "Nearby Landmark (optional)"
-msgstr ""
-
-#: includes/class-fxw-core.php:140
-#: templates/delivery-dashboard-template.php:52
-msgid "New"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:262
-msgid "No assigned orders."
-msgstr ""
-
-#: templates/delivery-dashboard-template.php:79
-msgid "No deliveries in progress."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:184
-msgid "No delivery boys available"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:241
-msgid "No delivery boys found. Please create a user with the \"Delivery Boy\" role."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:326
-msgid "No location found for the specified address."
-msgstr ""
-
-#: templates/delivery-dashboard-template.php:67
-msgid "No new deliveries assigned."
-msgstr ""
-
-#: includes/class-fxw-core.php:142
-msgid "No orders in this section."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:322
-msgid "No orders out for delivery."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:191
-msgid "No unassigned orders."
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:249
-#: templates/delivery-dashboard-template.php:154
-msgid "Open Exact Location"
-msgstr ""
-
-#: includes/class-fxw-core.php:371
-msgid "Open FoodXpress settings"
-msgstr ""
-
-#: templates/delivery-boy-view.php:80
-msgid "Open in Map"
-msgstr ""
-
-#: includes/class-fxw-settings.php:220
-msgid "Optional tagline shown below logo (e.g., \"Delicious Food, Delivered Fast!\")"
-msgstr ""
-
-#: includes/class-fxw-settings.php:96
-msgid "Optional. Exact \"lat, lng\" used for fee & zone checks, e.g. 23.8103, 90.4125. Overrides the address above."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:131
-#: includes/class-fxw-dashboard.php:201
-#: includes/class-fxw-dashboard.php:272
-msgid "Order"
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:348
-#: templates/delivery-boy-view.php:48
-#: templates/delivery-dashboard-template.php:104
-#: templates/emails/fxw-order-status.php:27
-#: templates/emails/plain/fxw-order-status.php:24
+#. translators: %s: order number.
+#. translators: %s: Order number
+#: includes/agent-template-helpers.php:108
+#: includes/class-routew-shortcodes.php:1060
+#: templates/emails/plain/routew-order-status.php:24
+#: templates/emails/routew-order-status.php:31
+#, php-format
 msgid "Order #%s"
 msgstr ""
 
-#: includes/class-fxw-dashboard.php:527
-msgid "Order #%s assigned to %s"
+#. translators: %s: collection datetime
+#: includes/agent-template-helpers.php:127
+#, php-format
+msgid "Cash collected %s"
 msgstr ""
 
-#: includes/class-fxw-dashboard.php:372
-msgid "Order #%s successfully assigned to %s"
+#: includes/agent-template-helpers.php:129
+msgid "Cash collected"
 msgstr ""
 
-#: includes/class-fxw-dashboard.php:544
-msgid "Order #%s unassigned"
+#: includes/agent-template-helpers.php:138
+msgid "Collected on delivery"
 msgstr ""
 
-#: includes/class-fxw-dashboard.php:378
-msgid "Order #%s unassigned from delivery boy"
+#: includes/agent-template-helpers.php:138
+msgid "Collect on delivery"
 msgstr ""
 
-#: includes/class-fxw-dashboard.php:585
-msgid "Order #%s updated to %s"
+#. translators: %s = payment method title, e.g. "Direct bank transfer".
+#: includes/agent-template-helpers.php:151
+#, php-format
+msgid "Prepaid — %s. Nothing to collect."
 msgstr ""
 
-#: includes/class-fxw-shortcodes.php:312
-msgid "Order ID"
+#: includes/agent-template-helpers.php:153
+msgid "Prepaid. Nothing to collect."
 msgstr ""
 
-#: includes/emails/class-fxw-email-in-kitchen.php:25
-msgid "Order In Kitchen"
+#: includes/agent-template-helpers.php:162
+msgid "Customer:"
 msgstr ""
 
-#: templates/receipt-template.php:314
-msgid "Order No:"
-msgstr ""
-
-#: includes/emails/class-fxw-email-picked-up.php:25
-msgid "Order Picked Up"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:329
-msgid "Order assigned to delivery boy."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:365
-#: includes/class-fxw-dashboard.php:519
-msgid "Order assigned to delivery boy: %s"
-msgstr ""
-
-#: includes/class-fxw-delivery-boy-view.php:68
-msgid "Order delivered by delivery agent (AJAX)."
-msgstr ""
-
-#: includes/class-fxw-delivery-boy-view.php:118
-msgid "Order delivered by delivery agent."
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:59
-msgid "Order not found."
-msgstr ""
-
-#: includes/class-fxw-delivery-boy-view.php:68
-msgid "Order picked up by delivery agent (AJAX)."
-msgstr ""
-
-#: includes/class-fxw-delivery-boy-view.php:104
-msgid "Order picked up by delivery agent."
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:55
-msgid "Order rejected by admin."
-msgstr ""
-
-#: includes/class-fxw-delivery-boy-view.php:75
-msgid "Order update not callable."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:268
-msgid "Out for Delivery"
-msgstr ""
-
-#: templates/receipt-template.php:423
-msgid "PAYMENT COMPLETED"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:134
-#: includes/class-fxw-dashboard.php:205
-#: includes/class-fxw-dashboard.php:276
-msgid "Payment"
-msgstr ""
-
-#: templates/delivery-boy-view.php:68
-msgid "Payment Information"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:222
-msgid "Payment Method:"
-msgstr ""
-
-#: templates/delivery-dashboard-template.php:139
-msgid "Payment:"
-msgstr ""
-
-#: templates/delivery-boy-view.php:63
-#: templates/delivery-dashboard-template.php:113
+#: includes/agent-template-helpers.php:165
 msgid "Phone:"
 msgstr ""
 
-#: templates/receipt-template.php:306
-msgid "Phone: %s"
+#: includes/agent-template-helpers.php:172
+#: includes/class-routew-order-admin.php:227
+#: templates/receipt-template.php:210
+msgid "Delivery Address:"
 msgstr ""
 
-#: includes/class-fxw-dashboard.php:245
-#: includes/class-fxw-order-statuses.php:52
-#: includes/class-fxw-order-statuses.php:80
-#: includes/class-fxw-order-statuses.php:89
-#: includes/class-fxw-shortcodes.php:198
-msgid "Picked Up"
+#: includes/agent-template-helpers.php:176
+msgid "Distance:"
 msgstr ""
 
-#: includes/class-fxw-order-statuses.php:57
-msgid "Picked Up <span class=\"count\">(%s)</span>"
+#: includes/agent-template-helpers.php:181
+msgid "Address:"
 msgstr ""
 
-#: includes/class-fxw-checkout-handler.php:212
-msgid "Please enter your exact address (house / flat / building no.) so our delivery agent can find you."
-msgstr ""
-
-#: includes/class-fxw-checkout.php:97
-msgid "Please provide complete details to help our delivery agent find you easily."
-msgstr ""
-
-#: includes/class-fxw-checkout-handler.php:222
-msgid "Please select your exact location on the map. This ensures accurate delivery and helps our delivery agent find you."
-msgstr ""
-
-#: templates/emails/fxw-order-status.php:40
-msgid "Price"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:158
-#: includes/class-fxw-dashboard.php:160
-#: includes/class-fxw-dashboard.php:233
-#: includes/class-fxw-dashboard.php:235
-#: includes/class-fxw-dashboard.php:304
-#: includes/class-fxw-dashboard.php:306
-msgid "Print Receipt"
-msgstr ""
-
-#: templates/receipt-template.php:442
-msgid "Printed: %s"
-msgstr ""
-
-#: templates/emails/fxw-order-status.php:38
-msgid "Product"
-msgstr ""
-
-#: templates/emails/fxw-order-status.php:39
-msgid "Quantity"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:270
-msgid "Re-assign"
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:98
-msgid "Re-order"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:255
-msgid "Reassign"
-msgstr ""
-
-#: includes/class-fxw-settings.php:173
-msgid "Receipt Branding"
-msgstr ""
-
-#: includes/class-fxw-settings.php:225
-msgid "Receipt Footer Message"
-msgstr ""
-
-#: includes/class-fxw-settings.php:180
-msgid "Receipt Logo"
-msgstr ""
-
-#: includes/class-fxw-settings.php:216
-msgid "Receipt Tagline"
-msgstr ""
-
-#: includes/class-fxw-settings.php:184
-msgid "Recommended: 200x80px, PNG or JPG"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:268
-msgid "Reject Order"
-msgstr ""
-
-#: includes/class-fxw-settings.php:316
-#: includes/class-fxw-settings.php:341
-msgid "Remove Logo"
-msgstr ""
-
-#: includes/class-fxw-settings.php:81
-msgid "Restaurant Address"
-msgstr ""
-
-#: includes/class-fxw-settings.php:198
-msgid "Restaurant Address (for Receipt)"
-msgstr ""
-
-#: includes/class-fxw-settings.php:90
-msgid "Restaurant Coordinates (lat, lng)"
-msgstr ""
-
-#: includes/class-fxw-settings.php:189
-msgid "Restaurant Name (for Receipt)"
-msgstr ""
-
-#: includes/class-fxw-settings.php:207
-msgid "Restaurant Phone (for Receipt)"
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:202
-msgid "Restaurant address or coordinates are not configured."
-msgstr ""
-
-#: templates/delivery-dashboard-template.php:159
-msgid "Search Delivery Address"
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:253
-#: templates/delivery-dashboard-template.php:164
-msgid "Search Location"
-msgstr ""
-
-#: includes/class-fxw-checkout.php:76
-msgid "Search for your area or landmark..."
-msgstr ""
-
-#: includes/class-fxw-checkout.php:71
-msgid "Search for your area, use current location, or drag the marker to set your exact delivery point."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:503
-#: includes/class-fxw-dashboard.php:566
-msgid "Security check failed."
-msgstr ""
-
-#: includes/class-fxw-admin-bar.php:70
-msgid "Security verification failed."
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:121
-#: includes/class-fxw-shortcodes.php:41
-msgid "Security verification failed. Please try again."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:170
-msgid "Select Delivery Boy..."
-msgstr ""
-
-#: includes/class-fxw-order-admin.php:233
-msgid "Select a Delivery Boy"
-msgstr ""
-
-#: includes/class-fxw-settings.php:331
-msgid "Select or Upload Logo"
-msgstr ""
-
-#: includes/class-fxw-checkout.php:86
-msgid "Selected Location:"
-msgstr ""
-
-#: includes/api/class-fxw-rest-checkout-controller.php:108
-#: includes/api/class-fxw-rest-checkout-controller.php:71
-msgid "Sorry, we are currently closed for deliveries."
-msgstr ""
-
-#: includes/api/class-fxw-rest-checkout-controller.php:70
-#: includes/class-fxw-checkout-maps.php:138
-msgid "Sorry, we do not deliver to this location."
-msgstr ""
-
-#: includes/api/class-fxw-rest-checkout-controller.php:133
-#: includes/class-fxw-checkout-handler.php:283
-msgid "Sorry, we do not deliver to your location."
-msgstr ""
-
-#: templates/receipt-template.php:433
-msgid "Special Instructions"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:133
-#: includes/class-fxw-dashboard.php:204
-#: includes/class-fxw-dashboard.php:275
-msgid "Status"
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:417
-#: includes/class-fxw-dashboard.php:582
-msgid "Status updated from dashboard."
-msgstr ""
-
-#: includes/class-fxw-delivery-boy-view.php:70
-msgid "Status updated successfully."
-msgstr ""
-
-#: templates/receipt-template.php:322
-msgid "Status:"
-msgstr ""
-
-#: includes/class-fxw-checkout.php:70
-msgid "Step 1: Select Your Location on Map"
-msgstr ""
-
-#: includes/class-fxw-checkout.php:96
-msgid "Step 2: Enter Your Delivery Details"
-msgstr ""
-
-#: templates/receipt-template.php:393
-msgid "Subtotal:"
-msgstr ""
-
-#: templates/receipt-template.php:407
-msgid "TOTAL AMOUNT:"
-msgstr ""
-
-#: templates/receipt-template.php:71
-msgid "Thank You! Have a great day!"
-msgstr ""
-
-#: includes/emails/class-fxw-email-in-kitchen.php:146
-msgid "Thank you for your order!"
-msgstr ""
-
-#: includes/class-fxw-shipping-method.php:66
-msgid "This controls the title which the user sees during checkout."
-msgstr ""
-
-#: includes/emails/class-fxw-email-assigned.php:26
-msgid "This email is sent when a delivery driver is assigned to the order."
-msgstr ""
-
-#: includes/emails/class-fxw-email-in-kitchen.php:26
-msgid "This email is sent when an order is being prepared in the kitchen."
-msgstr ""
-
-#: includes/emails/class-fxw-email-picked-up.php:26
-msgid "This email is sent when the order is picked up and out for delivery."
-msgstr ""
-
-#: includes/class-fxw-shipping-method.php:64
-msgid "Title"
-msgstr ""
-
-#: includes/class-fxw-reporting.php:34
-msgid "Today\\"
-msgstr ""
-
-#: includes/class-fxw-reporting.php:52
-msgid "Total Deliveries:"
-msgstr ""
-
-#: includes/class-fxw-reporting.php:56
-msgid "Total Delivery Fees:"
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:323
-msgid "Track Order"
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:307
-msgid "Track Your Order"
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:139
-msgid "Unable to calculate delivery distance for your location."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:113
-msgid "Unable to calculate delivery distance. Please try again or contact support."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:131
-msgid "Unable to calculate delivery distance. Please try again."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:296
-msgid "Unable to find location. Please try a different address."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:314
-msgid "Unable to find location. Please try again."
-msgstr ""
-
-#: includes/services/class-fxw-mapping-service.php:322
-msgid "Unable to find the specified address. Please check and try again."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:127
-msgid "Unassigned Orders"
-msgstr ""
-
-#: includes/class-fxw-admin-bar.php:64
-#: includes/class-fxw-delivery-boy-view.php:38
-msgid "Unauthorized access."
-msgstr ""
-
-#: includes/class-fxw-dashboard.php:339
-#: includes/class-fxw-dashboard.php:399
-#: includes/class-fxw-dashboard.php:498
-#: includes/class-fxw-dashboard.php:561
-#: includes/class-fxw-delivery-boy-view.php:133
-#: includes/class-fxw-order-admin.php:125
-msgid "Unauthorized."
-msgstr ""
-
-#: templates/receipt-template.php:345
-msgid "Unit/Flat: %s"
-msgstr ""
-
-#: templates/delivery-boy-view.php:60
-#: templates/delivery-dashboard-template.php:132
+#: includes/agent-template-helpers.php:185
 msgid "Unit:"
 msgstr ""
 
-#: includes/class-fxw-core.php:117
-msgid "Updating..."
+#: includes/agent-template-helpers.php:194
+msgid "Delivery instructions"
 msgstr ""
 
-#: includes/class-fxw-settings.php:311
-msgid "Upload Logo"
+#: includes/agent-template-helpers.php:206
+#: includes/class-routew-order-admin.php:269
+msgid "Open Exact Location"
 msgstr ""
 
-#: includes/class-fxw-checkout.php:78
-msgid "Use My Location"
+#: includes/agent-template-helpers.php:211
+msgid "Search Delivery Address"
 msgstr ""
 
-#: includes/class-fxw-settings.php:332
-msgid "Use this logo"
+#: includes/agent-template-helpers.php:216
+#: includes/class-routew-order-admin.php:273
+msgid "Search Location"
 msgstr ""
 
-#: includes/class-fxw-checkout-handler.php:236
-msgid "We are currently closed for deliveries. Please try again later."
+#: includes/agent-template-helpers.php:225
+msgid "Call customer"
 msgstr ""
 
-#: includes/class-fxw-shipping-method.php:131
-msgid "We could not calculate delivery distance. Please verify your location and try again."
+#: includes/agent-template-helpers.php:227
+#: includes/class-routew-shortcodes.php:911
+msgid "Call"
 msgstr ""
 
-#: includes/services/class-fxw-rate-limiter.php:60
-msgid "You are making too many requests. Please wait a moment and try again."
+#: includes/agent-template-helpers.php:234
+msgid "Mark Picked Up"
 msgstr ""
 
-#: includes/class-fxw-delivery-boy-view.php:150
-#: includes/class-fxw-delivery-boy-view.php:63
-msgid "You are not assigned to this order."
+#: includes/agent-template-helpers.php:248
+msgid "Confirm you received the full cash amount for this order?"
 msgstr ""
 
-#: includes/class-fxw-shortcodes.php:130
-msgid "You are not authorized to reorder this order."
+#. translators: %s: formatted order total
+#: includes/agent-template-helpers.php:252
+#, php-format
+msgid "Cash Collected (%s)"
 msgstr ""
 
-#: includes/class-fxw-shortcodes.php:75
-msgid "You are not authorized to view this receipt."
+#: includes/agent-template-helpers.php:258
+#: includes/agent-template-helpers.php:269
+msgid "Mark Delivered"
 msgstr ""
 
-#: templates/delivery-boy-view.php:105
-msgid "You have no assigned deliveries at the moment."
+#: includes/agent-template-helpers.php:261
+msgid "Confirm the cash was collected to unlock marking this order delivered."
 msgstr ""
 
-#: includes/class-fxw-shortcodes.php:118
-msgid "You must be logged in to reorder."
+#: includes/api/class-routew-rest-checkout-controller.php:99
+msgid "Address or place to look up."
 msgstr ""
 
-#: includes/class-fxw-shortcodes.php:261
-msgid "Your Delivery Rider"
+#: includes/api/class-routew-rest-checkout-controller.php:128
+msgid "Please type at least 3 characters."
 msgstr ""
 
-#: includes/emails/class-fxw-email-picked-up.php:106
-#: includes/emails/class-fxw-email-picked-up.php:129
-msgid "Your order has been picked up and is on its way to you!"
+#: includes/api/class-routew-rest-checkout-controller.php:160
+#: includes/class-routew-checkout-maps.php:242
+msgid "Sorry, we do not deliver to this location."
 msgstr ""
 
-#: includes/emails/class-fxw-email-in-kitchen.php:106
-#: includes/emails/class-fxw-email-in-kitchen.php:129
-msgid "Your order is being prepared and will be out for delivery soon."
+#: includes/api/class-routew-rest-checkout-controller.php:161
+#: includes/api/class-routew-rest-checkout-controller.php:198
+msgid "Sorry, we are currently closed for deliveries."
 msgstr ""
 
-#: includes/emails/class-fxw-email-in-kitchen.php:27
-msgid "Your order is being prepared!"
+#: includes/api/class-routew-rest-checkout-controller.php:190
+#: includes/api/class-routew-rest-checkout-controller.php:337
+msgid "Invalid coordinates provided."
 msgstr ""
 
-#: includes/emails/class-fxw-email-in-kitchen.php:62
-msgid "Your order is being prepared! 🍳"
+#: includes/api/class-routew-rest-checkout-controller.php:216
+msgid "Could not calculate delivery distance."
 msgstr ""
 
-#: includes/emails/class-fxw-email-picked-up.php:27
-msgid "Your order is on its way!"
+#: includes/api/class-routew-rest-checkout-controller.php:231
+#: includes/class-routew-checkout-handler.php:396
+#: includes/class-routew-checkout-handler.php:523
+msgid "Sorry, we do not deliver to your location."
 msgstr ""
 
-#: includes/emails/class-fxw-email-picked-up.php:62
-msgid "Your order is on its way! 🎉"
+#: includes/api/class-routew-rest-checkout-controller.php:351
+msgid "Checkout session is not available."
 msgstr ""
 
-#: includes/emails/class-fxw-email-assigned.php:146
-msgid "Your order will arrive soon!"
+#: includes/api/class-routew-rest-checkout-controller.php:387
+msgid "Latitude coordinate (-90 to 90)."
 msgstr ""
 
-#: includes/emails/class-fxw-email-assigned.php:28
-#: includes/emails/class-fxw-email-assigned.php:52
-msgid "[{site_title}]: Driver assigned to your order #{order_number}"
+#: includes/api/class-routew-rest-checkout-controller.php:401
+msgid "Longitude coordinate (-180 to 180)."
 msgstr ""
 
-#: includes/emails/class-fxw-email-in-kitchen.php:28
-#: includes/emails/class-fxw-email-in-kitchen.php:52
-msgid "[{site_title}]: Your order #{order_number} is in the kitchen"
+#: includes/class-routew-admin-bar.php:47
+#: includes/class-routew-admin-bar.php:128
+msgid "Deliveries: Open"
 msgstr ""
 
-#: includes/emails/class-fxw-email-picked-up.php:28
-#: includes/emails/class-fxw-email-picked-up.php:52
-msgid "[{site_title}]: Your order #{order_number} is out for delivery"
+#: includes/class-routew-admin-bar.php:51
+#: includes/class-routew-admin-bar.php:52
+#: includes/class-routew-admin-bar.php:129
+msgid "Deliveries: Closed"
 msgstr ""
 
-#: includes/services/class-fxw-address-validator.php:43
-msgid "address field is empty"
+#: includes/class-routew-admin-bar.php:89
+#: includes/class-routew-delivery-boy-view.php:124
+#: includes/class-routew-delivery-boy-view.php:223
+#: includes/class-routew-delivery-boy-view.php:410
+msgid "Unauthorized access."
 msgstr ""
 
-#: includes/services/class-fxw-address-validator.php:119
-msgid "address is acceptable but could use more detail"
+#: includes/class-routew-admin-bar.php:95
+msgid "Security verification failed."
 msgstr ""
 
-#: includes/services/class-fxw-address-validator.php:50
-msgid "address is too short - please provide more details"
+#: includes/class-routew-blocks-checkout.php:184
+msgid "Nearby Landmark"
 msgstr ""
 
-#: includes/services/class-fxw-address-validator.php:111
-msgid "address looks complete"
-msgstr ""
-
-#: includes/class-fxw-core.php:369
-msgid "delivery is not configured — %1$s. Customers cannot place delivery orders until this is fixed. %2$s"
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:314
-msgid "e.g. 123"
-msgstr ""
-
-#: includes/class-fxw-shortcodes.php:319
-msgid "e.g. you@example.com"
-msgstr ""
-
-#: includes/class-fxw-checkout.php:108
-msgid "e.g., Flat 4B, House 25, Tower A, Block 2"
-msgstr ""
-
-#: includes/class-fxw-checkout.php:117
+#: includes/class-routew-blocks-checkout.php:189
+#: includes/class-routew-checkout.php:218
 msgid "e.g., Near City Mall, Opposite Park"
 msgstr ""
 
-#: includes/class-fxw-checkout.php:126
+#: includes/class-routew-blocks-checkout.php:195
+#: includes/class-routew-checkout.php:228
+msgid "Delivery Instructions"
+msgstr ""
+
+#: includes/class-routew-blocks-checkout.php:200
+msgid "e.g., Ring the bell twice, call before arriving..."
+msgstr ""
+
+#: includes/class-routew-blocks-checkout.php:267
+#: includes/class-routew-checkout.php:104
+#: includes/class-routew-checkout.php:144
+msgid "We are currently closed for deliveries. You can browse and fill your cart — ordering will be available as soon as we reopen."
+msgstr ""
+
+#: includes/class-routew-brand-color.php:84
+msgid "Brand Color"
+msgstr ""
+
+#: includes/class-routew-brand-color.php:91
+msgid "Delivery App Color"
+msgstr ""
+
+#: includes/class-routew-brand-color.php:105
+msgid "Pick your restaurant's brand color — buttons, links, icons and the highlights on the customer account, checkout, order tracking and rider app recolour automatically. Status colors (delivered green, on-the-way blue) keep their meaning and stay unchanged. Clear the field to return to the default RouteMile orange."
+msgstr ""
+
+#: includes/class-routew-brand-color.php:126
+msgid "Use default orange"
+msgstr ""
+
+#: includes/class-routew-brand-color.php:128
+#: includes/class-routew-my-account.php:238
+msgid "Order again"
+msgstr ""
+
+#: includes/class-routew-brand-color.php:130
+#: includes/class-routew-shortcodes.php:239
+#: includes/class-routew-shortcodes.php:672
+#: includes/class-routew-stage-labels.php:80
+msgid "On the way"
+msgstr ""
+
+#: includes/class-routew-brand-color.php:131
+msgid "One color is all you set — every shade, hover and tint is derived automatically and checked for readable text contrast."
+msgstr ""
+
+#: includes/class-routew-checkout-address.php:115
+msgid "Phone number"
+msgstr ""
+
+#: includes/class-routew-checkout-address.php:116
+msgid "Your rider will call this number"
+msgstr ""
+
+#: includes/class-routew-checkout-address.php:215
+msgid "Flat / Floor / Block / Society / Tower"
+msgstr ""
+
+#: includes/class-routew-checkout-address.php:216
+msgid "e.g. Flat 4B, 2nd floor, Tower A, Green Valley Society"
+msgstr ""
+
+#: includes/class-routew-checkout-handler.php:95
+msgid "Please enter a valid phone number (7-15 digits) — your rider will call it on arrival."
+msgstr ""
+
+#: includes/class-routew-checkout-handler.php:151
+#: includes/class-routew-checkout-handler.php:254
+#: includes/class-routew-checkout-handler.php:270
+msgid "Landmark"
+msgstr ""
+
+#: includes/class-routew-checkout-handler.php:356
+msgid "Online ordering is currently unavailable — the delivery map is not configured. Please contact the store."
+msgstr ""
+
+#: includes/class-routew-checkout-handler.php:360
+#: includes/class-routew-checkout-handler.php:443
+msgid "We are currently closed for deliveries. Please try again later."
+msgstr ""
+
+#: includes/class-routew-checkout-handler.php:375
+msgid "Please select your exact location on the map above to enable delivery."
+msgstr ""
+
+#: includes/class-routew-checkout-handler.php:381
+#: includes/class-routew-checkout-handler.php:489
+msgid "Delivery service is not properly configured. Please contact support."
+msgstr ""
+
+#: includes/class-routew-checkout-handler.php:391
+#: includes/class-routew-checkout-handler.php:509
+msgid "Could not calculate delivery distance. Please try again."
+msgstr ""
+
+#: includes/class-routew-checkout-handler.php:460
+msgid "Please enter your exact address (house / flat / building no.) so our delivery agent can find you."
+msgstr ""
+
+#: includes/class-routew-checkout-handler.php:470
+msgid "Please select your exact location on the map. This ensures accurate delivery and helps our delivery agent find you."
+msgstr ""
+
+#: includes/class-routew-checkout-handler.php:476
+msgid "Invalid location coordinates detected. Please select your location again using the map."
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:237
+msgid "Calculating delivery fee..."
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:240
+msgid "Delivery fee:"
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:241
+msgid "Free delivery"
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:243
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:248
+msgid "The delivery map could not load. Please contact the store."
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:249
+msgid "estimated"
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:250
+msgid "Drag to set your exact delivery point"
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:251
+msgid "No match found. Try a different search, or drag the map pin."
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:252
+msgid "Geolocation is not supported by your browser."
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:253
+msgid "Locating…"
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:254
+msgid "Location permission denied. Please allow access in your browser settings."
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:255
+msgid "Location unavailable. Please try again."
+msgstr ""
+
+#: includes/class-routew-checkout-maps.php:256
+msgid "Location request timed out. Please try again."
+msgstr ""
+
+#: includes/class-routew-checkout.php:192
+msgid "Address details"
+msgstr ""
+
+#: includes/class-routew-checkout.php:193
+msgid "Help your rider find the exact door."
+msgstr ""
+
+#: includes/class-routew-checkout.php:206
+msgid "House / Flat / Building No."
+msgstr ""
+
+#: includes/class-routew-checkout.php:207
+msgid "e.g., Flat 4B, House 25, Tower A, Block 2"
+msgstr ""
+
+#: includes/class-routew-checkout.php:217
+msgid "Nearby Landmark (optional)"
+msgstr ""
+
+#: includes/class-routew-checkout.php:229
 msgid "e.g., Ring the bell twice, Leave at the door, Call before arriving..."
 msgstr ""
 
-#: includes/services/class-fxw-address-validator.php:92
-msgid "please add building name, street name, or nearby landmark"
+#: includes/class-routew-checkout.php:261
+msgid "Where should we deliver?"
 msgstr ""
 
-#: includes/services/class-fxw-address-validator.php:126
-msgid "please add more specific delivery details like floor, gate number, or landmarks"
+#: includes/class-routew-checkout.php:262
+msgid "Search your area, use your location, or drag the pin to set the exact drop point."
 msgstr ""
 
-#: includes/services/class-fxw-address-validator.php:85
-msgid "please include building/house/flat number"
+#: includes/class-routew-checkout.php:269
+msgid "Search area or landmark…"
 msgstr ""
 
-#: includes/class-fxw-core.php:348
-msgid "the Google Maps API key is missing"
+#: includes/class-routew-checkout.php:273
+msgid "Locate me"
 msgstr ""
 
-#: includes/class-fxw-core.php:315
-msgid "the block-based checkout is active, so the FoodXpress map picker, delivery-zone validation and distance fee will not appear. Edit the checkout page and replace the Checkout block with the [woocommerce_checkout] shortcode. %s"
+#: includes/class-routew-checkout.php:278
+msgid "Delivery location map"
 msgstr ""
 
-#: includes/class-fxw-core.php:354
+#: includes/class-routew-checkout.php:288
+msgid "Delivering to"
+msgstr ""
+
+#: includes/class-routew-core.php:156
+msgid "Updating..."
+msgstr ""
+
+#: includes/class-routew-core.php:157
+msgid "Error!"
+msgstr ""
+
+#: includes/class-routew-core.php:195
+#: templates/delivery-dashboard-template.php:243
+msgid "New"
+msgstr ""
+
+#: includes/class-routew-core.php:196
+#: templates/delivery-dashboard-template.php:249
+msgid "In Progress"
+msgstr ""
+
+#: includes/class-routew-core.php:197
+msgid "No orders in this section."
+msgstr ""
+
+#: includes/class-routew-core.php:209
+msgid "You are offline — orders will refresh when the connection returns"
+msgstr ""
+
+#: includes/class-routew-core.php:210
+msgid "Back online"
+msgstr ""
+
+#: includes/class-routew-core.php:211
+msgid "Order picked up"
+msgstr ""
+
+#: includes/class-routew-core.php:212
+msgid "Order delivered. Great job!"
+msgstr ""
+
+#: includes/class-routew-core.php:213
+msgid "Hand-over request sent — waiting for manager approval"
+msgstr ""
+
+#: includes/class-routew-core.php:214
+msgid "Send this cash hand-over to the manager for approval?"
+msgstr ""
+
+#: includes/class-routew-core.php:215
+msgid "Send {amount} hand-over request to the manager for approval?"
+msgstr ""
+
+#: includes/class-routew-core.php:216
+msgid "Cash to collect: {total} across {count} COD order(s)"
+msgstr ""
+
+#: includes/class-routew-core.php:217
+msgid "You are holding {amount} of the store's cash."
+msgstr ""
+
+#. translators: %s: map provider name.
+#: includes/class-routew-core.php:382
+#, php-format
+msgid "the %s API key is missing"
+msgstr ""
+
+#: includes/class-routew-core.php:390
 msgid "the restaurant location (coordinates or address) is missing"
+msgstr ""
+
+#: includes/class-routew-core.php:401
+msgid "RouteMile:"
+msgstr ""
+
+#. translators: 1: list of missing configuration, 2: link to settings
+#: includes/class-routew-core.php:405
+#, php-format
+msgid "delivery is not configured — %1$s. Customers cannot place delivery orders until this is fixed. %2$s"
+msgstr ""
+
+#: includes/class-routew-core.php:406
+msgid " and "
+msgstr ""
+
+#: includes/class-routew-core.php:407
+msgid "Open RouteMile settings"
+msgstr ""
+
+#: includes/class-routew-dashboard-actions.php:43
+#: includes/class-routew-dashboard-actions.php:119
+#: includes/class-routew-dashboard-actions.php:154
+#: includes/class-routew-dashboard-actions.php:227
+#: includes/class-routew-delivery-boy-view.php:515
+#: includes/class-routew-order-admin.php:42
+#: includes/class-routew-order-admin.php:66
+#: includes/class-routew-order-admin.php:146
+msgid "Unauthorized."
+msgstr ""
+
+#: includes/class-routew-dashboard-actions.php:48
+#: includes/class-routew-dashboard-actions.php:124
+#: includes/class-routew-delivery-boy-view.php:520
+#: includes/class-routew-order-admin.php:46
+#: includes/class-routew-order-admin.php:70
+#: includes/class-routew-shortcodes.php:342
+msgid "Invalid nonce."
+msgstr ""
+
+#: includes/class-routew-dashboard-actions.php:56
+#: includes/class-routew-dashboard-actions.php:132
+#: includes/class-routew-dashboard-actions.php:167
+#: includes/class-routew-dashboard-actions.php:240
+#: includes/class-routew-delivery-boy-view.php:247
+#: includes/class-routew-delivery-boy-view.php:417
+#: includes/class-routew-delivery-boy-view.php:527
+#: includes/class-routew-order-admin.php:51
+#: includes/class-routew-order-admin.php:75
+#: includes/class-routew-order-admin.php:153
+#: templates/receipt-template.php:27
+msgid "Invalid order."
+msgstr ""
+
+#. translators: %s: delivery agent display name.
+#: includes/class-routew-dashboard-actions.php:70
+#: includes/class-routew-dashboard-actions.php:176
+#, php-format
+msgid "Order assigned to delivery boy: %s"
+msgstr ""
+
+#. translators: 1: order number, 2: delivery agent display name.
+#: includes/class-routew-dashboard-actions.php:78
+#, php-format
+msgid "Order #%1$s successfully assigned to %2$s"
+msgstr ""
+
+#: includes/class-routew-dashboard-actions.php:89
+#: includes/class-routew-dashboard-actions.php:197
+msgid "Delivery boy unassigned — order returned to kitchen."
+msgstr ""
+
+#. translators: %s: order number.
+#: includes/class-routew-dashboard-actions.php:98
+#, php-format
+msgid "Order #%s unassigned from delivery boy"
+msgstr ""
+
+#: includes/class-routew-dashboard-actions.php:137
+#: includes/class-routew-dashboard-actions.php:248
+msgid "Status updated from dashboard."
+msgstr ""
+
+#: includes/class-routew-dashboard-actions.php:159
+#: includes/class-routew-dashboard-actions.php:232
+msgid "Security check failed."
+msgstr ""
+
+#. translators: 1: order number, 2: delivery agent display name.
+#: includes/class-routew-dashboard-actions.php:185
+#, php-format
+msgid "Order #%1$s assigned to %2$s"
+msgstr ""
+
+#. translators: %s: order number.
+#: includes/class-routew-dashboard-actions.php:208
+#, php-format
+msgid "Order #%s unassigned"
+msgstr ""
+
+#: includes/class-routew-dashboard-actions.php:245
+msgid "Invalid status."
+msgstr ""
+
+#. translators: 1: order number, 2: new order status label.
+#: includes/class-routew-dashboard-actions.php:252
+#, php-format
+msgid "Order #%1$s updated to %2$s"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:36
+msgid "Delivery Agents — Work Tracking"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:40
+#: includes/class-routew-dashboard-agents.php:155
+msgid "Agent"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:41
+msgid "Mobile"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:42
+#: templates/delivery-dashboard-template.php:113
+msgid "Active now"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:43
+#: templates/delivery-dashboard-template.php:106
+msgid "Delivered today"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:44
+msgid "Cash collected today"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:45
+msgid "Cash to hand over"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:46
+#: templates/delivery-dashboard-template.php:134
+msgid "All-time delivered"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:47
+msgid "Settle cash"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:69
+msgid "Not set"
+msgstr ""
+
+#. translators: %d = number of orders.
+#: includes/class-routew-dashboard-agents.php:82
+#, php-format
+msgid "%d order(s) in this balance"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:100
+msgid "Hand-over pending approval"
+msgstr ""
+
+#. translators: %s = formatted amount.
+#: includes/class-routew-dashboard-agents.php:105
+#, php-format
+msgid "Agent holds %s — awaiting their request"
+msgstr ""
+
+#. translators: 1: date/time, 2: approver name.
+#: includes/class-routew-dashboard-agents.php:113
+#, php-format
+msgid "Settled %1$s (by %2$s)"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:115
+#: templates/delivery-dashboard-template.php:176
+msgid "manager"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:128
+msgid "Active = assigned + picked up. Agents see the same numbers for themselves on their dashboard and can self-report a handover there."
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:150
+msgid "Cash hand-overs — requests & history"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:154
+msgid "Requested"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:156
+msgid "Amount"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:157
+#: includes/class-routew-dashboard-render.php:189
+#: includes/class-routew-dashboard-render.php:279
+#: includes/class-routew-dashboard-render.php:352
+msgid "Status"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:158
+msgid "Reviewed by"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:159
+#: includes/class-routew-dashboard-render.php:192
+#: includes/class-routew-dashboard-render.php:282
+#: includes/class-routew-dashboard-render.php:355
+msgid "Actions"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:164
+msgid "No hand-over requests yet. Agents send these from their dashboard when they hand cash to the store."
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:181
+msgid "Pending approval"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:183
+msgid "Accepted"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:185
+msgid "Rejected"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:205
+msgid "Accept"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:212
+msgid "Reject"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:215
+msgid "Awaiting a manager"
+msgstr ""
+
+#: includes/class-routew-dashboard-agents.php:225
+msgid "Agents request a hand-over of their collected cash; accepting clears it from their balance. Rejecting keeps the amount on the agent's balance."
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:52
+msgid "Deliveries Dashboard"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:53
+msgid "Deliveries"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:183
+msgid "Unassigned Orders"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:187
+#: includes/class-routew-dashboard-render.php:276
+#: includes/class-routew-dashboard-render.php:349
+#: includes/class-routew-shortcodes.php:177
+msgid "Order"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:188
+#: includes/class-routew-dashboard-render.php:277
+#: includes/class-routew-dashboard-render.php:350
+msgid "Customer"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:190
+#: includes/class-routew-dashboard-render.php:280
+#: includes/class-routew-dashboard-render.php:353
+msgid "Payment"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:191
+#: includes/class-routew-dashboard-render.php:281
+#: includes/class-routew-dashboard-render.php:354
+msgid "Kitchen Note"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:228
+msgid "Accept Order"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:233
+#: includes/class-routew-dashboard-render.php:235
+#: includes/class-routew-dashboard-render.php:310
+#: includes/class-routew-dashboard-render.php:312
+#: includes/class-routew-dashboard-render.php:383
+#: includes/class-routew-dashboard-render.php:385
+#: includes/class-routew-order-admin.php:278
+msgid "Print Receipt"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:245
+msgid "Select Delivery Boy..."
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:255
+msgid "Assign"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:259
+msgid "No delivery boys available"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:266
+msgid "No unassigned orders."
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:272
+msgid "Assigned Orders"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:278
+#: includes/class-routew-dashboard-render.php:351
+#: includes/class-routew-roles.php:63
+msgid "Delivery Boy"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:322
+msgid "Picked Up"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:332
+msgid "Reassign"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:339
+msgid "No assigned orders."
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:345
+msgid "Out for Delivery"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:394
+#: includes/class-routew-shortcodes.php:240
+#: includes/class-routew-shortcodes.php:679
+#: includes/class-routew-stage-labels.php:86
+#: templates/delivery-dashboard-template.php:255
+msgid "Delivered"
+msgstr ""
+
+#: includes/class-routew-dashboard-render.php:401
+msgid "No orders out for delivery."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:66
+#: includes/class-routew-roles.php:147
+#: templates/delivery-dashboard-template.php:91
+msgid "RouteMile Agent"
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:67
+#: templates/delivery-dashboard-template.php:76
+msgid "FX Agent"
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:68
+msgid "Delivery agent dashboard for RouteMile orders."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:230
+msgid "Missing order ID or status."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:238
+msgid "Invalid status transition."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:251
+#: includes/class-routew-delivery-boy-view.php:494
+msgid "You must mark the order as picked up before marking it delivered."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:258
+#: includes/class-routew-delivery-boy-view.php:498
+msgid "This is a cash-on-delivery order. Please confirm you collected the cash before marking it delivered."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:264
+#: includes/class-routew-delivery-boy-view.php:422
+#: includes/class-routew-delivery-boy-view.php:532
+msgid "You are not assigned to this order."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:269
+msgid "Order picked up by delivery agent (AJAX)."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:269
+msgid "Order delivered by delivery agent (AJAX)."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:273
+msgid "Failed to update order status."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:276
+msgid "Order update not callable."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:323
+msgid "Status updated successfully."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:426
+msgid "This order is not cash on delivery."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:430
+msgid "Cash can only be confirmed once the order is picked up."
+msgstr ""
+
+#. translators: 1: formatted amount, 2: agent name.
+#: includes/class-routew-delivery-boy-view.php:453
+#, php-format
+msgid "Cash of %1$s collected by delivery agent %2$s."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:476
+msgid "Order cannot be marked picked up from its current status."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:478
+msgid "Order picked up by delivery agent."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:500
+msgid "Order delivered by delivery agent."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:553
+#: includes/class-routew-delivery-boy-view.php:605
+#: includes/class-routew-order-admin.php:142
+#: includes/class-routew-shortcodes.php:270
+msgid "Security verification failed. Please try again."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:557
+msgid "Only the delivery agent can request a hand-over of their own collected cash."
+msgstr ""
+
+#. translators: 1: formatted amount, 2: agent name.
+#: includes/class-routew-delivery-boy-view.php:571
+#, php-format
+msgid "Cash hand-over of %1$s requested by %2$s — awaiting manager approval."
+msgstr ""
+
+#: includes/class-routew-delivery-boy-view.php:609
+msgid "Only managers and admins can approve cash hand-overs."
+msgstr ""
+
+#. translators: 1: formatted amount, 2: reviewer name.
+#: includes/class-routew-delivery-boy-view.php:623
+#, php-format
+msgid "Cash hand-over of %1$s ACCEPTED by %2$s. Agent balance cleared."
+msgstr ""
+
+#. translators: 1: formatted amount, 2: reviewer name.
+#: includes/class-routew-delivery-boy-view.php:630
+#, php-format
+msgid "Cash hand-over request of %1$s REJECTED by %2$s. Amount stays on the agent's balance."
+msgstr ""
+
+#: includes/class-routew-my-account.php:197
+msgid "Account overview"
+msgstr ""
+
+#. translators: %s: customer first name
+#: includes/class-routew-my-account.php:209
+#, php-format
+msgid "Hi %s"
+msgstr ""
+
+#. translators: %d: number of orders currently being delivered.
+#: includes/class-routew-my-account.php:217
+#, php-format
+msgid "%d order is on its way to you."
+msgid_plural "%d orders are on their way to you."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-routew-my-account.php:219
+msgid "Hungry again? Reorder your favourites in a tap."
+msgstr ""
+
+#: includes/class-routew-my-account.php:221
+msgid "Browse the menu and your first order will be at your door."
+msgstr ""
+
+#: includes/class-routew-my-account.php:239
+msgid "Your last order, one tap away."
+msgstr ""
+
+#: includes/class-routew-my-account.php:244
+msgid "Reorder"
+msgstr ""
+
+#: includes/class-routew-my-account.php:250
+msgid "Craving something?"
+msgstr ""
+
+#: includes/class-routew-my-account.php:251
+msgid "The kitchen is just a few taps away."
+msgstr ""
+
+#: includes/class-routew-my-account.php:256
+msgid "Browse menu"
+msgstr ""
+
+#: includes/class-routew-my-account.php:270
+#: includes/class-routew-shortcodes.php:176
+msgid "Orders"
+msgstr ""
+
+#. translators: %d: total number of orders placed.
+#: includes/class-routew-my-account.php:273
+#: includes/class-routew-my-account.php:374
+#, php-format
+msgid "%d order"
+msgid_plural "%d orders"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-routew-my-account.php:280
+#: includes/class-routew-shortcodes.php:178
+msgid "Addresses"
+msgstr ""
+
+#. translators: %d: number of saved addresses.
+#: includes/class-routew-my-account.php:283
+#: includes/class-routew-my-account.php:385
+#, php-format
+msgid "%d saved"
+msgid_plural "%d saved"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-routew-my-account.php:290
+msgid "Profile"
+msgstr ""
+
+#: includes/class-routew-my-account.php:291
+msgid "Name, email, password"
+msgstr ""
+
+#: includes/class-routew-my-account.php:297
+msgid "Payments"
+msgstr ""
+
+#: includes/class-routew-my-account.php:298
+#: includes/class-routew-my-account.php:402
+msgid "Saved cards & wallets"
+msgstr ""
+
+#: includes/class-routew-my-account.php:307
+msgid "Recent orders"
+msgstr ""
+
+#: includes/class-routew-my-account.php:311
+msgid "View all"
+msgstr ""
+
+#: includes/class-routew-my-account.php:317
+msgid "No orders yet"
+msgstr ""
+
+#: includes/class-routew-my-account.php:318
+msgid "Browse the menu and your first order will appear here."
+msgstr ""
+
+#: includes/class-routew-my-account.php:334
+msgid "Default address"
+msgstr ""
+
+#: includes/class-routew-my-account.php:338
+msgid "Manage"
+msgstr ""
+
+#: includes/class-routew-my-account.php:363
+msgid "Settings"
+msgstr ""
+
+#: includes/class-routew-my-account.php:371
+msgid "My orders"
+msgstr ""
+
+#: includes/class-routew-my-account.php:382
+msgid "Saved addresses"
+msgstr ""
+
+#: includes/class-routew-my-account.php:393
+msgid "Personal information"
+msgstr ""
+
+#: includes/class-routew-my-account.php:394
+msgid "Profile, email, password"
+msgstr ""
+
+#: includes/class-routew-my-account.php:401
+#: includes/class-routew-shortcodes.php:180
+msgid "Payment methods"
+msgstr ""
+
+#: includes/class-routew-my-account.php:412
+#: includes/class-routew-shortcodes.php:181
+msgid "Sign out"
+msgstr ""
+
+#. translators: %d: order number
+#: includes/class-routew-my-account.php:443
+#, php-format
+msgid "Order #%d"
+msgstr ""
+
+#. translators: %d: item count
+#: includes/class-routew-my-account.php:454
+#, php-format
+msgid "· %d item"
+msgid_plural "· %d items"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: quantity
+#: includes/class-routew-my-account.php:512
+#, php-format
+msgid "×%d"
+msgstr ""
+
+#. translators: %d: remaining item count
+#: includes/class-routew-my-account.php:516
+#, php-format
+msgid "+%d more"
+msgstr ""
+
+#: includes/class-routew-my-account.php:531
+msgid "Good morning"
+msgstr ""
+
+#: includes/class-routew-my-account.php:534
+msgid "Good afternoon"
+msgstr ""
+
+#: includes/class-routew-my-account.php:536
+msgid "Good evening"
+msgstr ""
+
+#: includes/class-routew-my-account.php:560
+msgid "there"
+msgstr ""
+
+#. translators: %d: delivery agent user ID
+#: includes/class-routew-notifications.php:74
+#, php-format
+msgid "Assignment notification skipped: no valid email address for delivery agent (user #%d)."
+msgstr ""
+
+#. translators: 1: site name, 2: order number
+#: includes/class-routew-notifications.php:83
+#, php-format
+msgid "[%1$s] New delivery assigned to you — Order #%2$s"
+msgstr ""
+
+#. translators: %s: delivery agent display name.
+#: includes/class-routew-notifications.php:90
+#, php-format
+msgid "Hello %s,"
+msgstr ""
+
+#. translators: %s: order number
+#: includes/class-routew-notifications.php:95
+#, php-format
+msgid "You have been assigned to deliver Order #%s."
+msgstr ""
+
+#: includes/class-routew-notifications.php:101
+msgid "Delivery address:"
+msgstr ""
+
+#. translators: %s: formatted order total
+#: includes/class-routew-notifications.php:106
+#, php-format
+msgid "Order total: %s"
+msgstr ""
+
+#: includes/class-routew-notifications.php:108
+msgid "Payment: Cash on Delivery — collect the order total from the customer."
+msgstr ""
+
+#: includes/class-routew-notifications.php:111
+msgid "Your delivery dashboard:"
+msgstr ""
+
+#. translators: %s: delivery agent display name
+#: includes/class-routew-notifications.php:117
+#, php-format
+msgid "Assignment notification emailed to %s."
+msgstr ""
+
+#. translators: %s: delivery agent display name
+#: includes/class-routew-notifications.php:120
+#, php-format
+msgid "Could not email the assignment notification to %s."
+msgstr ""
+
+#: includes/class-routew-order-admin.php:53
+msgid "Order rejected by admin."
+msgstr ""
+
+#: includes/class-routew-order-admin.php:81
+msgid "Delivery boy has been unassigned — order returned to kitchen."
+msgstr ""
+
+#: includes/class-routew-order-admin.php:179
+#: includes/class-routew-shipping-method.php:29
+#: includes/class-routew-shipping-method.php:67
+msgid "RouteMile Delivery"
+msgstr ""
+
+#: includes/class-routew-order-admin.php:231
+msgid "Delivery Distance:"
+msgstr ""
+
+#: includes/class-routew-order-admin.php:236
+msgid "Coordinates:"
+msgstr ""
+
+#: includes/class-routew-order-admin.php:242
+msgid "Payment Method:"
+msgstr ""
+
+#: includes/class-routew-order-admin.php:245
+msgid "Amount to Collect:"
+msgstr ""
+
+#: includes/class-routew-order-admin.php:250
+msgid "Assign Delivery Boy"
+msgstr ""
+
+#: includes/class-routew-order-admin.php:253
+msgid "Select a Delivery Boy"
+msgstr ""
+
+#: includes/class-routew-order-admin.php:261
+msgid "No delivery boys found. Please create a user with the \"Delivery Boy\" role."
+msgstr ""
+
+#: includes/class-routew-order-admin.php:291
+msgid "Reject Order"
+msgstr ""
+
+#: includes/class-routew-order-admin.php:297
+msgid "Re-assign"
+msgstr ""
+
+#: includes/class-routew-order-admin.php:355
+msgid "Order assigned to delivery boy."
+msgstr ""
+
+#: includes/class-routew-order-admin.php:357
+msgid "Delivery boy assigned (status unchanged)."
+msgstr ""
+
+#: includes/class-routew-pricing.php:55
+msgid "Pricing Rules"
+msgstr ""
+
+#: includes/class-routew-pricing.php:60
+msgid "Fee Structure"
+msgstr ""
+
+#: includes/class-routew-pricing.php:61
+msgid "Base Fee (starting amount)"
+msgstr ""
+
+#: includes/class-routew-pricing.php:61
+msgid "The flat starting cost of every delivery, before distance is added."
+msgstr ""
+
+#: includes/class-routew-pricing.php:62
+msgid "Charge per kilometre"
+msgstr ""
+
+#: includes/class-routew-pricing.php:62
+msgid "Added for each kilometre between your restaurant and the customer."
+msgstr ""
+
+#: includes/class-routew-pricing.php:63
+msgid "Distance Tiers"
+msgstr ""
+
+#: includes/class-routew-pricing.php:64
+msgid "Free Delivery From"
+msgstr ""
+
+#: includes/class-routew-pricing.php:64
+msgid "Order subtotal at or above this amount gets free delivery. 0 disables."
+msgstr ""
+
+#: includes/class-routew-pricing.php:65
+msgid "Minimum Order"
+msgstr ""
+
+#: includes/class-routew-pricing.php:65
+msgid "Orders below this subtotal cannot be placed for delivery. 0 disables."
+msgstr ""
+
+#: includes/class-routew-pricing.php:71
+msgid "All delivery pricing is configured here — tiers, free delivery, and the minimum order. Amounts are in your store currency."
+msgstr ""
+
+#: includes/class-routew-pricing.php:80
+msgid "Base fee + charge per km (simple)"
+msgstr ""
+
+#: includes/class-routew-pricing.php:81
+msgid "Fixed price per distance zone (tiers)"
+msgstr ""
+
+#: includes/class-routew-pricing.php:83
+msgid "Pick how you want to charge for distance. Only the fields that belong to your choice are shown."
+msgstr ""
+
+#: includes/class-routew-pricing.php:113
+msgid "Up to (km)"
+msgstr ""
+
+#: includes/class-routew-pricing.php:113
+msgid "Delivery fee"
+msgstr ""
+
+#: includes/class-routew-pricing.php:125
+msgid "Example: a row \"3 km → ₹40\" means any order up to 3 km costs ₹40 delivery. Rows are matched top-down by distance. Enter 0 in the last used row's \"Up to\" column to mean \"and above\". Empty rows are ignored."
+msgstr ""
+
+#. translators: 1: minimum order amount with currency (e.g. "₹200"), 2: shortfall amount the customer must add (e.g. "₹50").
+#: includes/class-routew-pricing.php:350
+#, php-format
+msgid "The minimum delivery order is %1$s — please add %2$s more to your cart."
+msgstr ""
+
+#: includes/class-routew-privacy.php:84
+#: includes/class-routew-privacy.php:100
+#: includes/class-routew-privacy.php:134
+msgid "RouteMile Delivery Profile"
+msgstr ""
+
+#: includes/class-routew-reporting.php:38
+msgid "Today's Report"
+msgstr ""
+
+#: includes/class-routew-reporting.php:63
+msgid "Total Deliveries:"
+msgstr ""
+
+#: includes/class-routew-reporting.php:67
+msgid "Total Delivery Fees:"
+msgstr ""
+
+#: includes/class-routew-roles.php:151
+msgid "Agent mobile number"
+msgstr ""
+
+#: includes/class-routew-roles.php:158
+msgid "Shown to the customer on order tracking while this agent has the order. Use the full dialable number, e.g. +91 98765 43210."
+msgstr ""
+
+#: includes/class-routew-settings-extra.php:83
+msgid "Restaurant Coordinates were out of range or malformed; previous value kept."
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:51
+msgid "Google Maps API Key"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:59
+msgid "Google Server Key (optional)"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:65
+msgid "Optional separate key for Geocoding/Distance Matrix — lets you restrict the main key to your site domain and this one to your server IP. Falls back to the main key when empty."
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:72
+msgid "Google Map ID (optional)"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:78
+msgid "Optional Map ID from your Cloud Console (enables Advanced Markers). Leave empty for classic markers."
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:98
+#: includes/class-routew-settings-maps.php:99
+#: includes/class-routew-settings.php:269
+#: includes/class-routew-settings.php:270
+msgid "Show"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:99
+#: includes/class-routew-settings.php:270
+msgid "Hide"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:100
+msgid "Paste your Google Maps JavaScript API key. Only needed when Google Maps is selected above — OpenStreetMap needs no key at all."
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:137
+#: includes/class-routew-settings-maps.php:144
+msgid "Map Provider"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:153
+msgid "Provider API Key"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:162
+msgid "Road Distance Factor"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:175
+msgid "Show Provider Credit"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:199
+msgid "Show map provider attribution (e.g. \"Powered by Geoapify\") on the customer-facing checkout map. Off by default per WP.org Guideline 10 — leave off unless the provider requires visible credit for license terms."
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:207
+msgid "Choose which mapping service powers the checkout location picker, address lookup and distance calculation. OpenStreetMap works with no key and no billing account; the others need a free key."
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:238
+msgid "road distance"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:240
+msgid "straight-line distance only"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:248
+msgid "Get a key"
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:282
+msgid "Paste the API key from your MapTiler or Geoapify account. Not needed for OpenStreetMap; Google uses its own fields below."
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:298
+msgid "Only for providers that cannot measure real road distance: straight-line distance is multiplied by this to approximate a driving route. 1.3 suits most towns and cities."
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:321
+msgid "Unknown map provider submitted; previous provider kept."
+msgstr ""
+
+#: includes/class-routew-settings-maps.php:334
+msgid "Road Distance Factor must be between 1.0 and 3.0; previous value kept."
+msgstr ""
+
+#: includes/class-routew-settings.php:42
+msgid "RouteMile"
+msgstr ""
+
+#: includes/class-routew-settings.php:79
+msgid "General Settings"
+msgstr ""
+
+#: includes/class-routew-settings.php:86
+msgid "Restaurant Address"
+msgstr ""
+
+#: includes/class-routew-settings.php:95
+msgid "Restaurant Coordinates (lat, lng)"
+msgstr ""
+
+#: includes/class-routew-settings.php:101
+msgid "Optional. Exact \"lat, lng\" used for fee & zone checks, e.g. 40.7128, -74.0060. Overrides the address above."
+msgstr ""
+
+#: includes/class-routew-settings.php:107
+msgid "Default Preparation Time (minutes)"
+msgstr ""
+
+#: includes/class-routew-settings.php:114
+msgid "How long your kitchen needs to prepare a typical order. RouteMile adds this to travel time to show customers an estimated arrival, e.g. 20 min cooking + 15 min ride = “Arrives in ~35 minutes”. Most restaurants keep 15–30."
+msgstr ""
+
+#: includes/class-routew-settings.php:132
+msgid "Remove Data on Uninstall"
+msgstr ""
+
+#: includes/class-routew-settings.php:132
+msgid "Delete all RouteMile data (settings, saved profiles, the delivery_boy role) on uninstall. Order meta is never deleted either way."
+msgstr ""
+
+#: includes/class-routew-settings.php:137
+msgid "Delivery Zone Settings"
+msgstr ""
+
+#: includes/class-routew-settings.php:144
+msgid "Delivery Radius (km)"
+msgstr ""
+
+#: includes/class-routew-settings.php:153
+msgid "Auto-Set Status on Assign"
+msgstr ""
+
+#: includes/class-routew-settings.php:157
+msgid "Automatically set order status to \"Assigned\" when a delivery boy is assigned from the order edit page"
+msgstr ""
+
+#: includes/class-routew-settings.php:163
+msgid "Receipt Branding"
+msgstr ""
+
+#: includes/class-routew-settings.php:170
+msgid "Receipt Logo"
+msgstr ""
+
+#: includes/class-routew-settings.php:174
+msgid "Recommended: 200x80px, PNG or JPG"
+msgstr ""
+
+#: includes/class-routew-settings.php:179
+msgid "Restaurant Name (for Receipt)"
+msgstr ""
+
+#: includes/class-routew-settings.php:183
+msgid "Leave empty to use site name"
+msgstr ""
+
+#: includes/class-routew-settings.php:188
+msgid "Restaurant Address (for Receipt)"
+msgstr ""
+
+#: includes/class-routew-settings.php:192
+msgid "Full address as it appears on receipts"
+msgstr ""
+
+#: includes/class-routew-settings.php:197
+msgid "Restaurant Phone (for Receipt)"
+msgstr ""
+
+#: includes/class-routew-settings.php:206
+msgid "Receipt Tagline"
+msgstr ""
+
+#: includes/class-routew-settings.php:210
+msgid "Optional tagline shown below logo (e.g., \"Delicious Food, Delivered Fast!\")"
+msgstr ""
+
+#: includes/class-routew-settings.php:215
+msgid "Receipt Footer Message"
+msgstr ""
+
+#: includes/class-routew-settings.php:230
+msgid "Customize your delivery receipts with your restaurant branding. These settings are used only for printed receipts."
+msgstr ""
+
+#: includes/class-routew-settings.php:314
+msgid "Select or Upload Logo"
+msgstr ""
+
+#: includes/class-routew-settings.php:315
+msgid "Use this logo"
+msgstr ""
+
+#: includes/class-routew-settings.php:316
+#: includes/class-routew-settings.php:335
+msgid "Remove Logo"
+msgstr ""
+
+#: includes/class-routew-settings.php:330
+msgid "Upload Logo"
+msgstr ""
+
+#: includes/class-routew-settings.php:395
+msgid "minutes"
+msgstr ""
+
+#: includes/class-routew-shipping-method.php:30
+msgid "Dynamic distance-based shipping for RouteMile."
+msgstr ""
+
+#: includes/class-routew-shipping-method.php:64
+msgid "Title"
+msgstr ""
+
+#: includes/class-routew-shipping-method.php:66
+msgid "This controls the title which the user sees during checkout."
+msgstr ""
+
+#: includes/class-routew-shipping-method.php:160
+msgid "We could not calculate delivery distance. Please verify your location and try again."
+msgstr ""
+
+#. translators: %s: shipping method title shown to the customer.
+#: includes/class-routew-shipping-method.php:240
+#, php-format
+msgid "%s (Free delivery)"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:179
+msgid "Account details"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:183
+msgid "My account"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:186
+msgid "Back to My account"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:237
+msgid "All"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:238
+#: includes/class-routew-shortcodes.php:875
+msgid "Pending"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:241
+#: includes/class-routew-shortcodes.php:686
+#: includes/class-routew-shortcodes.php:689
+msgid "Cancelled"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:244
+msgid "Filter orders"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:282
+msgid "Invalid order ID."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:288
+msgid "Order not found."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:304
+msgid "You are not authorized to view this receipt."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:327
+msgid "Re-order"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:347
+msgid "You must be logged in to reorder."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:359
+msgid "You are not authorized to reorder this order."
+msgstr ""
+
+#. translators: %s: product name
+#: includes/class-routew-shortcodes.php:383
+#, php-format
+msgid "Could not add \"%s\" to your cart. It may no longer be available."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:388
+msgid "Items from your previous order have been added to the cart. Review and adjust before checkout."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:635
+#: includes/class-routew-stage-labels.php:62
+msgid "Order placed"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:636
+msgid "We received your order"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:637
+msgid "Waiting for confirmation."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:642
+msgid "On hold"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:643
+msgid "Your order is on hold"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:644
+msgid "We will start preparing once the payment is confirmed."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:649
+msgid "Confirmed"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:650
+#: includes/class-routew-shortcodes.php:657
+msgid "Preparing your order"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:651
+msgid "Your order is confirmed."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:656
+#: includes/class-routew-stage-labels.php:68
+msgid "In the kitchen"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:658
+msgid "Our chefs are preparing your food."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:665
+#: includes/class-routew-stage-labels.php:74
+msgid "Rider assigned"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:666
+msgid "Your rider is on it"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:667
+msgid "Your order is still being prepared — your rider will pick it up as soon as it is ready."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:673
+msgid "Out for delivery"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:674
+msgid "Your rider is heading your way."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:680
+msgid "Delivered. Enjoy!"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:687
+msgid "Order cancelled"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:694
+#: includes/class-routew-shortcodes.php:695
+msgid "Payment failed"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:696
+msgid "This order could not be paid for and was not prepared."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:697
+msgid "Failed"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:702
+#: includes/class-routew-shortcodes.php:705
+msgid "Refunded"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:703
+msgid "Order refunded"
+msgstr ""
+
+#. translators: %s: order placed datetime
+#: includes/class-routew-shortcodes.php:730
+#, php-format
+msgid "Placed %s"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:805
+msgid "Delivery status"
+msgstr ""
+
+#. translators: %s: step start datetime
+#: includes/class-routew-shortcodes.php:856
+#, php-format
+msgid "Started %s"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:864
+msgid "In progress"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:885
+msgid "Your delivery rider"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:896
+msgid "Verified delivery partner"
+msgstr ""
+
+#. translators: %s: assignment datetime
+#: includes/class-routew-shortcodes.php:902
+#, php-format
+msgid "Assigned %s"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:909
+msgid "Call rider"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:913
+msgid "Message rider"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:915
+msgid "Message"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:920
+msgid "Contact via store"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:927
+msgid "Your rider details will appear here as soon as one is assigned."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:931
+msgid "Delivered by our store team."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:999
+msgid "Track your order"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:1000
+msgid "Enter your order details to see its live delivery status."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:1004
+msgid "Order ID"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:1006
+msgid "e.g. 123"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:1009
+msgid "Billing email"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:1011
+msgid "you@example.com"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:1015
+msgid "Track order"
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:1037
+msgid "Too many tracking attempts. Please try again in a few minutes."
+msgstr ""
+
+#: includes/class-routew-shortcodes.php:1053
+msgid "Invalid order details."
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:109
+msgid "Grey — neutral"
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:110
+msgid "Orange — preparing"
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:111
+msgid "Amber — assigned"
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:112
+msgid "Blue — in transit"
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:113
+msgid "Green — delivered"
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:285
+msgid "Order Stage Labels"
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:292
+msgid "Delivery Stage Names"
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:306
+msgid "Rename the delivery stages your customers and riders see — e.g. \"Sent to kitchen\" or \"Out for delivery\" — and pick a colour and icon for each. This only changes the wording on screen: your orders, their history and every recorded time stay exactly as they are."
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:330
+msgid "Stage name"
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:337
+msgid "Colour"
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:346
+msgid "Icon"
+msgstr ""
+
+#: includes/class-routew-stage-labels.php:361
+msgid "Tip: the preview pill shows exactly what your riders and customers will see. Leave a name empty to restore the default wording."
+msgstr ""
+
+#: includes/class-routew-store-hours.php:86
+msgid "Opening Hours"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:93
+msgid "Enable Schedule"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:101
+msgid "Weekly Hours"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:109
+msgid "Special Occasion Override"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:119
+msgid "The admin-bar toggle closes deliveries immediately at any time; this schedule additionally pauses ordering outside your opening hours."
+msgstr ""
+
+#: includes/class-routew-store-hours.php:127
+msgid "Close ordering automatically outside the hours below"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:145
+msgid "Stay open regardless of the weekly schedule"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:148
+msgid "For special occasions — a holiday the weekly schedule marks as closed, or an all-day event. Ordering stays open until the moment below (the manual Open/Closed admin-bar toggle still wins)."
+msgstr ""
+
+#. translators: %s: formatted date/time when the override ends.
+#: includes/class-routew-store-hours.php:158
+#, php-format
+msgid "Currently forcing OPEN until %s."
+msgstr ""
+
+#: includes/class-routew-store-hours.php:163
+msgid "Leave empty and untick to rely on the weekly schedule only."
+msgstr ""
+
+#: includes/class-routew-store-hours.php:176
+#: includes/class-routew-store-hours.php:450
+msgid "Sunday"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:176
+#: includes/class-routew-store-hours.php:450
+msgid "Monday"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:176
+#: includes/class-routew-store-hours.php:450
+msgid "Tuesday"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:177
+#: includes/class-routew-store-hours.php:450
+msgid "Wednesday"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:177
+#: includes/class-routew-store-hours.php:450
+msgid "Thursday"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:177
+#: includes/class-routew-store-hours.php:450
+msgid "Friday"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:177
+#: includes/class-routew-store-hours.php:450
+msgid "Saturday"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:181
+msgid "Opens"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:181
+msgid "Closes"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:198
+msgid "Open all day"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:200
+msgid "Closed all day"
+msgstr ""
+
+#: includes/class-routew-store-hours.php:277
+msgid "Special-occasion override date was invalid; override not saved."
+msgstr ""
+
+#. translators: %s: opening time for today.
+#: includes/class-routew-store-hours.php:457
+#, php-format
+msgid "We open today at %s."
+msgstr ""
+
+#. translators: 1: day name, 2: opening time.
+#: includes/class-routew-store-hours.php:469
+#, php-format
+msgid "We reopen %1$s at %2$s."
+msgstr ""
+
+#: includes/emails/class-routew-email-assigned.php:25
+msgid "Driver Assigned"
+msgstr ""
+
+#: includes/emails/class-routew-email-assigned.php:26
+msgid "This email is sent when a delivery driver is assigned to the order."
+msgstr ""
+
+#: includes/emails/class-routew-email-assigned.php:27
+msgid "A driver has been assigned!"
+msgstr ""
+
+#: includes/emails/class-routew-email-assigned.php:28
+#: includes/emails/class-routew-email-assigned.php:53
+msgid "{site_title}: Driver assigned to your order #{order_number}"
+msgstr ""
+
+#: includes/emails/class-routew-email-assigned.php:63
+msgid "A driver is on the way! 🚗"
+msgstr ""
+
+#: includes/emails/class-routew-email-assigned.php:107
+#: includes/emails/class-routew-email-assigned.php:130
+msgid "A delivery driver is on their way to pick up your order."
+msgstr ""
+
+#: includes/emails/class-routew-email-assigned.php:147
+msgid "Your order will arrive soon!"
+msgstr ""
+
+#: includes/emails/class-routew-email-in-kitchen.php:25
+msgid "Order In Kitchen"
+msgstr ""
+
+#: includes/emails/class-routew-email-in-kitchen.php:26
+msgid "This email is sent when an order is being prepared in the kitchen."
+msgstr ""
+
+#: includes/emails/class-routew-email-in-kitchen.php:27
+msgid "Your order is being prepared!"
+msgstr ""
+
+#: includes/emails/class-routew-email-in-kitchen.php:28
+#: includes/emails/class-routew-email-in-kitchen.php:53
+msgid "{site_title}: Your order #{order_number} is in the kitchen"
+msgstr ""
+
+#: includes/emails/class-routew-email-in-kitchen.php:63
+msgid "Your order is being prepared! 🍳"
+msgstr ""
+
+#: includes/emails/class-routew-email-in-kitchen.php:107
+#: includes/emails/class-routew-email-in-kitchen.php:130
+msgid "Your order is being prepared and will be out for delivery soon."
+msgstr ""
+
+#: includes/emails/class-routew-email-in-kitchen.php:147
+msgid "Thank you for your order!"
+msgstr ""
+
+#: includes/emails/class-routew-email-picked-up.php:25
+msgid "Order Picked Up"
+msgstr ""
+
+#: includes/emails/class-routew-email-picked-up.php:26
+msgid "This email is sent when the order is picked up and out for delivery."
+msgstr ""
+
+#: includes/emails/class-routew-email-picked-up.php:27
+msgid "Your order is on its way!"
+msgstr ""
+
+#: includes/emails/class-routew-email-picked-up.php:28
+#: includes/emails/class-routew-email-picked-up.php:53
+msgid "{site_title}: Your order #{order_number} is out for delivery"
+msgstr ""
+
+#: includes/emails/class-routew-email-picked-up.php:63
+msgid "Your order is on its way! 🎉"
+msgstr ""
+
+#: includes/emails/class-routew-email-picked-up.php:107
+#: includes/emails/class-routew-email-picked-up.php:130
+msgid "Your order has been picked up and is on its way to you!"
+msgstr ""
+
+#: includes/emails/class-routew-email-picked-up.php:147
+msgid "Get ready to receive your delicious order!"
+msgstr ""
+
+#: includes/services/class-routew-address-validator.php:48
+msgid "ROUTEW_Address_Validator::validate_address_completeness() is deprecated and a no-op as of 1.5.0."
+msgstr ""
+
+#. translators: %d: estimated travel time in minutes.
+#: includes/services/class-routew-delivery-fee.php:93
+#, php-format
+msgid "ETA ~ %d mins (estimated)"
+msgstr ""
+
+#. translators: %d: estimated travel time in minutes.
+#: includes/services/class-routew-delivery-fee.php:98
+#, php-format
+msgid "ETA ~ %d mins"
+msgstr ""
+
+#: includes/services/class-routew-map-provider-client.php:48
+msgid "Map provider endpoint is not allowed."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: includes/services/class-routew-map-provider-client.php:77
+#, php-format
+msgid "Map provider returned HTTP %d."
+msgstr ""
+
+#: includes/services/class-routew-map-provider-client.php:84
+msgid "Map provider returned an unreadable response."
+msgstr ""
+
+#: includes/services/class-routew-map-provider-client.php:158
+msgid "Address lookups are busy for a moment — please try again, or drag the map pin instead."
+msgstr ""
+
+#: includes/services/class-routew-map-provider-client.php:240
+msgid "The configured map provider cannot geocode addresses."
+msgstr ""
+
+#: includes/services/class-routew-map-provider-client.php:261
+#: includes/services/class-routew-map-provider-client.php:331
+msgid "Provider has no road routing."
+msgstr ""
+
+#: includes/services/class-routew-map-provider-client.php:375
+msgid "Could not find that location. Please try a different address or move the map pin."
+msgstr ""
+
+#: includes/services/class-routew-map-providers.php:58
+msgid "Google Maps"
+msgstr ""
+
+#: includes/services/class-routew-map-providers.php:61
+msgid "Requires a Google Cloud billing account. Free monthly credit covers small stores."
+msgstr ""
+
+#: includes/services/class-routew-map-providers.php:69
+msgid "OpenStreetMap (no key required)"
+msgstr ""
+
+#: includes/services/class-routew-map-providers.php:72
+msgid "Completely free — no signup, no card. Runs on volunteer infrastructure: address lookups are throttled to one per second site-wide and the public routing server asks that busy stores not use it. Best for low-volume stores; switch to Geoapify if you outgrow it."
+msgstr ""
+
+#: includes/services/class-routew-map-providers.php:89
+msgid "MapTiler"
+msgstr ""
+
+#: includes/services/class-routew-map-providers.php:92
+msgid "Free key, no card required: 100k tile loads and 100k geocoding requests per month. No road routing — distance uses the straight-line estimate."
+msgstr ""
+
+#: includes/services/class-routew-map-providers.php:102
+msgid "Geoapify"
+msgstr ""
+
+#: includes/services/class-routew-map-providers.php:105
+msgid "Free key, no card required: 3,000 requests per day covering tiles, geocoding and road routing in one provider."
+msgstr ""
+
+#. translators: %s: map provider name.
+#: includes/services/class-routew-mapping-service.php:95
+#, php-format
+msgid "%s requires an API key. Add one in WooCommerce → Settings → RouteMile, or switch to OpenStreetMap which needs no key."
+msgstr ""
+
+#: includes/services/class-routew-mapping-service.php:96
+msgid "The map provider"
+msgstr ""
+
+#. translators: %s: distance in kilometres.
+#: includes/services/class-routew-mapping-service.php:189
+#, php-format
+msgid "%s km"
+msgstr ""
+
+#. translators: %d: duration in minutes.
+#: includes/services/class-routew-mapping-service.php:197
+#, php-format
+msgid "%d min"
+msgid_plural "%d mins"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/services/class-routew-mapping-service.php:235
+msgid "Restaurant address or coordinates are not configured."
+msgstr ""
+
+#: includes/services/class-routew-mapping-service.php:276
+msgid "Invalid location array. Expected lat,lng."
+msgstr ""
+
+#: includes/services/class-routew-mapping-service.php:282
+msgid "Invalid location type."
+msgstr ""
+
+#: includes/services/class-routew-mapping-service.php:313
+msgid "The configured map provider cannot look up addresses."
+msgstr ""
+
+#: includes/services/class-routew-rate-limiter.php:56
+msgid "You are making too many requests. Please wait a moment and try again."
+msgstr ""
+
+#: includes/services/class-routew-rate-limiter.php:80
+msgid "ROUTEW_Rate_Limiter::get_remaining_quota() is deprecated and a no-op as of 1.5.0."
+msgstr ""
+
+#: routemile-woocommerce.php:44
+msgid "RouteMile for WooCommerce requires WooCommerce to be installed and active."
+msgstr ""
+
+#: routemile-woocommerce.php:234
+msgid "RouteMile for WooCommerce requires PHP 7.4 or higher."
+msgstr ""
+
+#: routemile-woocommerce.php:245
+msgid "RouteMile for WooCommerce requires WordPress 6.0 or higher."
+msgstr ""
+
+#: routemile-woocommerce.php:261
+msgid "RouteMile for WooCommerce requires WooCommerce 7.0 or higher."
+msgstr ""
+
+#: templates/delivery-dashboard-template.php:120
+msgid "Collected today"
+msgstr ""
+
+#: templates/delivery-dashboard-template.php:127
+msgid "To hand over"
+msgstr ""
+
+#. translators: 1: formatted amount.
+#: templates/delivery-dashboard-template.php:142
+#, php-format
+msgid "Hand-over of %1$s sent — waiting for manager approval."
+msgstr ""
+
+#. translators: %s = formatted amount.
+#: templates/delivery-dashboard-template.php:153
+#, php-format
+msgid "You are holding %s of the store's cash."
+msgstr ""
+
+#: templates/delivery-dashboard-template.php:164
+msgid "Request hand-over"
+msgstr ""
+
+#. translators: 1: formatted amount, 2: date/time, 3: approver name.
+#: templates/delivery-dashboard-template.php:173
+#, php-format
+msgid "Last hand-over: %1$s on %2$s, approved by %3$s. All settled."
+msgstr ""
+
+#. translators: 1 = formatted amount, 2 = number of orders.
+#: templates/delivery-dashboard-template.php:187
+#, php-format
+msgid "Cash to collect: %1$s across %2$s COD order(s)"
+msgstr ""
+
+#: templates/delivery-dashboard-template.php:206
+msgid "No new deliveries assigned."
+msgstr ""
+
+#: templates/delivery-dashboard-template.php:207
+msgid "New orders appear here automatically — leave the app open."
+msgstr ""
+
+#: templates/delivery-dashboard-template.php:220
+msgid "No deliveries in progress."
+msgstr ""
+
+#: templates/delivery-dashboard-template.php:233
+msgid "No delivered orders yet."
+msgstr ""
+
+#: templates/delivery-dashboard-template.php:239
+msgid "Delivery status filters"
+msgstr ""
+
+#: templates/emails/routew-order-status.php:42
+msgid "Product"
+msgstr ""
+
+#: templates/emails/routew-order-status.php:43
+msgid "Quantity"
+msgstr ""
+
+#: templates/emails/routew-order-status.php:44
+msgid "Price"
+msgstr ""
+
+#: templates/receipt-template.php:122
+msgid "Thank You! Have a great day!"
+msgstr ""
+
+#. translators: %s: order number.
+#: templates/receipt-template.php:135
+#, php-format
+msgid "Bill - Order #%s"
+msgstr ""
+
+#. translators: %s: store phone number.
+#: templates/receipt-template.php:176
+#, php-format
+msgid "Phone: %s"
+msgstr ""
+
+#: templates/receipt-template.php:180
+msgid "Delivery Bill"
+msgstr ""
+
+#: templates/receipt-template.php:186
+msgid "Order No:"
+msgstr ""
+
+#: templates/receipt-template.php:190
+msgid "Date:"
+msgstr ""
+
+#: templates/receipt-template.php:191
+msgid "N/A"
+msgstr ""
+
+#: templates/receipt-template.php:195
+msgid "Delivery By:"
+msgstr ""
+
+#: templates/receipt-template.php:203
+msgid "Customer Details"
+msgstr ""
+
+#. translators: %s: unit or flat number.
+#: templates/receipt-template.php:215
+#, php-format
+msgid "Unit/Flat: %s"
+msgstr ""
+
+#: templates/receipt-template.php:224
+msgid "Items Ordered"
+msgstr ""
+
+#. translators: 1: item quantity, 2: formatted unit price.
+#: templates/receipt-template.php:253
+#, php-format
+msgid "%1$d × %2$s"
+msgstr ""
+
+#: templates/receipt-template.php:266
+msgid "Subtotal:"
+msgstr ""
+
+#: templates/receipt-template.php:274
+msgid "Delivery Fee:"
+msgstr ""
+
+#: templates/receipt-template.php:280
+msgid "TOTAL AMOUNT:"
+msgstr ""
+
+#: templates/receipt-template.php:288
+msgid "Cash on Delivery"
+msgstr ""
+
+#. translators: %s: formatted order total to collect.
+#: templates/receipt-template.php:292
+#, php-format
+msgid "COLLECT: %s"
+msgstr ""
+
+#: templates/receipt-template.php:300
+msgid "PAYMENT COMPLETED"
+msgstr ""
+
+#: templates/receipt-template.php:310
+msgid "Special Instructions"
+msgstr ""
+
+#. translators: %s: formatted print timestamp.
+#: templates/receipt-template.php:321
+#, php-format
+msgid "Printed: %s"
 msgstr ""

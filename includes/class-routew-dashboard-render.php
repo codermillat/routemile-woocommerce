@@ -201,7 +201,7 @@ class ROUTEW_Dashboard_Render
 										href="<?php echo esc_url($this->get_order_edit_url($order->get_id())); ?>">#<?php echo esc_html($order->get_order_number()); ?></a>
 								</td>
 								<td><?php echo esc_html($order->get_formatted_billing_full_name()); ?></td>
-								<td><?php echo esc_html(wc_get_order_status_name($order->get_status())); ?></td>
+								<td><?php echo esc_html(ROUTEW_Stage_Labels::status_label($order->get_status())); ?></td>
 								<td>
 									<?php echo esc_html($order->get_payment_method_title()); ?>
 									<?php if ('cod' === $order->get_payment_method()): ?>
@@ -211,6 +211,23 @@ class ROUTEW_Dashboard_Render
 								<?php $this->kitchen_note_cell($order); ?>
 								<td>
 									<div class="routew-action-buttons">
+										<?php if ('pending' === $order->get_status()) : ?>
+											<?php
+											// The manager accepts a newly placed order → it moves
+											// to the kitchen stage (routew-in-kitchen). Reuses the
+											// nonce-verified routew_update_order_status handler —
+											// no new endpoint, no new capability.
+											?>
+											<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"
+												style="display:inline-block; margin-right:5px;">
+												<?php wp_nonce_field('routew_update_status'); ?>
+												<input type="hidden" name="action" value="routew_update_order_status" />
+												<input type="hidden" name="order_id" value="<?php echo esc_attr($order->get_id()); ?>" />
+												<input type="hidden" name="new_status" value="routew-in-kitchen" />
+												<button type="submit"
+													class="button button-small button-primary"><?php esc_html_e('Accept Order', 'routemile-for-woocommerce'); ?></button>
+											</form>
+										<?php endif; ?>
 										<button type="button" class="button button-small routew-print-receipt"
 											data-order-id="<?php echo esc_attr($order->get_id()); ?>"
 											title="<?php esc_attr_e('Print Receipt', 'routemile-for-woocommerce'); ?>">
@@ -278,7 +295,7 @@ class ROUTEW_Dashboard_Render
 								</td>
 								<td><?php echo esc_html($order->get_formatted_billing_full_name()); ?></td>
 								<td><?php echo esc_html($delivery_boy ? $delivery_boy->display_name : '-'); ?></td>
-								<td><?php echo esc_html(wc_get_order_status_name($order->get_status())); ?></td>
+								<td><?php echo esc_html(ROUTEW_Stage_Labels::status_label($order->get_status())); ?></td>
 								<td>
 									<?php echo esc_html($order->get_payment_method_title()); ?>
 									<?php if ('cod' === $order->get_payment_method()): ?>
@@ -351,7 +368,7 @@ class ROUTEW_Dashboard_Render
 								</td>
 								<td><?php echo esc_html($order->get_formatted_billing_full_name()); ?></td>
 								<td><?php echo esc_html($delivery_boy ? $delivery_boy->display_name : '-'); ?></td>
-								<td><?php echo esc_html(wc_get_order_status_name($order->get_status())); ?></td>
+								<td><?php echo esc_html(ROUTEW_Stage_Labels::status_label($order->get_status())); ?></td>
 								<td>
 									<?php echo esc_html($order->get_payment_method_title()); ?>
 									<?php if ('cod' === $order->get_payment_method()): ?>

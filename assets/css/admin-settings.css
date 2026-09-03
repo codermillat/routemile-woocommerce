@@ -154,3 +154,94 @@
 	padding: 12px 14px;
 	max-width: 560px;
 }
+
+/* Order Stage Labels — renameable delivery stages with live preview */
+.routew-stage-row {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 10px 0;
+	border-bottom: 1px solid #f0f0f1;
+	flex-wrap: wrap;
+}
+
+.routew-stage-row:last-child {
+	border-bottom: 0;
+}
+
+.routew-stage-row__fields {
+	display: flex;
+	align-items: flex-end;
+	gap: 10px;
+	flex-wrap: wrap;
+	flex: 1 1 420px;
+}
+
+.routew-stage-row__fields .routew-stage-row__label {
+	flex: 1 1 220px;
+}
+
+.routew-stage-row__control {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	font-size: 12px;
+	color: #50575e;
+}
+
+.routew-stage-row__control select {
+	width: auto;
+}
+
+.routew-stage-row__preview {
+	flex: 0 0 auto;
+	font-size: 12px;
+	font-weight: 600;
+	border-radius: 50rem;
+	padding: 3px 12px;
+	white-space: nowrap;
+}
+
+.routew-pill--placed.routew-stage-row__preview { background: #f5f4f2; color: #44403c; }
+.routew-pill--preparing.routew-stage-row__preview { background: #ffebdd; color: #c2410c; }
+.routew-pill--assigned.routew-stage-row__preview { background: #fef0dc; color: #92400e; }
+.routew-pill--transit.routew-stage-row__preview { background: #e8effd; color: #1d4ed8; }
+.routew-pill--delivered.routew-stage-row__preview { background: #e6f6ec; color: #15803d; }
+
+/* Brand Color field — picker + reset + live preview swatches */
+.routew-brand-color-field {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.routew-brand-color-input {
+	width: 56px;
+	height: 32px;
+	padding: 0;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.routew-brand-color-preview {
+	display: inline-block;
+	font-size: 12px;
+	font-weight: 600;
+	padding: 4px 14px;
+	border-radius: 50rem;
+	border: 1px solid transparent;
+	white-space: nowrap;
+}
+
+.routew-brand-color-preview--button {
+	background: #c2410c;
+	color: #fff;
+}
+
+.routew-brand-color-preview--pill {
+	background: #fff1e7;
+	color: #c2410c;
+	border-color: #ffd9be;
+}

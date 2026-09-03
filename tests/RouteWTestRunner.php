@@ -215,12 +215,31 @@ class ROUTEWTestRunner
             'includes/services/class-routew-rate-limiter.php' => 'Rate Limiter',
             'templates/delivery-dashboard-template.php' => 'Dashboard Template',
             'templates/receipt-template.php' => 'Receipt Template',
+            'templates/woocommerce/myaccount/dashboard.php' => 'WC template override: my-account dashboard',
+            'templates/woocommerce/myaccount/my-address.php' => 'WC template override: my-account addresses',
             'assets/js/admin.js' => 'Admin JavaScript',
             'assets/js/checkout.js' => 'Checkout JavaScript (Google provider)',
             'assets/js/checkout-leaflet.js' => 'Checkout JavaScript (Leaflet providers)',
             'assets/vendor/leaflet/leaflet.js' => 'Bundled Leaflet library',
             'assets/vendor/leaflet/leaflet.css' => 'Bundled Leaflet stylesheet',
-            'assets/css/frontend.css' => 'Frontend CSS',
+            'assets/css/routew-ui.css' => 'Scoped Bootstrap design system (Mile Zero)',
+            'assets/css/my-account.css' => 'My Account shell CSS',
+            'assets/css/my-account-dashboard.css' => 'My Account dashboard widgets CSS',
+            'assets/css/checkout.css' => 'Checkout location picker + delivery fields CSS',
+            'assets/css/tracking.css' => 'Order tracking CSS',
+            'assets/css/delivery-dashboard.css' => 'Agent PWA CSS',
+            'assets/fonts/routew-sans-var.woff2' => 'Bundled RouteMile Sans (Plus Jakarta Sans, OFL) variable font',
+            'assets/fonts/OFL.txt' => 'Font license (SIL OFL 1.1)',
+            'tools/ui/build.mjs' => 'Design-system build script (Node)',
+            'tools/ui/postcss.config.js' => 'Scope-prefixing postcss config',
+            'tools/ui/scss/routew-bootstrap.scss' => 'Scoped Bootstrap build entry',
+            'tools/ui/scss/_tokens.scss' => 'Design tokens source (single source of truth)',
+            'tools/ui/scss/_components.scss' => 'Shared component layer source',
+            'assets/css-src/my-account.scss' => 'My Account shell source',
+            'assets/css-src/my-account-dashboard.scss' => 'Dashboard widgets source',
+            'assets/css-src/checkout.scss' => 'Checkout surface source',
+            'assets/css-src/tracking.scss' => 'Tracking surface source',
+            'assets/css-src/agent.scss' => 'Agent PWA source',
         ];
 
         foreach ($required_files as $path => $description) {
@@ -708,30 +727,171 @@ class ROUTEWTestRunner
             $this->fail('R4 session helper file missing: ' . $session_helper);
         }
 
-        // UI1 — Agent dashboard Bootstrap 5 overlay (Batch 1b).
-        // Verifies the Bootstrap CSS bundle exists, is enqueued on the agent
-        // surface, the agent JS contract is preserved verbatim in the
-        // template, the PWA manifest endpoint is still wired, and the service
-        // worker cache version was bumped for the CSS overhaul.
-        $bootstrap_css = $this->plugin_dir . '/assets/vendor/bootstrap/bootstrap.min.css';
-        if (file_exists($bootstrap_css)) {
-            $this->pass('UI1 Bootstrap 5.3 CSS bundle present at assets/vendor/bootstrap/');
+        // =====================================================================
+        // Mile Zero design system (v1.6.0). The UI1–UI12 Bootstrap-overlay
+        // tests are superseded: the plugin now ships a COMPILED, SCOPED
+        // Bootstrap 5.3 re-skin (assets/css/routew-ui.css) built from
+        // tools/ui/ sources, plus per-surface stylesheets. These tests lock
+        // the new contract: scoping, the enqueue graph, markup/JS contracts,
+        // and the token-driven component vocabulary.
+        // =====================================================================
+
+        // DS1 — routew-ui.css exists and is fully scoped: every rule applies
+        // only under .routew-ui, so the storefront theme can never collide
+        // with Bootstrap's globals (the root bug the old overlay had).
+        $ui_css_path = $this->plugin_dir . '/assets/css/routew-ui.css';
+        if (file_exists($ui_css_path)) {
+            $ui_css = file_get_contents($ui_css_path);
+            $this->pass('DS1 routew-ui.css present (' . round(strlen($ui_css) / 1024) . ' KB compiled)');
+
+            // Bundled font wired into the build.
+            if (false !== strpos($ui_css, "font-family:RouteMile Sans") && false !== strpos($ui_css, '../fonts/routew-sans-var.woff2')) {
+                $this->pass('DS1 bundled RouteMile Sans @font-face wired (self-hosted, no CDN)');
+            } else {
+                $this->fail('DS1 bundled font @font-face missing from routew-ui.css');
+            }
+
+            // Tokens emitted on the scope root (not global :root).
+            if (false !== strpos($ui_css, '.routew-ui{--rm-brand:')) {
+                $this->pass('DS1 design tokens emitted on the .routew-ui scope root');
+            } else {
+                $this->fail('DS1 design tokens not scoped — expected .routew-ui{--rm-brand:…} at build head');
+            }
+
+            // No unscoped page-level selectors survive (Reboot's html/body
+            // must have been rewritten to the scope class by postcss).
+            if (preg_match('/[^.\w#-](html|body)\s*\{/', $ui_css) === 0 && false === strpos($ui_css, ':root{')) {
+                $this->pass('DS1 scoping airtight — no html/body/:root rules escape the .routew-ui prefix');
+            } else {
+                $this->fail('DS1 unscoped rules found in routew-ui.css — theme styles will break');
+            }
         } else {
-            $this->fail('UI1 Bootstrap CSS bundle missing at ' . $bootstrap_css);
+            $this->fail('DS1 routew-ui.css missing — run node tools/ui/build.mjs');
         }
 
+        // DS2 — No unscoped Bootstrap bundle anywhere: the raw
+        // assets/vendor/bootstrap/ overlay is retired.
+        if (!is_dir($this->plugin_dir . '/assets/vendor/bootstrap')) {
+            $this->pass('DS2 raw Bootstrap vendor bundle removed (no unscoped framework CSS)');
+        } else {
+            $this->fail('DS2 assets/vendor/bootstrap/ still exists — must not ship alongside the scoped build');
+        }
+        $bootstrap_refs = 0;
+        foreach (glob($this->plugin_dir . '/includes/*.php') as $inc) {
+            $bootstrap_refs += substr_count(file_get_contents($inc), 'vendor/bootstrap');
+        }
+        if (0 === $bootstrap_refs) {
+            $this->pass('DS2 no PHP enqueue references the old vendor/bootstrap path');
+        } else {
+            $this->fail('DS2 ' . $bootstrap_refs . ' enqueue reference(s) to vendor/bootstrap remain');
+        }
+
+        // DS3 — Enqueue graph: every surface loads the scoped build under
+        // the shared 'routew-ui' handle, with surface CSS depending on it.
         $core_php = file_get_contents($this->plugin_dir . '/includes/class-routew-core.php');
-        // The bootstrap path may appear as 'assets/vendor/...' or
-        // '../assets/vendor/...' (the enqueue concatenates with __DIR__-relative
-        // plugin_dir_url), so match on the unique tail.
-        if (false !== strpos($core_php, "'routew-bootstrap'") && false !== strpos($core_php, "vendor/bootstrap/bootstrap.min.css'")) {
-            $this->pass('UI1 Bootstrap enqueued on agent surface (routew-bootstrap handle)');
+        $shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+        $maps_php = file_get_contents($this->plugin_dir . '/includes/class-routew-checkout-maps.php');
+        $my_account_php = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
+
+        if (false !== strpos($core_php, "'routew-ui'") && false !== strpos($core_php, 'routew-ui.css') && false !== strpos($core_php, "array('routew-ui')")) {
+            $this->pass('DS3 agent PWA enqueues routew-ui + delivery-dashboard (dep: routew-ui)');
         } else {
-            $this->fail('UI1 Bootstrap not enqueued on agent surface — class-routew-core.php must wp_enqueue_style the bootstrap CSS');
+            $this->fail('DS3 agent PWA enqueue graph broken in class-routew-core.php');
         }
 
-        // JS contract preserved in template.
+        if (false !== strpos($shortcodes_php, "'routew-ui'")
+            && false !== strpos($shortcodes_php, 'is_account_page')
+            && false !== strpos($shortcodes_php, 'routew-my-account')
+            && false !== strpos($shortcodes_php, 'routew-tracking')) {
+            $this->pass('DS3 my-account enqueues routew-ui + my-account + tracking (gated by is_account_page)');
+        } else {
+            $this->fail('DS3 my-account enqueue graph broken in class-routew-shortcodes.php');
+        }
+
+        if (false !== strpos($maps_php, "'routew-ui'") && false !== strpos($maps_php, 'routew-checkout') && false !== strpos($maps_php, 'checkout.css')) {
+            $this->pass('DS3 checkout enqueues routew-ui + checkout surface CSS');
+        } else {
+            $this->fail('DS3 checkout enqueue graph broken in class-routew-checkout-maps.php');
+        }
+
+        // Old global handles retired.
+        if (false === strpos($shortcodes_php, 'routew-frontend') && false === strpos($maps_php, 'frontend.css')) {
+            $this->pass('DS3 retired routew-frontend / frontend.css global handle');
+        } else {
+            $this->fail('DS3 frontend.css global handle still enqueued somewhere');
+        }
+
+        // DS4 — Account scope wrapper: .routew-ui opens before any endpoint
+        // output (priority 0) and closes after everything (9999), so WC's
+        // own endpoint markup (orders table, forms) is styled by the scoped
+        // build without touching the theme. On the dashboard root the
+        // wrapper also carries routew-account--dashboard, which the CSS
+        // uses to suppress WC's default "Hello user" greeting.
+        if (false !== strpos($shortcodes_php, 'open_account_ui_scope') && false !== strpos($shortcodes_php, 'close_account_ui_scope')
+            && false !== strpos($shortcodes_php, "'woocommerce_account_content', array(\$this, 'open_account_ui_scope'), 0")
+            && false !== strpos($shortcodes_php, "'woocommerce_account_content', array(\$this, 'close_account_ui_scope'), 9999")
+            && false !== strpos($shortcodes_php, 'routew-account--dashboard')
+            && false !== strpos(file_get_contents($this->plugin_dir . '/assets/css/my-account.css'), '.routew-ui.routew-account--dashboard>p{display:none}')) {
+            $this->pass('DS4 account scope wrapper (0/9999) + dashboard greeting suppression wired');
+        } else {
+            $this->fail('DS4 account scope wrapper hooks or greeting suppression missing');
+        }
+
+        // DS4b — Scope-root same-element selectors. Components that live ON
+        // the .routew-ui wrapper element (account wrapper, checkout cards,
+        // agent app shell, track page) MUST be matched with `.routew-ui.foo`
+        // (same element). The descendant form `.routew-ui .foo` never matches
+        // (an element cannot be its own descendant) — the exact bug that
+        // made v1.6.0-dev render endpoint tables, checkout cards, and the
+        // agent shell unstyled.
+        $same_element_specs = array(
+            'assets/css/my-account.css'         => '.routew-ui.routew-account',
+            'assets/css/checkout.css'           => '.routew-ui.routew-checkout-card',
+            'assets/css/delivery-dashboard.css' => '.routew-ui.routew-app-dashboard',
+            'assets/css/tracking.css'           => '.routew-ui.routew-track-order-page',
+        );
+        foreach ($same_element_specs as $rel => $needle) {
+            $css = file_get_contents($this->plugin_dir . '/' . $rel);
+            if (false !== strpos($css, $needle)) {
+                $this->pass('DS4b ' . basename($rel) . ' matches the scope root with a same-element selector (' . $needle . ')');
+            } else {
+                $this->fail('DS4b ' . basename($rel) . ' lost the same-element scope-root selector — ' . $needle . ' missing');
+            }
+        }
+
+        // The broken descendant forms must NOT exist (scope-root classes
+        // reached via `.routew-ui .x` never match). Match the rule-opening
+        // brace or a trailing space so legitimate child selectors like
+        // `.routew-ui .routew-checkout-card__body` are not flagged.
+        $broken_descendants = array(
+            'assets/css/my-account.css'         => array('.routew-ui .routew-account{', '.routew-ui .routew-account '),
+            'assets/css/checkout.css'           => array('.routew-ui .routew-checkout-card{', '.routew-ui .routew-checkout-card '),
+            'assets/css/delivery-dashboard.css' => array('.routew-ui .routew-app-dashboard{', '.routew-ui .routew-app-dashboard '),
+            'assets/css/tracking.css'           => array('.routew-ui .routew-track-order-page{', '.routew-ui .routew-track-order-page '),
+        );
+        foreach ($broken_descendants as $rel => $needles) {
+            $css = file_get_contents($this->plugin_dir . '/' . $rel);
+            $hits = array();
+            foreach ($needles as $needle) {
+                if (false !== strpos($css, $needle)) {
+                    $hits[] = $needle;
+                }
+            }
+            if (empty($hits)) {
+                $this->pass('DS4b ' . basename($rel) . ' has no broken descendant selector for the scope root');
+            } else {
+                $this->fail('DS4b ' . basename($rel) . ' still contains broken descendant selector(s): ' . implode(', ', $hits));
+            }
+        }
+
+        // DS5 — Agent PWA JS contract preserved verbatim (delivery-dashboard.js
+        // depends on these attributes + IDs) and the PWA shell is scoped.
+        // The order-card markup lives in includes/agent-template-helpers.php
+        // (extracted so AJAX handlers can render a single card) — the
+        // contract spans both files.
         $tpl = file_get_contents($this->plugin_dir . '/templates/delivery-dashboard-template.php');
+        $agent_helpers = file_get_contents($this->plugin_dir . '/includes/agent-template-helpers.php');
+        $tpl_all = $tpl . $agent_helpers;
         $contract_attrs = array(
             'data-routew-tab',
             'data-action',
@@ -744,18 +904,16 @@ class ROUTEWTestRunner
         );
         $missing_attrs = array();
         foreach ($contract_attrs as $attr) {
-            if (false === strpos($tpl, $attr)) {
+            if (false === strpos($tpl_all, $attr)) {
                 $missing_attrs[] = $attr;
             }
         }
         if (empty($missing_attrs)) {
-            $this->pass('UI1 JS contract preserved: all 8 data-* attributes present in template');
+            $this->pass('DS5 agent JS contract preserved: all 8 data-* attributes present');
         } else {
-            $this->fail('UI1 JS contract broke — missing in template: ' . implode(', ', $missing_attrs));
+            $this->fail('DS5 agent JS contract broke — missing: ' . implode(', ', $missing_attrs));
         }
 
-        // Required IDs preserved. Match `id="X"` rather than `#X` since
-        // the template emits them as HTML id attributes.
         $required_ids = array('new-orders', 'in-progress', 'delivered', 'routew-toast');
         $missing_ids = array();
         foreach ($required_ids as $id) {
@@ -764,622 +922,961 @@ class ROUTEWTestRunner
             }
         }
         if (empty($missing_ids)) {
-            $this->pass('UI1 Required IDs preserved: ' . implode(', ', array_map(function ($id) { return '#' . $id; }, $required_ids)));
+            $this->pass('DS5 agent required IDs preserved (' . implode(', ', array_map(function ($id) { return '#' . $id; }, $required_ids)) . ')');
         } else {
-            $this->fail('UI1 Missing required IDs in template: ' . implode(', ', $missing_ids));
+            $this->fail('DS5 missing agent IDs: ' . implode(', ', $missing_ids));
         }
 
-        // PWA manifest endpoint still wired.
+        if (false !== strpos($tpl, 'routew-ui routew-app-dashboard')) {
+            $this->pass('DS5 agent PWA root carries the .routew-ui scope class');
+        } else {
+            $this->fail('DS5 agent PWA root missing .routew-ui scope class');
+        }
+
+        // Agent order cards use the tinted pill variants.
+        if (false !== strpos($tpl_all, "routew-pill routew-pill--")) {
+            $this->pass('DS5 agent order cards use design-system status pills (routew-pill--*)');
+        } else {
+            $this->fail('DS5 agent order cards not using routew-pill--* variants');
+        }
+
+        // PWA manifest + SW endpoints still wired.
         $dbv_php = file_get_contents($this->plugin_dir . '/includes/class-routew-delivery-boy-view.php');
         if (false !== strpos($dbv_php, "'routew_agent_manifest'") && false !== strpos($dbv_php, "'routew_agent_sw'")) {
-            $this->pass('UI1 PWA manifest + SW endpoints wired (routew_agent_manifest, routew_agent_sw)');
+            $this->pass('DS5 PWA manifest + SW endpoints wired');
         } else {
-            $this->fail('UI1 PWA manifest/SW endpoints missing from class-routew-delivery-boy-view.php');
+            $this->fail('DS5 PWA manifest/SW endpoints missing from class-routew-delivery-boy-view.php');
         }
 
-        // Service worker cache version bumped to v2.
+        // SW cache bumped for the design-system CSS swap.
         $sw_js = file_get_contents($this->plugin_dir . '/assets/js/routew-agent-sw.js');
-        if (preg_match("/CACHE_VERSION\s*=\s*['\"]routew-agent-v(\\d+)['\"]/", $sw_js, $swm) && (int) $swm[1] >= 2) {
-            $this->pass('UI1 SW cache version bumped to v' . $swm[1] . ' (was v1 pre-overhaul)');
+        if (preg_match("/CACHE_VERSION\s*=\s*['\"]routew-agent-v(\\d+)['\"]/", $sw_js, $swm) && (int) $swm[1] >= 3) {
+            $this->pass('DS5 SW cache version bumped to v' . $swm[1] . ' (CSS filename set changed)');
         } else {
-            $this->fail('UI1 SW CACHE_VERSION not bumped to v2 — old PWAs will serve stale CSS');
+            $this->fail('DS5 SW CACHE_VERSION not bumped to v3 — installed PWAs will serve stale CSS');
         }
 
-        // UI2 — My-account Bootstrap 5 overlay (Batch 2).
-        // Verifies Bootstrap is enqueued on the account page, the body-class
-        // gate still isolates our CSS, the WC my-account hooks are still
-        // registered, the reorder POST handler is intact, and the status
-        // pill class map was migrated from bespoke modifiers to Bootstrap
-        // text-bg-* utility classes.
-        $shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
-        if (false !== strpos($shortcodes_php, "'routew-bootstrap'") && false !== strpos($shortcodes_php, 'vendor/bootstrap/bootstrap.min.css') && false !== strpos($shortcodes_php, 'is_account_page')) {
-            $this->pass('UI2 Bootstrap enqueued on my-account page (routew-bootstrap handle, gated by is_account_page)');
+        // DS6 — My-account dashboard markup: greeting hero, quick actions,
+        // delivery-native pills, order rows with item summary.
+        $dash_signals = array(
+            'routew-hero__eyebrow'        => 'greeting hero',
+            'routew-quick-action"'        => 'quick action tile',
+            'routew-order-row'            => 'recent order row',
+            'routew-pill routew-pill--'   => 'delivery-native status pill',
+            'routew-avatar'               => 'avatar component',
+            'routew-btn-signout'          => 'sign-out button',
+            'routew-reorder-banner'       => 'reorder banner',
+            'routew-empty__'              => 'empty state',
+        );
+        $missing_dash = array();
+        foreach ($dash_signals as $needle => $label) {
+            if (false === strpos($my_account_php, $needle)) {
+                $missing_dash[] = $label;
+            }
+        }
+        if (empty($missing_dash)) {
+            $this->pass('DS6 dashboard emits the full component vocabulary (hero, tiles, rows, pills)');
         } else {
-            $this->fail('UI2 Bootstrap not enqueued on my-account page — class-routew-shortcodes.php must wp_enqueue_style the bootstrap CSS inside is_account_page()');
+            $this->fail('DS6 dashboard missing components: ' . implode(', ', $missing_dash));
         }
 
-        if (false !== strpos($shortcodes_php, "'routew-my-account-styled'") && false !== strpos($shortcodes_php, 'add_my_account_body_class')) {
-            $this->pass('UI2 Body class gate preserved: routew-my-account-styled added in add_my_account_body_class()');
+        // Four quick-action tiles.
+        $quick_action_count = substr_count($my_account_php, 'class="routew-quick-action"');
+        if ($quick_action_count >= 4) {
+            $this->pass('DS6 quick actions grid renders >=4 tiles (found ' . $quick_action_count . ')');
         } else {
-            $this->fail('UI2 Body class gate broken — routew-my-account-styled must still be added on the account page');
+            $this->fail('DS6 quick actions grid missing tiles (found ' . $quick_action_count . ')');
         }
 
-        $my_account_php = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
+        // Status pills speak delivery language, not WC internals. Since
+        // the stage-labels feature the pill map is delegated to
+        // ROUTEW_Stage_Labels (admin-renameable), so the vocabulary is
+        // verified on the helper + the delegation wiring.
+        if (preg_match("/function\s+order_status_pill\s*\(\s*\\\$status\s*\)/", $my_account_php, $spm)) {
+            $map_snippet = substr($my_account_php, (int) strpos($my_account_php, $spm[0]), 800);
+            $stage_labels_php = file_get_contents($this->plugin_dir . '/includes/class-routew-stage-labels.php');
+            $delegation_ok = false !== strpos($map_snippet, 'ROUTEW_Stage_Labels::status_colour')
+                && false !== strpos($map_snippet, 'ROUTEW_Stage_Labels::status_label');
+            $expected_variants = array('placed', 'preparing', 'assigned', 'transit', 'delivered', 'cancelled');
+            $expected_labels = array('On the way', 'In the kitchen', 'Rider assigned', 'Delivered');
+            $missing_variants = array();
+            foreach (array_merge($expected_variants, $expected_labels) as $needle) {
+                if (false === strpos($stage_labels_php, $needle)) {
+                    $missing_variants[] = $needle;
+                }
+            }
+            if ($delegation_ok && empty($missing_variants)) {
+                $this->pass('DS6 order_status_pill() maps delivery variants + customer-facing labels (via ROUTEW_Stage_Labels)');
+            } else {
+                $this->fail('DS6 order_status_pill() missing: ' . implode(', ', $missing_variants) . (!$delegation_ok ? ' + stage-labels delegation' : ''));
+            }
+        } else {
+            $this->fail('DS6 could not locate order_status_pill() in class-routew-my-account.php');
+        }
+
+        // Order summary line ("Chicken Biryani ×2 +1 more").
+        if (false !== strpos($my_account_php, 'order_item_summary')) {
+            $this->pass('DS6 recent orders show a first-item summary line (order_item_summary)');
+        } else {
+            $this->fail('DS6 order_item_summary() missing — rows lose the food-app item preview');
+        }
+
+        // Required WC hooks + chip filter preserved through the redesign.
         if (false !== strpos($my_account_php, "'woocommerce_account_dashboard'") && false !== strpos($my_account_php, "'woocommerce_account_menu_items'")) {
-            $this->pass('UI2 Required hooks preserved: woocommerce_account_dashboard + woocommerce_account_menu_items');
+            $this->pass('DS6 required WC hooks preserved (dashboard + menu items)');
         } else {
-            $this->fail('UI2 Missing required WC hooks in class-routew-my-account.php');
+            $this->fail('DS6 missing required WC hooks in class-routew-my-account.php');
+        }
+        if (false !== strpos($my_account_php, "add_filter('woocommerce_my_account_my_orders_query'")
+            && false !== strpos($my_account_php, 'filter_my_orders_by_chip_status')
+            && preg_match("/'cancelled'\s*=>\s*array\('cancelled',\s*'failed',\s*'refunded'\)/", $my_account_php)) {
+            $this->pass('DS6 ?status= chip still filters the orders query');
+        } else {
+            $this->fail('DS6 chip filter not wired (orders table shows unfiltered list)');
         }
 
+        // Reorder POST handler + body-class gate preserved.
         if (false !== strpos($shortcodes_php, "'template_redirect'") && false !== strpos($shortcodes_php, 'handle_reorder') && false !== strpos($shortcodes_php, "'routew_reorder'")) {
-            $this->pass('UI2 Reorder POST handler preserved (handle_reorder + wp_verify_nonce on routew_reorder)');
+            $this->pass('DS6 reorder POST handler preserved (nonce-verified)');
         } else {
-            $this->fail('UI2 Reorder POST handler missing or nonce check removed from class-routew-shortcodes.php');
+            $this->fail('DS6 reorder POST handler missing from class-routew-shortcodes.php');
+        }
+        if (false !== strpos($shortcodes_php, "'routew-my-account-styled'") && false !== strpos($shortcodes_php, 'add_my_account_body_class')) {
+            $this->pass('DS6 body-class gate preserved (routew-my-account-styled)');
+        } else {
+            $this->fail('DS6 body-class gate broken');
         }
 
-        // Status pill class names migrated to Bootstrap text-bg-* utilities.
-        // status_pill_class() should return at least one of each variant.
-        // Anchor on `function status_pill_class` to find the DEFINITION, not a
-        // caller (the caller is above the definition in the file).
-        if (preg_match("/function\s+status_pill_class\s*\(\s*\\\$status\s*\)/", $my_account_php, $spm)) {
-            $map_offset = strpos($my_account_php, $spm[0]);
-            $map_snippet = substr($my_account_php, (int) $map_offset, 1500);
-            $expected = array('text-bg-success', 'text-bg-info', 'text-bg-warning', 'text-bg-danger', 'text-bg-secondary');
+        // DS7 — Tracking UI: hero in delivery language, pulsing current
+        // step, rider card with call/message actions.
+        $tracking_signals = array(
+            'routew-tracking-hero__eyebrow' => 'hero eyebrow',
+            'routew-tracking-hero__title'   => 'hero title',
+            'routew-status-stepper'         => 'stepper',
+            'routew-status-step--current'   => 'current-step class',
+            'routew-status-step__time--live' => 'live in-progress timestamp',
+            'routew-rider-card__btn--call'  => 'call action',
+            'routew-rider-card__btn--msg'   => 'message action',
+            'href="tel:'                    => 'tel link',
+            'href="sms:'                    => 'sms link',
+        );
+        $missing_tracking = array();
+        foreach ($tracking_signals as $needle => $label) {
+            if (false === strpos($shortcodes_php, $needle)) {
+                $missing_tracking[] = $label;
+            }
+        }
+        if (empty($missing_tracking)) {
+            $this->pass('DS7 tracking UI complete (hero, stepper, live step, rider card, tel/sms)');
+        } else {
+            $this->fail('DS7 tracking UI missing: ' . implode(', ', $missing_tracking));
+        }
+
+        $tracking_css = file_get_contents($this->plugin_dir . '/assets/css/tracking.css');
+        if (false !== strpos($tracking_css, 'routew-step-pulse') && false !== strpos($tracking_css, 'prefers-reduced-motion')) {
+            $this->pass('DS7 tracking CSS has current-step pulse + reduced-motion guard');
+        } else {
+            $this->fail('DS7 tracking CSS missing pulse animation or reduced-motion guard');
+        }
+
+        // DS8 — Checkout contract: numbered step cards, all JS-bound IDs,
+        // no inline layout styles.
+        $checkout_php = file_get_contents($this->plugin_dir . '/includes/class-routew-checkout.php');
+        $checkout_ids = array(
+            'id="routew-location-picker-container"',
+            'id="routew-location-search-input"',
+            'id="routew-get-location"',
+            'id="routew-map"',
+            'id="routew-selected-location"',
+            'id="routew-selected-address"',
+            'id="routew_lat"',
+            'id="routew_lng"',
+            'id="routew-delivery-details-container"',
+        );
+        $missing_checkout_ids = array();
+        foreach ($checkout_ids as $needle) {
+            if (false === strpos($checkout_php, $needle)) {
+                $missing_checkout_ids[] = $needle;
+            }
+        }
+        if (empty($missing_checkout_ids)) {
+            $this->pass('DS8 checkout JS contract preserved (all 9 IDs)');
+        } else {
+            $this->fail('DS8 checkout JS contract broke — missing: ' . implode(', ', $missing_checkout_ids));
+        }
+
+        // checkout.js reveals #routew-selected-location via slideDown(), so
+        // it must start hidden without relying on CSS.
+        if (false !== strpos($checkout_php, 'id="routew-selected-location" class="routew-location-confirm" style="display:none;"')) {
+            $this->pass('DS8 selected-location banner starts display:none (slideDown contract)');
+        } else {
+            $this->fail('DS8 selected-location banner must keep style="display:none;" for the slideDown contract');
+        }
+
+        // Numbered step chips + no inline layout styles on the map.
+        if (false !== strpos($checkout_php, 'routew-checkout-step__num" aria-hidden="true">1<') && false !== strpos($checkout_php, '>2<')
+            && false === strpos($checkout_php, 'style="height: 300px')) {
+            $this->pass('DS8 checkout renders numbered step cards (no inline layout CSS)');
+        } else {
+            $this->fail('DS8 checkout step markup broken or inline styles returned');
+        }
+
+        $checkout_css = file_get_contents($this->plugin_dir . '/assets/css/checkout.css');
+        if (false !== strpos($checkout_css, 'routew-skeleton-loading') && false !== strpos($checkout_css, '#routew-map')) {
+            $this->pass('DS8 checkout CSS covers map shell + skeleton shimmer');
+        } else {
+            $this->fail('DS8 checkout CSS missing map/skeleton coverage');
+        }
+
+        // DS9 — Surface stylesheets keep their key selectors (regression
+        // guard for the compiled artifacts).
+        $surface_expectations = array(
+            'assets/css/my-account.css' => array(
+                '.woocommerce-MyAccount-navigation' => 'account nav rail',
+                '.routew-orders-filter__chip--active' => 'filter chip active state',
+                'table.woocommerce-orders-table' => 'orders table styling',
+                '.routew-subpage-header' => 'sub-page header',
+            ),
+            'assets/css/my-account-dashboard.css' => array(
+                '.routew-hero' => 'greeting hero',
+                '.routew-quick-actions' => 'quick actions grid',
+                '.routew-order-row' => 'order row',
+                '.routew-reorder-banner' => 'reorder banner',
+            ),
+            'assets/css/delivery-dashboard.css' => array(
+                '.routew-app-header' => 'agent app header',
+                '.routew-tabbar' => 'bottom tab bar',
+                '.routew-cod-strip' => 'COD strip',
+                'safe-area-inset-bottom' => 'iPhone safe-area support',
+            ),
+        );
+        foreach ($surface_expectations as $rel => $signals) {
+            $css = file_get_contents($this->plugin_dir . '/' . $rel);
             $missing = array();
-            foreach ($expected as $needle) {
-                if (false === strpos($map_snippet, $needle)) {
-                    $missing[] = $needle;
+            foreach ($signals as $needle => $label) {
+                if (false === strpos($css, $needle)) {
+                    $missing[] = $label;
                 }
             }
             if (empty($missing)) {
-                $this->pass('UI2 Status pill class map returns Bootstrap text-bg-* utilities (success/info/warning/danger/secondary)');
+                $this->pass('DS9 ' . basename($rel) . ' keeps all key selectors');
             } else {
-                $this->fail('UI2 Status pill map missing Bootstrap variants: ' . implode(', ', $missing));
+                $this->fail('DS9 ' . basename($rel) . ' missing selectors: ' . implode(', ', $missing));
             }
-        } else {
-            $this->fail('UI2 Could not locate status_pill_class() method in class-routew-my-account.php');
         }
 
-        // UI-X — Bootstrap handle consistency across both surfaces.
-        // Same handle 'routew-bootstrap' must be used in both enqueue sites so
-        // WP dedupes the request when both surfaces are active.
-        $agent_core_php = file_get_contents($this->plugin_dir . '/includes/class-routew-core.php');
-        $agent_count = substr_count($agent_core_php, "'routew-bootstrap'");
-        $shortcodes_count = substr_count($shortcodes_php, "'routew-bootstrap'");
-        if ($agent_count >= 1 && $shortcodes_count >= 1) {
-            $this->pass('UI-X Bootstrap handle "routew-bootstrap" used in BOTH enqueue sites (agent=' . $agent_count . ', my-account=' . $shortcodes_count . ')');
+        // DS10 — Text-domain hygiene: the redesign must not regress the
+        // translation domain (the plugin uses routemile-for-woocommerce).
+        $domain_typos = 0;
+        foreach (glob($this->plugin_dir . '/includes/*.php') as $inc) {
+            $domain_typos += substr_count(file_get_contents($inc), "'routemile-woocommerce'");
+        }
+        foreach (glob($this->plugin_dir . '/templates/*.php') as $tpl_file) {
+            $domain_typos += substr_count(file_get_contents($tpl_file), "'routemile-woocommerce'");
+        }
+        if (0 === $domain_typos) {
+            $this->pass('DS10 no misspelled text domains (routemile-woocommerce) in includes/ or templates/');
         } else {
-            $this->fail('UI-X Bootstrap handle not consistent — agent=' . $agent_count . ', my-account=' . $shortcodes_count . ' (need both >= 1)');
+            $this->fail('DS10 found ' . $domain_typos . ' misspelled text-domain string(s)');
         }
 
-        // UI3 — Visual polish layer (Batch 3).
-        // Verifies the my-account dashboard adds inline SVG stat icons, the
-        // agent PWA adds KPI tile icons, the page-wrapper has a max-width
-        // for proper viewport use, and the mobile bottom-tab nav uses
-        // safe-area-inset-bottom for iPhone notch support.
-        // My-account dashboard icons — UI6 replaced stat tiles with quick-action
-        // tiles (same visual role: at-a-glance dashboard numbers). Count both
-        // stat icons (legacy) and quick-action icons (current) so the assertion
-        // survives the dashboard widget rebuild.
-        $stat_icon_count = substr_count($my_account_php, 'routew-dashboard__stat-icon');
-        $quick_action_icon_count = substr_count($my_account_php, 'routew-dashboard__quick-action__icon');
-        $combined_icons = $stat_icon_count + $quick_action_icon_count;
-        if ($combined_icons >= 4) {
-            $this->pass('UI3 my-account dashboard emits >=4 icons (stat=' . $stat_icon_count . ' + quick-action=' . $quick_action_icon_count . ')');
+        // =====================================================================
+        // DS11 — WooCommerce template overrides (the "fix WordPress itself"
+        // layer). The plugin ships its own copies of two WC my-account
+        // templates and redirects WC to them via the
+        // `woocommerce_locate_template` filter. This locks the contract:
+        // the filter is registered, the templates mirror WC 9.3's API
+        // surface exactly (no array_replace-on-strings fatal, correct
+        // edit URLs, empty-state handling, preserved actions), and the
+        // CSS targets the plugin-owned address classes.
+        // =====================================================================
+
+        $sc_php_ds11 = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+        if (false !== strpos($sc_php_ds11, "add_filter('woocommerce_locate_template', array(\$this, 'override_wc_templates'), 10, 3)")
+            && false !== strpos($sc_php_ds11, 'function override_wc_templates')) {
+            $this->pass('DS11 woocommerce_locate_template filter registered + override_wc_templates() defined');
         } else {
-            $this->fail('UI3 my-account dashboard missing icons — expected >= 4 (stat + quick-action combined)');
+            $this->fail('DS11 template-override filter not wired in class-routew-shortcodes.php');
         }
 
-        // Agent PWA KPI icons — 5 SVG icons (Delivered today / Active now /
-        // Collected today / To hand over / All-time delivered).
-        $tpl = file_get_contents($this->plugin_dir . '/templates/delivery-dashboard-template.php');
-        $kpi_icon_count = substr_count($tpl, 'routew-agent-stat__icon');
-        if ($kpi_icon_count >= 5) {
-            $this->pass('UI3 agent PWA KPI tiles include icons (count=' . $kpi_icon_count . ' — 5 tiles + selector)');
-        } else {
-            $this->fail('UI3 agent PWA KPI tiles missing icons — expected >= 5 occurrences of routew-agent-stat__icon');
-        }
-
-        // Page-wrapper max-width so widgets fill the viewport on desktop
-        // instead of hugging the left edge.
-        $my_account_css = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
-        if (preg_match('/max-width:\s*1200px/i', $my_account_css) || preg_match('/max-width:\s*\d+px/i', $my_account_css)) {
-            $this->pass('UI3 my-account page wrapper has max-width (widgets fill the viewport on desktop)');
-        } else {
-            $this->fail('UI3 my-account page wrapper missing max-width — content hugs left edge');
-        }
-
-        // Mobile bottom-tab uses safe-area-inset-bottom for iPhone notch.
-        if (false !== strpos($my_account_css, 'safe-area-inset-bottom')) {
-            $this->pass('UI3 mobile bottom-tab respects safe-area-inset-bottom (iPhone notch support)');
-        } else {
-            $this->fail('UI3 mobile bottom-tab does not respect safe-area-inset-bottom');
-        }
-
-        // UI4 — Sub-page polish (Batch 4).
-        // Verifies the WC sub-pages (Orders list, View Order, Edit Address,
-        // Edit Account) now have Bootstrap-styled CSS that targets their
-        // stock WC classes — no template changes, just CSS-only composition.
-        $my_account_css = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
-
-        // Orders list table — wc_orders-table + shop_table.
-        if (false !== strpos($my_account_css, '.woocommerce-orders-table') && false !== strpos($my_account_css, 'table.shop_table')) {
-            $this->pass('UI4 orders list table styled (.woocommerce-orders-table + table.shop_table)');
-        } else {
-            $this->fail('UI4 orders list table styling missing for .woocommerce-orders-table');
-        }
-
-        // View Order — order overview + order details table + re-order button.
-        $view_order_signals = array(
-            '.woocommerce-order-overview' => 'order overview grid',
-            '.woocommerce-table--order-details' => 'order details table',
-            'order-again' => 'order-again button',
+        $dash_tpl = file_get_contents($this->plugin_dir . '/templates/woocommerce/myaccount/dashboard.php');
+        $dash_signals = array(
+            "do_action( 'woocommerce_account_dashboard' )"   => 'dashboard action preserved',
+            "do_action( 'woocommerce_before_my_account' )"   => 'deprecated before-action preserved',
+            "do_action( 'woocommerce_after_my_account' )"    => 'deprecated after-action preserved',
+            'defined( \'ABSPATH\' )'                          => 'ABSPATH guard',
         );
-        $missing_signals = array();
-        foreach ($view_order_signals as $needle => $label) {
-            if (false === strpos($my_account_css, $needle)) {
-                $missing_signals[] = $label;
+        $missing_dash = array();
+        foreach ($dash_signals as $needle => $label) {
+            if (false === strpos($dash_tpl, $needle)) {
+                $missing_dash[] = $label;
             }
         }
-        if (empty($missing_signals)) {
-            $this->pass('UI4 view order page styled (overview grid + details table + re-order button)');
+        if (false !== strpos($dash_tpl, 'Hello %1$s')) {
+            $missing_dash[] = 'still prints the core Hello greeting (override pointless)';
+        }
+        if (empty($missing_dash)) {
+            $this->pass('DS11 dashboard override: 3 actions preserved, core greeting paragraphs stripped');
         } else {
-            $this->fail('UI4 view order page missing styles for: ' . implode(', ', $missing_signals));
+            $this->fail('DS11 dashboard override broken: ' . implode(', ', $missing_dash));
         }
 
-        // Edit Address — wc Addresses grid + edit link styling.
-        if (false !== strpos($my_account_css, '.woocommerce-Addresses') && false !== strpos($my_account_css, '.woocommerce-Address-title') && false !== strpos($my_account_css, 'grid-template-columns: repeat(auto-fit, minmax(320px')) {
-            $this->pass('UI4 edit address page styled (Addresses grid + title + edit link)');
-        } else {
-            $this->fail('UI4 edit address page missing styles for .woocommerce-Addresses grid');
-        }
-
-        // Edit Account — form fieldsets styled as Bootstrap cards.
-        if (false !== strpos($my_account_css, '.woocommerce-EditAccountForm fieldset') && false !== strpos($my_account_css, 'legend')) {
-            $this->pass('UI4 edit account page styled (fieldset cards + legend pills)');
-        } else {
-            $this->fail('UI4 edit account page missing styles for .woocommerce-EditAccountForm fieldset');
-        }
-
-        // UI5 — DoorDash-style View Order upgrade.
-        // Verifies the tracking block has the new hero header, the stepper
-        // has timestamp + body structure, the driver card has avatar + call
-        // + message actions, and the view-order page has item-card styling
-        // for product line items.
-
-        // Tracking block — hero header with status badge + placed date.
-        $shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
-        $hero_signals = array(
-            'routew-order-tracking__hero' => 'hero header',
-            'routew-order-tracking__hero-eyebrow' => 'hero eyebrow',
-            'routew-order-tracking__hero-title' => 'hero title',
-            'routew-order-tracking__hero-subtitle' => 'hero subtitle with placed date',
-            'routew-order-tracking__hero-badge' => 'hero status badge',
+        $addr_tpl = file_get_contents($this->plugin_dir . '/templates/woocommerce/myaccount/my-address.php');
+        $addr_signals = array(
+            'wc_get_account_formatted_address'               => 'correct WC 9.3 address API',
+            "wc_get_endpoint_url( 'edit-address', \$routew_address_name )" => 'pretty edit URL (not ?name)',
+            'woocommerce_my_account_get_addresses'           => 'addresses filter preserved',
+            'woocommerce_my_account_my_address_description'  => 'description filter preserved',
+            'woocommerce_my_account_after_my_address'        => 'after-address action preserved',
+            'You have not set up this type of address yet'   => 'empty-state handling',
+            'routew-address-grid'                            => 'plugin-owned grid markup',
+            'routew-address-col--'                           => 'typed card classes',
+            'defined( \'ABSPATH\' )'                          => 'ABSPATH guard',
         );
-        $missing_hero = array();
-        foreach ($hero_signals as $needle => $label) {
-            if (false === strpos($shortcodes_php, $needle)) {
-                $missing_hero[] = $label;
+        $missing_addr = array();
+        foreach ($addr_signals as $needle => $label) {
+            if (false === strpos($addr_tpl, $needle)) {
+                $missing_addr[] = $label;
             }
         }
-        if (empty($missing_hero)) {
-            $this->pass('UI5 tracking block has DoorDash-style hero header');
+        // The fatal from the first attempt: array_replace() on the filter's
+        // title strings. Guard against it ever coming back.
+        if (false !== strpos($addr_tpl, 'array_replace')) {
+            $missing_addr[] = 'array_replace present (fatals on WC 9.3 title-map data)';
+        }
+        if (empty($missing_addr)) {
+            $this->pass('DS11 my-address override mirrors WC 9.3 API (9 signals, no array_replace)');
         } else {
-            $this->fail('UI5 tracking hero missing signals: ' . implode(', ', $missing_hero));
+            $this->fail('DS11 my-address override broken: ' . implode(', ', $missing_addr));
         }
 
-        // Stepper — step bodies with label + timestamp.
-        $step_signals = array(
-            'routew-status-step__body' => 'step body wrapper',
-            'routew-status-step__time' => 'timestamp',
-            'routew-status-step--current' => 'current-step pulse class',
+        // CSS targets the plugin-owned selectors (grid + typed cards).
+        $ma_css_ds11 = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
+        foreach (array('.routew-address-grid', '.routew-address-col', '.routew-address-edit', '.routew-lead') as $needle) {
+            if (false === strpos($ma_css_ds11, $needle)) {
+                $this->fail('DS11 compiled my-account.css missing selector: ' . $needle);
+                $missing_addr[] = $needle;
+            }
+        }
+        if (empty($missing_addr)) {
+            $this->pass('DS11 compiled CSS targets the plugin-owned address classes');
+        }
+
+        // =====================================================================
+        // DS12 — Accurate order tracking + mandatory phone (2026-09 fix
+        // round). Locks four contracts:
+        //  A. Every status transition stamps a `_routew_status_at_{status}`
+        //     GMT timestamp (via the official woocommerce_order_status_changed
+        //     hook) — the tracking stepper reads these for real step times.
+        //  B. The tracking UI maps EVERY WC + routew-* status to its own
+        //     pill/hero/step (pending orders no longer render "In the
+        //     kitchen"), renders 5 steps with real timestamps, and never
+        //     shows "Pending" on a finished order's completed steps.
+        //  C. The customer phone is required on both checkout surfaces
+        //     (option filter for the Checkout block + billing fields filter
+        //     for classic) and format-validated server-side.
+        //  D. The view-order page styles the Re-order action and WC's
+        //     status <mark> with the design-system pill vocabulary.
+        // =====================================================================
+
+        // --- A: status timestamp recording ---
+        $statuses_php = file_get_contents($this->plugin_dir . '/includes/class-routew-order-statuses.php');
+        if (false !== strpos($statuses_php, "add_action('woocommerce_order_status_changed', array(\$this, 'record_status_timestamp'), 10, 4)")
+            && false !== strpos($statuses_php, 'function record_status_timestamp')
+            && false !== strpos($statuses_php, "_routew_status_at_' . \$status_to")
+            && false !== strpos($statuses_php, '$order->save()')) {
+            $this->pass('DS12 status transitions record _routew_status_at_* meta (official hook + save)');
+        } else {
+            $this->fail('DS12 status timestamp recording missing in class-routew-order-statuses.php');
+        }
+
+        // --- B: tracking state map + step times ---
+        $sc_php_ds12 = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+        $ds12_states = array(
+            "'pending' =>"        => 'pending state defined',
+            "'on-hold' =>"        => 'on-hold state defined',
+            "'processing' =>"     => 'processing state defined',
+            "'routew-in-kitchen' =>" => 'in-kitchen state defined',
+            "'routew-assigned' =>"   => 'assigned state defined',
+            "'routew-picked-up' =>"  => 'picked-up state defined',
+            "'completed' =>"      => 'completed state defined',
+            "'cancelled' =>"      => 'cancelled state defined',
+            "'failed' =>"         => 'failed state defined',
+            "'refunded' =>"       => 'refunded state defined',
         );
-        $missing_step = array();
-        foreach ($step_signals as $needle => $label) {
-            if (false === strpos($shortcodes_php, $needle)) {
-                $missing_step[] = $label;
+        $missing_states = array();
+        foreach ($ds12_states as $needle => $label) {
+            if (false === strpos($sc_php_ds12, $needle)) {
+                $missing_states[] = $label;
             }
         }
-        if (empty($missing_step)) {
-            $this->pass('UI5 stepper has body + timestamp + current-step pulse');
+        if (empty($missing_states)) {
+            $this->pass('DS12 tracking map covers all 10 WC + routew-* statuses');
         } else {
-            $this->fail('UI5 stepper missing signals: ' . implode(', ', $missing_step));
+            $this->fail('DS12 tracking map missing states: ' . implode(', ', $missing_states));
         }
 
-        // Driver card — avatar circle + call + message actions.
-        $driver_signals = array(
-            'routew-delivery-contact__avatar' => 'avatar circle',
-            'routew-delivery-contact__actions' => 'action buttons row',
-            'routew-delivery-contact__btn' => 'primary call/message button',
-            'href="sms:' => 'SMS / message link',
-            'href="tel:' => 'tel / call link',
-        );
-        $missing_driver = array();
-        foreach ($driver_signals as $needle => $label) {
-            if (false === strpos($shortcodes_php, $needle)) {
-                $missing_driver[] = $label;
-            }
-        }
-        if (empty($missing_driver)) {
-            $this->pass('UI5 driver card has avatar + Call + Message actions');
+        // Pending maps to its own step 0 ("Order placed"), NOT the kitchen
+        // step — the old map collapsed pending/on-hold/processing onto
+        // step 0 = "In the kitchen" and lied about pending orders.
+        // Round 8: the timeline is 4 sequential steps; "Rider assigned"
+        // is NOT a stepper row (assigned orders are still in the
+        // kitchen) — completed = step 3.
+        if (false !== strpos($sc_php_ds12, "__('Order placed', 'routemile-for-woocommerce')")
+            && false !== strpos($sc_php_ds12, "'step' => 3")
+            && false !== strpos($sc_php_ds12, "'step' => -1")
+            && false === strpos($sc_php_ds12, "'pending' => 0,")) {
+            $this->pass('DS12 4-step sequential timeline (Order placed first; assigned = still in kitchen)');
         } else {
-            $this->fail('UI5 driver card missing signals: ' . implode(', ', $missing_driver));
+            $this->fail('DS12 step map regressed — pending orders must not map to the kitchen step');
         }
 
-        // CSS — hero header, product card thumbs, sticky bar, pulse animation.
-        $my_account_css = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
-        $css_signals = array(
-            'routew-order-tracking__hero' => 'hero header CSS',
-            'product-thumbnail img' => 'product thumbnail styling',
-            'routew-status-step__body' => 'step body CSS',
-            '@keyframes routew-step-pulse' => 'current-step pulse animation',
-            'routew-delivery-contact__avatar' => 'driver avatar CSS',
-            'routew-delivery-contact__btn' => 'driver action button CSS',
+        // Step times read the recorded meta; finished steps without data
+        // render an em dash, never "Pending".
+        if (false !== strpos($sc_php_ds12, '_routew_status_at_')
+            && false !== strpos($sc_php_ds12, 'function step_datetime')
+            && false !== strpos($sc_php_ds12, 'wc_timezone_string()')
+            && false !== strpos($sc_php_ds12, '&mdash;')) {
+            $this->pass('DS12 step times from recorded meta; unknown times render — (never Pending)');
+        } else {
+            $this->fail('DS12 step timestamp resolution broken in output_tracking_ui()');
+        }
+
+        // Rider info is still surfaced, plus honest placeholders when no
+        // rider is linked (assigned / delivered-by-store notes).
+        if (false !== strpos($sc_php_ds12, 'routew-rider-card')
+            && false !== strpos($sc_php_ds12, 'routew-rider-note')
+            && false !== strpos($sc_php_ds12, 'routew_agent_phone')) {
+            $this->pass('DS12 rider card + no-rider notes rendered with agent phone lookup');
+        } else {
+            $this->fail('DS12 rider card markup regressed');
+        }
+
+        // --- C: mandatory phone ---
+        $addr_php_ds12 = file_get_contents($this->plugin_dir . '/includes/class-routew-checkout-address.php');
+        if (false !== strpos($addr_php_ds12, "add_filter('option_woocommerce_checkout_phone_field', array(\$this, 'force_phone_required'))")
+            && false !== strpos($addr_php_ds12, "add_filter('default_option_woocommerce_checkout_phone_field', array(\$this, 'force_phone_required'))")
+            && false !== strpos($addr_php_ds12, "add_filter('woocommerce_billing_fields', array(\$this, 'require_phone_field'), 20)")
+            && false !== strpos($addr_php_ds12, "return 'required';")) {
+            $this->pass('DS12 phone forced required on both checkout surfaces (option + billing-fields filters)');
+        } else {
+            $this->fail('DS12 phone-required wiring missing in class-routew-checkout-address.php');
+        }
+
+        $handler_php_ds12 = file_get_contents($this->plugin_dir . '/includes/class-routew-checkout-handler.php');
+        if (false !== strpos($handler_php_ds12, "add_action('woocommerce_after_checkout_validation', array(\$this, 'validate_phone_number'), 20, 2)")
+            && false !== strpos($handler_php_ds12, 'function validate_phone_number')
+            && false !== strpos($handler_php_ds12, 'strlen($digits) < 7 || strlen($digits) > 15')) {
+            $this->pass('DS12 phone format validated server-side (7-15 digits)');
+        } else {
+            $this->fail('DS12 phone format validation missing in class-routew-checkout-handler.php');
+        }
+
+        // --- D: view-order styling ---
+        $ds12_css_signals = array(
+            'td a.order-actions-button' => 'quiet action pill',
+            'td a.routew_reorder'       => 'brand Re-order CTA',
+            'mark.order-status'         => 'WC status mark pill',
+            'status-routew-in-kitchen'  => 'kitchen mark variant',
+            'status-routew-picked-up'   => 'picked-up mark variant',
+            'status-completed'          => 'completed mark variant',
+            'status-cancelled'          => 'cancelled mark variant',
         );
         $missing_css = array();
-        foreach ($css_signals as $needle => $label) {
-            if (false === strpos($my_account_css, $needle)) {
+        foreach ($ds12_css_signals as $needle => $label) {
+            if (false === strpos($ma_css_ds11, $needle)) {
                 $missing_css[] = $label;
             }
         }
         if (empty($missing_css)) {
-            $this->pass('UI5 my-account.css has all DoorDash-style CSS signals');
+            $this->pass('DS12 view-order CSS: Re-order CTA + status-mark pill variants present');
         } else {
-            $this->fail('UI5 my-account.css missing CSS signals: ' . implode(', ', $missing_css));
+            $this->fail('DS12 compiled my-account.css missing: ' . implode(', ', $missing_css));
         }
 
-        // UI6 — Native mobile-app polish (Batch 6): redesign dashboard
-        // widgets + spacing rhythm + iOS-style list rows + press feedback.
-        $shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
-
-        // Dashboard render emits 5+ unconditional sections (profile, quick
-        // actions, recent orders, settings, signout). The welcome banner and
-        // default address sections are conditional, so we count what the
-        // static markup guarantees.
-        $section_count = substr_count($shortcodes_php, '<section class="routew-section">');
-        if ($section_count >= 4) {
-            $this->pass('UI6 dashboard emits >=4 unconditional routew-section blocks (found ' . $section_count . '; 2 more conditional)');
+        $tracking_css_ds12 = file_get_contents($this->plugin_dir . '/assets/css/tracking.css');
+        if (false !== strpos($tracking_css_ds12, '.routew-rider-note')) {
+            $this->pass('DS12 tracking CSS covers the rider-note strip');
         } else {
-            $this->fail('UI6 dashboard missing routew-section blocks — found only ' . $section_count);
+            $this->fail('DS12 compiled tracking.css missing .routew-rider-note');
         }
 
-        // Profile card with avatar + name + email + Edit button.
-        if (false !== strpos($shortcodes_php, 'routew-profile-card__avatar')
-            && false !== strpos($shortcodes_php, 'routew-profile-card__name')
-            && false !== strpos($shortcodes_php, 'routew-profile-card__email')) {
-            $this->pass('UI6 profile card renders avatar + name + email');
+        // =====================================================================
+        // DS13 — Round 8: creation-time stamps, COD cash gate, thank-you
+        // scope. Locks four contracts:
+        //  A. The status an order is CREATED with also gets a timestamp —
+        //     WooCommerce never fires woocommerce_order_status_changed for
+        //     the initial assignment (WC_Order::set_status records no
+        //     transition without a previous status), so a COD order created
+        //     directly as processing needed its own hook.
+        //  B. COD orders cannot be marked delivered until the agent
+        //     confirms the cash was collected (UI button + server-side
+        //     gates on BOTH the AJAX and admin_post paths).
+        //  C. The order-received page is scoped (.routew-ui) so the
+        //     tracking block + WC markup render styled, with a thank-you
+        //     hero for the success notice.
+        //  D. The rider card shows the recorded assignment time; a current
+        //     stepper step shows "Started <time>" when a stamp exists.
+        // =====================================================================
+
+        // --- A: creation-time stamping ---
+        if (false !== strpos($statuses_php, "add_action('woocommerce_new_order', array(\$this, 'record_initial_status_timestamp'), 10, 2)")
+            && false !== strpos($statuses_php, 'function record_initial_status_timestamp')
+            && false !== strpos($statuses_php, "in_array(\$status, array('new', 'auto-draft', 'checkout-draft', 'draft'), true)")) {
+            $this->pass('DS13 creation status also stamped (woocommerce_new_order, draft statuses skipped)');
         } else {
-            $this->fail('UI6 profile card markup missing expected hooks');
+            $this->fail('DS13 initial-status stamping missing in class-routew-order-statuses.php');
         }
 
-        // Quick actions grid (4 tiles).
-        $quick_action_count = substr_count($shortcodes_php, 'routew-dashboard__quick-action"');
-        if ($quick_action_count >= 4) {
-            $this->pass('UI6 quick actions grid renders >=4 tiles (found ' . $quick_action_count . ')');
+        // --- B: COD cash gate ---
+        $agent_php_ds13 = file_get_contents($this->plugin_dir . '/includes/class-routew-delivery-boy-view.php');
+        if (false !== strpos($agent_php_ds13, "add_action('wp_ajax_routew_confirm_cash_collected', array(\$this, 'ajax_confirm_cash_collected'))")
+            && false !== strpos($agent_php_ds13, 'function is_cash_collected')
+            && false !== strpos($agent_php_ds13, "_routew_cash_collected")
+            && false !== strpos($agent_php_ds13, 'set_date_paid')) {
+            $this->pass('DS13 cash-collected AJAX handler records meta + paid date');
         } else {
-            $this->fail('UI6 quick actions grid missing — found only ' . $quick_action_count . ' tiles');
+            $this->fail('DS13 cash confirmation handler missing in class-routew-delivery-boy-view.php');
         }
 
-        // Settings list (iOS-style link rows). UI9 renamed to Bootstrap
-        // .list-group-item + .list-group-item-action.
-        $settings_list_count = substr_count($shortcodes_php, 'class="list-group-item list-group-item-action routew-list-item"');
-        if ($settings_list_count >= 4) {
-            $this->pass('UI6 settings list has >=4 list-group-item rows (found ' . $settings_list_count . ')');
+        $gate_count = substr_count($agent_php_ds13, "is_cash_collected(\$order)");
+        if ($gate_count >= 3) {
+            $this->pass('DS13 COD gate enforced on AJAX + admin_post paths (' . $gate_count . ' checks)');
         } else {
-            $this->fail('UI6 settings list missing — found ' . $settings_list_count . ' rows');
+            $this->fail('DS13 COD gate must cover ajax_update_delivery_status AND mark_delivered (found ' . $gate_count . ' is_cash_collected call sites)');
         }
 
-        // Sign-out button (Bootstrap .btn .btn-lg). UI9 added btn classes.
-        if (false !== strpos($shortcodes_php, 'btn btn-lg btn-light')
-            && false !== strpos($shortcodes_php, 'routew-signout')) {
-            $this->pass('UI6 sign-out button styled as full-width pill (.btn .btn-lg)');
+        $agent_tpl_ds13 = file_get_contents($this->plugin_dir . '/templates/delivery-dashboard-template.php')
+            . file_get_contents($this->plugin_dir . '/includes/agent-template-helpers.php');
+        if (false !== strpos($agent_tpl_ds13, 'routew-button-cash')
+            && false !== strpos($agent_tpl_ds13, 'data-action="routew_confirm_cash_collected"')
+            && false !== strpos($agent_tpl_ds13, 'routew-button-deliver--locked')
+            && false !== strpos($agent_tpl_ds13, 'routew-cash-hint')
+            && false !== strpos($agent_tpl_ds13, 'routew-cod-strip--collected')) {
+            $this->pass('DS13 agent card renders cash CTA + locked deliver + collected strip');
         } else {
-            $this->fail('UI6 sign-out button missing or not styled');
+            $this->fail('DS13 agent template missing the COD cash-gate markup');
         }
 
-        // CSS — 8px spacing scale, iOS list rows, press feedback, fade cascade.
-        $css_native_signals = array(
-            '--routew-spacing-4: 16px' => '8px spacing scale tokens',
-            '.routew-list ' => 'iOS-style list container',
-            '.routew-list-item' => 'iOS-style list row',
-            '.routew-dashboard__quick-action' => 'quick action tile',
-            '.routew-profile-card' => 'profile card',
-            ':active' => 'press feedback hooks',
-            '@keyframes routew-fade-up' => 'fade-up cascade',
-            'prefers-reduced-transparency' => 'reduced-transparency handlers',
-        );
-        $missing_native_css = array();
-        foreach ($css_native_signals as $needle => $label) {
-            if (false === strpos($my_account_css, $needle)) {
-                $missing_native_css[] = $label;
+        $agent_js_ds13 = file_get_contents($this->plugin_dir . '/assets/js/delivery-dashboard.js');
+        if (false !== strpos($agent_js_ds13, "data('action')")
+            && false !== strpos($agent_js_ds13, "data('confirm')")
+            && false !== strpos($agent_js_ds13, 'function applyActionResponse')
+            && false !== strpos($agent_js_ds13, 'applyActionResponse($button, response.data)')) {
+            $this->pass('DS13 agent JS dispatches data-action endpoints + applies responses in place');
+        } else {
+            $this->fail('DS13 agent JS still hardcodes the single status endpoint or reloads after actions');
+        }
+
+        $agent_css_ds13 = file_get_contents($this->plugin_dir . '/assets/css/delivery-dashboard.css');
+        foreach (array('.routew-button-cash', '.routew-cash-hint', 'routew-button-deliver--locked', 'routew-cod-strip--collected') as $needle) {
+            if (false === strpos($agent_css_ds13, $needle)) {
+                $this->fail('DS13 compiled delivery-dashboard.css missing selector: ' . $needle);
             }
         }
-        if (empty($missing_native_css)) {
-            $this->pass('UI6 my-account.css has all native-app CSS signals');
+        $this->pass('DS13 compiled agent CSS covers the cash-gate components');
+
+        // --- C: thank-you scope (blockified template) ---
+        // The live site renders order-received via WC's BLOCKIFIED
+        // order-confirmation template: every block (status, summary,
+        // totals, addresses) renders independently, so the classic
+        // before_thankyou/thankyou hooks fired INSIDE the status and
+        // additional-information blocks and split the wrapper across
+        // siblings. The fix injects the scope classes onto each block's
+        // own wrapper div via the render_block filter.
+        if (false !== strpos($sc_php_ds12, "add_filter('render_block', array(\$this, 'wrap_thankyou_block'), 10, 2)")
+            && false !== strpos($sc_php_ds12, 'function wrap_thankyou_block')
+            && false !== strpos($sc_php_ds12, "strpos(\$name, 'woocommerce/order-confirmation')")
+            && false !== strpos($sc_php_ds12, 'routew-account--thankyou')
+            && false !== strpos($sc_php_ds12, 'is_order_received_context()')) {
+            $this->pass('DS13 render_block filter scopes every order-confirmation block');
         } else {
-            $this->fail('UI6 my-account.css missing CSS: ' . implode(', ', $missing_native_css));
+            $this->fail('DS13 thank-you render_block filter missing in class-routew-shortcodes.php');
         }
 
-        // UI7 — Sub-page polish: tighten edit-account, edit-address, orders
-        // list, view-order. Verifies the CSS targets the WC stock classes
-        // (woocommerce-EditAccountForm, woocommerce-Address, etc.) plus a
-        // few selector signals.
-        $ui7_css_signals = array(
-            '.woocommerce-EditAccountForm fieldset input' => 'fieldset input restyled',
-            '.woocommerce-Address-title .edit:hover' => 'address edit-link hover state',
-            '.woocommerce-Address-title h3' => 'address title typography',
-            '.routew-orders-filter__chip' => 'orders filter chip',
-            '.routew-orders-filter__chip--active' => 'orders filter active state',
-            '.order-again' => 'order-again CTA styling',
-            '.woocommerce-customer-details > section' => 'customer details column',
-        );
-        $missing_ui7 = array();
-        foreach ($ui7_css_signals as $needle => $label) {
-            if (false === strpos($my_account_css, $needle)) {
-                $missing_ui7[] = $label;
+        // The classic-hook approach must NOT return (it split wrappers
+        // on blockified templates — the bug this round fixed).
+        if (false === strpos($sc_php_ds12, "add_action('woocommerce_before_thankyou', array(\$this, 'open_thankyou_scope')")
+            && false === strpos($sc_php_ds12, "add_action('woocommerce_thankyou', array(\$this, 'close_thankyou_scope')")) {
+            $this->pass('DS13 classic split-wrapper hooks retired');
+        } else {
+            $this->fail('DS13 classic thankyou hooks still present — they split the wrapper on blockified templates');
+        }
+
+        $ma_css_ds13 = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
+        if (false !== strpos($ma_css_ds13, 'routew-account--thankyou')
+            && false !== strpos($ma_css_ds13, 'woocommerce-thankyou-order-received')
+            && false !== strpos($ma_css_ds13, 'wc-block-order-confirmation-status')
+            && false !== strpos($ma_css_ds13, 'wc-block-order-confirmation-summary-list')
+            && false !== strpos($ma_css_ds13, 'wc-block-order-confirmation-totals__table')
+            && false !== strpos($ma_css_ds13, 'wc-block-order-confirmation-shipping-wrapper')) {
+            $this->pass('DS13 thank-you hero + blockified order-confirmation styles compiled');
+        } else {
+            $this->fail('DS13 compiled my-account.css missing the thank-you / blockified blocks');
+        }
+
+        // Block-root components must use SAME-ELEMENT selectors (DS4b):
+        // the scope classes are injected ON the block wrapper divs, so
+        // `.routew-ui.routew-account--thankyou.wc-block-…` is required —
+        // a descendant selector never matches (the round-8.1 regression).
+        if (false !== strpos($ma_css_ds13, '.routew-ui.routew-account--thankyou.wc-block-order-confirmation-status{')
+            && false !== strpos($ma_css_ds13, '.routew-ui.routew-account--thankyou.wc-block-order-confirmation-shipping-wrapper')) {
+            $this->pass('DS13 block-root thank-you components use same-element scope selectors (DS4b)');
+        } else {
+            $this->fail('DS13 block-root thank-you selectors regressed to descendant form — will never match');
+        }
+
+        // --- D: rider assignment time + current-step start time ---
+        if (false !== strpos($sc_php_ds12, 'routew-rider-card__assigned')
+            && false !== strpos($sc_php_ds12, "__('Assigned %s', 'routemile-for-woocommerce')")
+            && false !== strpos($sc_php_ds12, "__('Started %s', 'routemile-for-woocommerce')")) {
+            $this->pass('DS13 rider card shows assignment time; current step shows start time');
+        } else {
+            $this->fail('DS13 assignment/start-time rendering missing in output_tracking_ui()');
+        }
+
+        // =====================================================================
+        // DS14 — Agent PWA native-app flow (2026-09 round 9). The bug: every
+        // order action reloaded the whole page, landing the agent back on
+        // the New tab while their order moved elsewhere. The fix: actions
+        // return a rich payload (fresh card + destination tab + counters +
+        // signature) and the client moves the card, updates the counters,
+        // switches to the destination tab and toasts — no reload. External
+        // changes (heartbeat) still reload, but restore the active tab.
+        // =====================================================================
+
+        $helpers_php_ds14 = file_get_contents($this->plugin_dir . '/includes/agent-template-helpers.php');
+        $agent_js_ds14 = file_get_contents($this->plugin_dir . '/assets/js/delivery-dashboard.js');
+
+        // A. Card renderer extracted + AJAX-callable (returns a string).
+        if (false !== strpos($helpers_php_ds14, "function routew_render_order_card")
+            && false !== strpos($helpers_php_ds14, 'return (string) ob_get_clean();')
+            && false !== strpos($helpers_php_ds14, 'data-order-id=')
+            && false !== strpos($helpers_php_ds14, 'data-order-status=')
+            && false !== strpos($tpl, "require_once ROUTEW_PLUGIN_DIR . 'includes/agent-template-helpers.php'")) {
+            $this->pass('DS14 order-card renderer extracted to includes/agent-template-helpers.php (AJAX-callable)');
+        } else {
+            $this->fail('DS14 order-card extraction incomplete — template/AJAX cannot share the renderer');
+        }
+
+        // B. AJAX handlers return the rich payload.
+        if (false !== strpos($agent_php_ds13, 'function build_action_response')
+            && false !== strpos($agent_php_ds13, "'tab'")
+            && false !== strpos($agent_php_ds13, "'card'")
+            && false !== strpos($agent_php_ds13, "'counts'")
+            && false !== strpos($agent_php_ds13, "'cod'")
+            && false !== strpos($agent_php_ds13, "'cash'")
+            && false !== strpos($agent_php_ds13, "'signature'")) {
+            $this->pass('DS14 action responses carry card + tab + counts + cod + cash + signature');
+        } else {
+            $this->fail('DS14 build_action_response() payload incomplete in class-routew-delivery-boy-view.php');
+        }
+
+        // C. The client moves the card to its destination tab and follows it.
+        if (false !== strpos($agent_js_ds14, 'destinationTab')
+            && false !== strpos($agent_js_ds14, 'switchTab(destinationTab)')
+            && false !== strpos($agent_js_ds14, 'refreshEmptyStates()')
+            && false !== strpos($agent_js_ds14, 'pulseBadge')) {
+            $this->pass('DS14 JS moves cards to destination tab + follows + live counters');
+        } else {
+            $this->fail('DS14 agent JS missing the in-place card-move flow');
+        }
+
+        // D. Same-tab refresh for the COD gate (cash confirm stays put).
+        if (false !== strpos($agent_js_ds14, 'isCashConfirm')
+            && false !== strpos($agent_js_ds14, "destinationTab === currentPanelId")) {
+            $this->pass('DS14 COD cash confirmation refreshes the card in place (same tab)');
+        } else {
+            $this->fail('DS14 COD gate same-tab refresh missing');
+        }
+
+        // E. Heartbeat reloads restore the active tab (not home).
+        if (false !== strpos($agent_js_ds14, 'fxwAgentActiveTab')
+            && false !== strpos($agent_js_ds14, 'function restoreActiveTab')) {
+            $this->pass('DS14 heartbeat reload restores the agent\'s active tab');
+        } else {
+            $this->fail('DS14 active-tab restore missing — heartbeat reloads still land on New');
+        }
+
+        // E2. Heartbeat re-reads the signature from the shell on every poll,
+        // so it does NOT reload right after the agent's own action (which
+        // updates data-routew-state in place — without the re-read, the
+        // captured-by-closure `knownSignature` stays stale and the next
+        // poll sees the server's new signature as "external" → hard reload).
+        if (false !== strpos($agent_js_ds14, 'function getKnownSignature')
+            && false !== strpos($agent_js_ds14, '$shell.data(\'routew-state\')')) {
+            $this->pass('DS14 heartbeat re-reads signature from shell (no spurious reload after own action)');
+        } else {
+            $this->fail('DS14 heartbeat still uses a stale closure signature — Cash Collected will hard-reload');
+        }
+
+        // E3. Cash-collected orders are excluded from the live COD
+        // "Cash to collect" total on the server side.
+        if (false !== strpos($agent_php_ds13, 'is_cash_collected')
+            && false !== strpos($agent_php_ds13, '_routew_cash_collected')
+            && false !== strpos($agent_php_ds13, 'no longer "to collect"')) {
+            $this->pass('DS14 build_dashboard_state excludes cash-collected orders from COD summary');
+        } else {
+            $this->fail('DS14 "Cash to collect" banner still counts orders the agent has already collected');
+        }
+
+        // E4. JS updates the "Cash to collect" + "You are holding" banners
+        // in place from the AJAX response (no full reload needed).
+        if (false !== strpos($agent_js_ds14, "'.routew-cod-summary'")
+            && false !== strpos($agent_js_ds14, "'.routew-settle-bar--active'")
+            && false !== strpos($agent_js_ds14, 'cash_to_collect')) {
+            $this->pass('DS14 in-place banner refresh for COD summary + unsettled cash');
+        } else {
+            $this->fail('DS14 in-place banner refresh missing — agent still sees stale totals until reload');
+        }
+
+        // F. Arrival/removal animations + badge pulse compiled.
+        $agent_css_ds14 = file_get_contents($this->plugin_dir . '/assets/css/delivery-dashboard.css');
+        foreach (array('routew-card--arriving', 'routew-card--removing', 'routew-badge-pop', 'routew-tabbar__count--pulse') as $needle) {
+            if (false === strpos($agent_css_ds14, $needle)) {
+                $this->fail('DS14 compiled agent CSS missing animation: ' . $needle);
             }
         }
-        if (empty($missing_ui7)) {
-            $this->pass('UI7 my-account.css has all sub-page polish CSS signals');
-        } else {
-            $this->fail('UI7 my-account.css missing CSS: ' . implode(', ', $missing_ui7));
-        }
+        $this->pass('DS14 card arrival/removal + badge-pulse animations compiled');
 
-        // UI8 — Sub-page native-app polish: sticky header + profile card +
-        // filter chips rendered via PHP hooks. The CSS targets the new
-        // class names the hooks emit.
-        $shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+        // =====================================================================
+        // DS15 — Admin-configurable order stage labels (2026-09 round 12).
+        // The feature: store admins rename the 5 delivery stages ("Sent to
+        // kitchen", "Out for delivery"…) and pick a colour + icon each;
+        // the rename is display-only (slugs + `_routew_status_at_*` metas
+        // untouched). Every surface (WC dropdown, agent card, tracking
+        // stepper, my-account pills, dashboard) must read from the shared
+        // helper, and the save path must whitelist-validate everything.
+        // =====================================================================
 
-        // Sticky sub-page header with back button + page title.
-        $header_signals = array(
-            'render_subpage_header' => 'render method',
-            "add_action('woocommerce_account_content', array(\$this, 'render_subpage_header'), 1)" => 'hook registration',
-            'routew-subpage-header__back' => 'back-button markup',
-            'routew-subpage-header__title' => 'title markup',
-        );
-        $missing_header = array();
-        foreach ($header_signals as $needle => $label) {
-            if (false === strpos($shortcodes_php, $needle)) {
-                $missing_header[] = $label;
+        $stage_php_ds15 = file_get_contents($this->plugin_dir . '/includes/class-routew-stage-labels.php');
+        $statuses_php_ds15 = file_get_contents($this->plugin_dir . '/includes/class-routew-order-statuses.php');
+        $shortcodes_php_ds15 = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+        $core_php_ds15 = file_get_contents($this->plugin_dir . '/includes/class-routew-core.php');
+        $settings_js_ds15 = file_get_contents($this->plugin_dir . '/assets/js/admin-settings.js');
+        $settings_css_ds15 = file_get_contents($this->plugin_dir . '/assets/css/admin-settings.css');
+
+        // A. Helper exists, is loaded on all requests, and carries the
+        // five renameable stages with whitelisted palettes.
+        $stage_keys = array("'placed'", "'kitchen'", "'assigned'", "'picked_up'", "'delivered'");
+        $missing_stages = array();
+        foreach ($stage_keys as $needle) {
+            if (false === strpos($stage_php_ds15, $needle)) {
+                $missing_stages[] = $needle;
             }
         }
-        if (empty($missing_header)) {
-            $this->pass('UI8 sub-page header hook renders back button + title');
+        if (empty($missing_stages)
+            && false !== strpos($stage_php_ds15, 'function defaults')
+            && false !== strpos($stage_php_ds15, 'function colour_palette')
+            && false !== strpos($stage_php_ds15, 'function icon_palette')
+            && false !== strpos($core_php_ds15, "class-routew-stage-labels.php")) {
+            $this->pass('DS15 stage-labels helper: 5 stages + colour/icon palettes, loaded on all requests');
         } else {
-            $this->fail('UI8 sub-page header signals missing: ' . implode(', ', $missing_header));
+            $this->fail('DS15 stage-labels helper incomplete (missing: ' . implode(', ', $missing_stages) . ')');
         }
 
-        // Profile card rendered on /edit-account/.
-        if (false !== strpos($shortcodes_php, 'render_account_profile_card')
-            && false !== strpos($shortcodes_php, 'routew-subpage-profile__avatar')) {
-            $this->pass('UI8 profile card hook renders avatar + name + email on edit-account');
+        // B. Display-only contract: the sanitize output never writes the
+        // status→stage mapping from the form (only label/colour/icon),
+        // and reading validates against the same whitelists the save
+        // path uses.
+        if (false === strpos($stage_php_ds15, "'statuses' => \$clean")
+            && false !== strpos($stage_php_ds15, "array_key_exists(\$colour, self::colour_palette())")
+            && false !== strpos($stage_php_ds15, "array_key_exists(\$icon, self::icon_palette())")) {
+            $this->pass('DS15 stage reads validate colour/icon + statuses map is never form-writable');
         } else {
-            $this->fail('UI8 profile card signals missing — render_account_profile_card or avatar markup not found');
+            $this->fail('DS15 stage reads missing whitelist validation (or statuses map became writable)');
         }
 
-        // Orders filter chip row rendered before /orders/ table.
-        if (false !== strpos($shortcodes_php, 'render_orders_filter_chips')
-            && false !== strpos($shortcodes_php, "add_action('woocommerce_before_account_orders'")) {
-            $this->pass('UI8 orders filter chip row registered + rendered');
+        // C. Save path: registered through the settings extension points,
+        // sanitizes via sanitize_text_field + palette whitelists, and
+        // falls back to the default label when empty.
+        if (false !== strpos($stage_php_ds15, "routew_settings_register_extra_fields")
+            && false !== strpos($stage_php_ds15, "routew_sanitize_settings_extra")
+            && false !== strpos($stage_php_ds15, 'sanitize_text_field((string) $row[\'label\'])')
+            && false !== strpos($stage_php_ds15, 'sanitize_key((string) $row[\'colour\'])')
+            && false !== strpos($stage_php_ds15, 'sanitize_key((string) $row[\'icon\'])')
+            && false !== strpos($stage_php_ds15, "\$label = \$default['label'];")) {
+            $this->pass('DS15 stage save path: Settings API extension points + full sanitization + empty→default fallback');
         } else {
-            $this->fail('UI8 orders filter chip signals missing');
+            $this->fail('DS15 stage save path incomplete — check sanitization / extension-point wiring');
         }
 
-        // CSS — sticky subpage header + profile card + filter chips.
-        $css_signals_ui8 = array(
-            '.routew-subpage-header' => 'sticky sub-page header',
-            'backdrop-filter: blur' => 'translucent chrome',
-            '.routew-subpage-profile__avatar' => 'profile avatar',
-            '.routew-orders-filter__chip--active' => 'filter chip active state',
-            '.woocommerce-Address-title h3::before' => 'address pin-emoji prefix',
-            '.routew-default-pill' => 'default-address pill class',
-            '.woocommerce-EditAccountForm fieldset:hover' => 'fieldset hover lift',
-            'animation: routew-fade-up' => 'fade-up cascade',
-        );
-        $missing_css_ui8 = array();
-        foreach ($css_signals_ui8 as $needle => $label) {
-            if (false === strpos($my_account_css, $needle)) {
-                $missing_css_ui8[] = $label;
+        // D. WC status registration + dropdown read the stage labels
+        // (so an admin rename shows in the admin order list + filters).
+        if (false !== strpos($statuses_php_ds15, "ROUTEW_Stage_Labels::get('kitchen')")
+            && false !== strpos($statuses_php_ds15, "ROUTEW_Stage_Labels::get('assigned')")
+            && false !== strpos($statuses_php_ds15, "ROUTEW_Stage_Labels::get('picked_up')")
+            && false === strpos($statuses_php_ds15, "_x('Assigned'")) {
+            $this->pass('DS15 WC status registration + dropdown use admin-renameable stage labels');
+        } else {
+            $this->fail('DS15 WC status registration still hard-codes stage labels');
+        }
+
+        // E. Agent PWA card pill reads colour + label from the helper.
+        if (false !== strpos($helpers_php_ds14, 'ROUTEW_Stage_Labels::status_colour($status)')
+            && false !== strpos($helpers_php_ds14, 'ROUTEW_Stage_Labels::status_label($status)')
+            && false === strpos($helpers_php_ds14, 'wc_get_order_status_name($status)')) {
+            $this->pass('DS15 agent card pill: stage colour + label from the helper');
+        } else {
+            $this->fail('DS15 agent card pill not fully wired to ROUTEW_Stage_Labels');
+        }
+
+        // F. Customer tracking stepper labels + icons + status pill map
+        // read the stages (rename mirrors onto the timeline).
+        if (false !== strpos($shortcodes_php_ds15, "ROUTEW_Stage_Labels::stages()")
+            && false !== strpos($shortcodes_php_ds15, "ROUTEW_Stage_Labels::get('placed')")
+            && false !== strpos($shortcodes_php_ds15, "ROUTEW_Stage_Labels::get('kitchen')")
+            && false !== strpos($shortcodes_php_ds15, "ROUTEW_Stage_Labels::get('picked_up')")
+            && false !== strpos($shortcodes_php_ds15, "ROUTEW_Stage_Labels::get('delivered')")
+            && false !== strpos($shortcodes_php_ds15, 'ROUTEW_Stage_Labels::icon_palette()')) {
+            $this->pass('DS15 tracking stepper: labels + icons + pills from stage labels');
+        } else {
+            $this->fail('DS15 tracking stepper not wired to stage labels');
+        }
+
+        // G. My-account pills delegate to the helper (verified in DS6 too,
+        // here for the feature suite).
+        if (false !== strpos($my_account_php, 'ROUTEW_Stage_Labels::status_colour($status)')) {
+            $this->pass('DS15 my-account status pills delegate to the helper');
+        } else {
+            $this->fail('DS15 my-account status pills not delegated');
+        }
+
+        // H. Settings UI: field names nest under routew_settings, the
+        // preview pill + live-preview JS + admin CSS are in place.
+        if (false !== strpos($stage_php_ds15, 'routew_settings[routew_stage_labels]')
+            && false !== strpos($stage_php_ds15, 'data-routew-stage-preview')
+            && false !== strpos($settings_js_ds15, 'data-routew-stage-label-input')
+            && false !== strpos($settings_css_ds15, 'routew-stage-row__preview')) {
+            $this->pass('DS15 settings UI: nested field names + live preview pill (PHP+JS+CSS)');
+        } else {
+            $this->fail('DS15 settings UI incomplete — preview pill wiring missing');
+        }
+
+        // I. PCP hygiene for the new file: ABSPATH guard + escaped output
+        // on every echo/print in the renderer.
+        if (0 === strpos($stage_php_ds15, "<?php\n/**\n * Admin-configurable order stage")
+            && false !== strpos($stage_php_ds15, "if (!defined('ABSPATH'))")
+            && false !== strpos($stage_php_ds15, "esc_attr(\$key)")
+            && false !== strpos($stage_php_ds15, "esc_html(\$stage['label'])")) {
+            $this->pass('DS15 stage-labels file: ABSPATH guard + escaped render output');
+        } else {
+            $this->fail('DS15 stage-labels file missing ABSPATH guard or escaping');
+        }
+
+        // J. Manager "Accept Order" action: a newly placed (pending)
+        // order is accepted by the manager and moves to the kitchen
+        // stage — the first step of the delivery workflow. Reuses the
+        // nonce-verified routew_update_order_status handler (no new
+        // endpoint, no new capability).
+        $dash_render_ds15 = file_get_contents($this->plugin_dir . '/includes/class-routew-dashboard-render.php');
+        if (false !== strpos($dash_render_ds15, "'pending' === \$order->get_status()")
+            && false !== strpos($dash_render_ds15, 'value="routew-in-kitchen"')
+            && false !== strpos($dash_render_ds15, "wp_nonce_field('routew_update_status')")
+            && false !== strpos($dash_render_ds15, 'value="routew_update_order_status"')) {
+            $this->pass('DS15 manager Accept Order action on pending orders (reuses nonce-verified status handler)');
+        } else {
+            $this->fail('DS15 Accept Order action missing on the deliveries dashboard');
+        }
+
+        // =====================================================================
+        // DS16 — Admin-configurable brand color (2026-09 round 13).
+        // The feature: ONE admin-picked hex re-derives the full design-
+        // system brand ramp and is injected as an inline custom-property
+        // override on the shared routew-ui handle. Root prerequisite: the
+        // compiled stylesheets must CONSUME var(--rm-brand*) rather than
+        // baked literals — otherwise no override can recolour anything.
+        // =====================================================================
+
+        $brand_php_ds16 = file_get_contents($this->plugin_dir . '/includes/class-routew-brand-color.php');
+        $ui_css_ds16 = file_get_contents($this->plugin_dir . '/assets/css/routew-ui.css');
+        $ma_css_ds16 = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
+        $dd_css_ds16 = file_get_contents($this->plugin_dir . '/assets/css/delivery-dashboard.css');
+        $settings_js_ds16 = file_get_contents($this->plugin_dir . '/assets/js/admin-settings.js');
+        $settings_css_ds16 = file_get_contents($this->plugin_dir . '/assets/css/admin-settings.css');
+
+        // A. Helper: settings field + sanitizer + ramp derivation +
+        // contrast guardrail + inline-style output, registered through
+        // the Settings API extension points.
+        if (false !== strpos($brand_php_ds16, 'routew_settings_register_extra_fields')
+            && false !== strpos($brand_php_ds16, 'routew_sanitize_settings_extra')
+            && false !== strpos($brand_php_ds16, 'sanitize_hex_color')
+            && false !== strpos($brand_php_ds16, 'function derive_ramp')
+            && false !== strpos($brand_php_ds16, 'function on_brand_text')
+            && false !== strpos($brand_php_ds16, 'wp_add_inline_style')) {
+            $this->pass('DS16 brand-color helper: Settings API wiring + sanitizer + ramp + contrast guardrail');
+        } else {
+            $this->fail('DS16 brand-color helper incomplete');
+        }
+
+        // B. The compiled stylesheets actually consume the brand tokens
+        // (the root fix — before this the tokens were declared but never
+        // referenced, so nothing could recolour at runtime).
+        $ma_brand_vars = substr_count($ma_css_ds16, 'var(--rm-brand');
+        $dd_brand_vars = substr_count($dd_css_ds16, 'var(--rm-brand');
+        $ui_brand_vars = substr_count($ui_css_ds16, 'var(--rm-brand');
+        if ($ma_brand_vars >= 30 && $dd_brand_vars >= 15 && $ui_brand_vars >= 20) {
+            $this->pass("DS16 compiled CSS consumes brand tokens (my-account {$ma_brand_vars}, agent {$dd_brand_vars}, ui {$ui_brand_vars} references)");
+        } else {
+            $this->fail("DS16 compiled CSS still brand-literal (my-account {$ma_brand_vars}, agent {$dd_brand_vars}, ui {$ui_brand_vars} var references)");
+        }
+
+        // C. Solid brand fills use the contrast-safe text color.
+        if (substr_count($ui_css_ds16, 'var(--rm-on-brand') >= 4
+            && substr_count($ma_css_ds16, 'var(--rm-on-brand') >= 6
+            && substr_count($dd_css_ds16, 'var(--rm-on-brand') >= 2) {
+            $this->pass('DS16 on-brand text color wired on solid brand fills (btn-brand + surface buttons + agent pickup)');
+        } else {
+            $this->fail('DS16 on-brand text color missing on solid brand fills');
+        }
+
+        // D. Alpha brand usage compiles to color-mix (modern browsers) —
+        // the rgba($rm-brand, .N) Sass literal could not be overridden.
+        if (false !== strpos($dd_css_ds16, 'color-mix(in srgb, var(--rm-brand)')
+            && false !== strpos($ma_css_ds16, 'color-mix(in srgb, var(--rm-brand')) {
+            $this->pass('DS16 alpha brand usage compiles to color-mix with var()');
+        } else {
+            $this->fail('DS16 alpha brand usage still literal rgba');
+        }
+
+        // E. The token block still declares the DEFAULT ramp (identical
+        // rendering when no override is saved) + the new canvas-wash token.
+        foreach (array('--rm-brand:#e85d04', '--rm-brand-strong:#c2410c', '--rm-brand-deep:#9a3412', '--rm-brand-soft:#fff1e7', '--rm-brand-line:#ffd9be', '--rm-brand-canvas-wash:#fff6ef') as $needle) {
+            if (false === strpos($ui_css_ds16, $needle)) {
+                $this->fail('DS16 default token ramp missing from routew-ui.css: ' . $needle);
             }
         }
-        if (empty($missing_css_ui8)) {
-            $this->pass('UI8 my-account.css has all native-app subpage polish signals');
+        $this->pass('DS16 default token ramp intact in routew-ui.css (no-overrides = identical rendering)');
+
+        // F. PWA: manifest + theme-color read the admin color.
+        $dbv_php_ds16 = file_get_contents($this->plugin_dir . '/includes/class-routew-delivery-boy-view.php');
+        $dd_tpl_ds16 = file_get_contents($this->plugin_dir . '/templates/delivery-dashboard-template.php');
+        if (false !== strpos($dbv_php_ds16, 'ROUTEW_Brand_Color::pwa_color()')
+            && false !== strpos($dd_tpl_ds16, 'ROUTEW_Brand_Color::pwa_color()')
+            && false === strpos($dd_tpl_ds16, 'content="#E85D04"')) {
+            $this->pass('DS16 PWA manifest theme_color + dashboard meta read the admin brand');
         } else {
-            $this->fail('UI8 my-account.css missing CSS: ' . implode(', ', $missing_css_ui8));
+            $this->fail('DS16 PWA colors still hard-coded');
         }
 
-        // UI9 — Bootstrap framework composition. Verify the PHP templates
-        // emit Bootstrap 5.3 component classes (card, list-group, btn, btn-*)
-        // instead of bespoke modifier names. This locks the contract that
-        // the visual system uses the framework primitives, not custom
-        // hand-rolled classes that Bootstrap already provides.
-        $ma_php = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
-        $sc_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
-
-        $framework_signals = array(
-            // Dashboard widgets
-            'class="card routew-profile-card"'           => 'profile card uses Bootstrap .card',
-            'class="card-body d-flex align-items-center' => 'profile card body uses Bootstrap flex utilities',
-            'card routew-ios-card'                       => 'orders + address cards use .card',
-            'card-body routew-ios-card__body'             => 'card body uses Bootstrap .card-body',
-            'btn btn-sm btn-outline-primary'              => 'Edit button uses .btn .btn-outline-primary',
-            'row g-3 routew-dashboard__quick-actions'    => 'quick actions use Bootstrap .row .g-3',
-            'col-6 col-md-3 btn btn-light'               => 'quick action tiles use .btn .btn-light + .col-*',
-            'card border-0 shadow-sm routew-empty-state' => 'empty state uses .card .border-0 .shadow-sm',
-            'list-group list-group-flush routew-list'     => 'settings list uses Bootstrap .list-group',
-            'list-group-item list-group-item-action'      => 'list rows use .list-group-item-action',
-            'btn btn-lg btn-light'                        => 'sign-out uses Bootstrap .btn .btn-lg',
-            // Sub-page header
-            'navbar routew-subpage-header'                => 'sub-page header uses Bootstrap .navbar',
-            'navbar-brand mb-0'                           => 'sub-page title uses .navbar-brand',
-            // Filter chips
-            'btn btn-sm routew-orders-filter__chip'      => 'filter chips use .btn .btn-sm',
-            'btn-primary routew-orders-filter__chip--active' => 'active filter chip includes btn-primary class',
-        );
-
-        $missing_framework = array();
-        foreach ($framework_signals as $needle => $label) {
-            if (false === strpos($ma_php . $sc_php, $needle)) {
-                $missing_framework[] = $label;
-            }
-        }
-        if (empty($missing_framework)) {
-            $this->pass('UI9 dashboard + sub-page templates compose Bootstrap framework classes (card, list-group, btn, navbar) — found all 14');
+        // G. Settings UI: color input + reset + live preview (PHP + JS + CSS).
+        if (false !== strpos($brand_php_ds16, "routew_settings[routew_brand_color]")
+            && false !== strpos($brand_php_ds16, 'data-routew-brand-preview-button')
+            && false !== strpos($settings_js_ds16, 'brandPreview')
+            && false !== strpos($settings_css_ds16, 'routew-brand-color-preview')) {
+            $this->pass('DS16 settings UI: color picker + reset + live preview swatches');
         } else {
-            $this->fail('UI9 missing framework class compositions: ' . implode(', ', $missing_framework));
+            $this->fail('DS16 settings UI incomplete');
         }
 
-        // UI11 — My-account visual + structural fix-up.
-        // Re-fetch the source files defensively so the assertions below always
-        // see the current state, regardless of prior in-function reads.
-        $ui11_my_account_css = file_get_contents($this->plugin_dir . '/assets/css/my-account.css');
-        $ui11_shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
-        $ui11_dashboard_php  = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
-
-        // UI11.1 — Address title targets h2 (not only h3)
-        if (preg_match('/\.woocommerce-account\.routew-my-account-styled \.woocommerce-Address-title (h3,h2|h2,h3|h2)\b[^{]*\{/', $ui11_my_account_css)) {
-            $this->pass('UI11.1 — address title targets h2 and h3 (WC 8+ emits h2)');
+        // H. PCP hygiene: ABSPATH guard + the emitted CSS contains only
+        // derived hex values (never reflects raw user input).
+        if (0 === strpos($brand_php_ds16, "<?php\n/**\n * Admin-configurable brand color")
+            && false !== strpos($brand_php_ds16, "if (!defined('ABSPATH'))")
+            && false !== strpos($brand_php_ds16, "preg_match('/^#[0-9A-F]{6}$/', \$hex)")) {
+            $this->pass('DS16 brand-color file: ABSPATH guard + hex-validated output');
         } else {
-            $this->fail('UI11.1 — address title CSS does not target h2 (h3 only — WC emits h2 in 8+)');
-        }
-
-        // UI11.2 — Duplicate theme-emitted H1 is hidden on my-account sub-pages.
-        // UI12-batch1 replaced the broad selector list with a universal h1 hide
-        // (no legitimate h1 is needed on my-account surfaces; the sub-page
-        // header + welcome banner already convey title). Asserting the
-        // universal rule is present.
-        if (preg_match('/\.woocommerce-account\.routew-my-account-styled h1,/', $ui11_my_account_css)
-            && preg_match('/display: none !important;\s*\}\s*$/m', $ui11_my_account_css)) {
-            $this->pass('UI11.2 — duplicate theme-emitted H1 is hidden on sub-pages (universal h1 rule)');
-        } else {
-            $this->fail('UI11.2 — duplicate H1 not hidden (theme H1 + sticky sub-page header both visible)');
-        }
-
-        // UI11.3 — Warm cream background painted through common theme wrappers
-        if (preg_match('/body\.woocommerce-account\.routew-my-account-styled[^}]*background-color:\s*var\(--bs-body-bg\)/', $ui11_my_account_css)) {
-            $this->pass('UI11.3 — cream background painted through body / .site / .site-content / #page');
-        } else {
-            $this->fail('UI11.3 — cream background missing (page renders on theme white)');
-        }
-
-        // UI11.4 — Recent orders card surface (bg + border + shadow)
-        if (preg_match('/\.routew-dashboard__orders\s*\{[^}]*background:\s*#fff/s', $ui11_my_account_css)) {
-            $this->pass('UI11.4 — recent orders card has visible white surface');
-        } else {
-            $this->fail('UI11.4 — recent orders card missing surface');
-        }
-
-        // UI11.5 — Settings list row rhythm (padding 14px 18px)
-        if (preg_match('/\.routew-list-item\s*\{[^}]*padding:\s*14px 18px/s', $ui11_my_account_css)) {
-            $this->pass('UI11.5 — settings list row padding set (matches orders card rhythm)');
-        } else {
-            $this->fail('UI11.5 — settings list row padding missing');
-        }
-
-        // UI11.6 — Address body bg is transparent (no cream-on-cream orphan)
-        if (preg_match('/\.woocommerce-Address address\s*\{[^}]*background:\s*transparent/s', $ui11_my_account_css)) {
-            $this->pass('UI11.6 — address body sits on white card (no cream-on-cream)');
-        } else {
-            $this->fail('UI11.6 — address body bg not transparent');
-        }
-
-        // UI11.7 — §8 selectors rewritten to PHP-emitted class names
-        if (false !== strpos($ui11_my_account_css, '.routew-dashboard__order-meta {')
-            && false !== strpos($ui11_my_account_css, '.routew-dashboard__order-chevron')) {
-            $this->pass('UI11.7 — §8 selector names now match PHP-emitted classes (__order-meta, __order-chevron)');
-        } else {
-            $this->fail('UI11.7 — §8 still uses dead __orders-item__* class names');
-        }
-
-        // UI11.8 — Tracking hero <header> properly closed by </header>
-        if (preg_match('/<header class="routew-order-tracking__hero">.*?<\/header>/s', $ui11_shortcodes_php)) {
-            $this->pass('UI11.8 — tracking block hero properly closed by </header>');
-        } else {
-            $this->fail('UI11.8 — tracking hero has broken nesting (</nav> → </header>)');
-        }
-
-        // UI11.9 — Recent orders wrapped in <ul> + chevron span added
-        if (false !== strpos($ui11_dashboard_php, '<ul class="routew-dashboard__orders-list list-unstyled mb-0">')
-            && false !== strpos($ui11_dashboard_php, 'routew-dashboard__order-chevron')) {
-            $this->pass('UI11.9 — recent orders <li> wrapped in <ul> + chevron span added');
-        } else {
-            $this->fail('UI11.9 — recent orders not wrapped in <ul> (or chevron missing)');
-        }
-
-        // UI11 follow-up — Fix 10: broader H1 hide selector list covers block themes.
-// Superseded by UI12.1 (universal h1 hide). Keep the test for history but
-// relax it to check the universal rule covers the original theme classes.
-        $ui11_broad_h1_selectors = array(
-            '.entry-title,',
-            '.page-title,',
-            '.wp-block-post-title { display: none',
-        );
-        $missing_broad_h1 = array();
-        foreach ($ui11_broad_h1_selectors as $needle) {
-            if (false === strpos($ui11_my_account_css, $needle)) {
-                $missing_broad_h1[] = $needle;
-            }
-        }
-        if (empty($missing_broad_h1)) {
-            $this->pass('UI11 follow-up 10 — broader H1 hide selectors covered by universal h1 rule');
-        } else {
-            $this->fail('UI11 follow-up 10 — broader H1 hide missing selectors: ' . implode(', ', $missing_broad_h1));
-        }
-
-        // UI11 follow-up — Fix 11a: .order-again has brand-orange background
-        if (preg_match('/\.woocommerce-account\.routew-my-account-styled \.order-again\s*\{[^}]*background-color:\s*var\(--bs-primary\)/s', $ui11_my_account_css)) {
-            $this->pass('UI11 follow-up 11a — order-again button now brand orange (not WC black)');
-        } else {
-            $this->fail('UI11 follow-up 11a — order-again still WC black (background-color: var(--bs-primary) missing)');
-        }
-
-        // UI11 follow-up — Fix 11b: WC .button on orders table + view order is brand orange
-        if (preg_match('/\.woocommerce-account\.routew-my-account-styled \.woocommerce-orders-table \.button[^{]*\{[^}]*background-color:\s*var\(--bs-primary\)/s', $ui11_my_account_css)) {
-            $this->pass('UI11 follow-up 11b — orders-table action buttons brand orange');
-        } else {
-            $this->fail('UI11 follow-up 11b — orders-table .button still WC black');
-        }
-
-        // UI12-batch1 — Fix 12.1: universal h1 hide on my-account pages
-        // The selector list from UI11 follow-up missed the theme variant used
-        // on edit-address. Universal rule now hides every h1 because no
-        // legitimate h1 is needed on any my-account sub-page (the sub-page
-        // header + welcome banner serve as the title).
-        if (preg_match('/\.woocommerce-account\.routew-my-account-styled h1,/', $ui11_my_account_css)
-            && preg_match('/\.woocommerce-account\.routew-my-account-styled \.entry-title,/', $ui11_my_account_css)
-            && preg_match('/\.woocommerce-account\.routew-my-account-styled \.wp-block-post-title \{ display: none/s', $ui11_my_account_css)) {
-            $this->pass('UI12.1 — universal h1 hide applied to my-account pages');
-        } else {
-            $this->fail('UI12.1 — universal h1 hide rule missing or incomplete (theme H1 still visible)');
-        }
-
-        // UI12-batch1 — Fix 12.2: filter chips actually filter the orders query
-        $ui12_shortcodes_php = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
-        $ui12_dashboard_php  = file_get_contents($this->plugin_dir . '/includes/class-routew-my-account.php');
-        if (false !== strpos($ui12_dashboard_php, "add_filter('woocommerce_my_account_my_orders_query'")
-            && false !== strpos($ui12_dashboard_php, 'filter_my_orders_by_chip_status')
-            && preg_match("/'pending'\s*=>\s*array\('pending',\s*'on-hold'\)/", $ui12_dashboard_php)
-            && preg_match("/'cancelled'\s*=>\s*array\('cancelled',\s*'failed',\s*'refunded'\)/", $ui12_dashboard_php)) {
-            $this->pass('UI12.2 — ?status= chip now actually filters the orders query');
-        } else {
-            $this->fail('UI12.2 — chip filter not wired (orders table shows unfiltered list)');
-        }
-
-        // UI12-batch1 — Fix 12.3: orders-table status pills by row status-* class
-        if (preg_match('/tr\.status-completed \.woocommerce-orders-table__cell-order-status \{ background-color: var\(--bs-success\)/', $ui11_my_account_css)
-            && preg_match('/tr\.status-processing \.woocommerce-orders-table__cell-order-status \{ background-color: var\(--bs-info\)/', $ui11_my_account_css)
-            && preg_match('/tr\.status-pending \.woocommerce-orders-table__cell-order-status \{ background-color: var\(--bs-secondary\)/', $ui11_my_account_css)) {
-            $this->pass('UI12.3 — orders-table status pills color-coded by row status');
-        } else {
-            $this->fail('UI12.3 — orders-table status pills missing or incomplete');
-        }
-
-        // UI12-batch1 — Fix 12.4: orders-table layout (date nowrap, action buttons within max-width)
-        if (preg_match('/\.woocommerce-orders-table__cell-order-date[^{]*\{[^}]*white-space:\s*nowrap/s', $ui11_my_account_css)
-            && preg_match('/\.woocommerce-orders-table__cell-order-actions \.button[^{]*\{[^}]*max-width:\s*110px[^}]*white-space:\s*nowrap/s', $ui11_my_account_css)) {
-            $this->pass('UI12.4 — orders table layout (date nowrap, action buttons constrained, no hyphenation)');
-        } else {
-            $this->fail('UI12.4 — orders table layout not properly constrained');
+            $this->fail('DS16 brand-color file missing ABSPATH guard or hex validation');
         }
 
         echo "\n";

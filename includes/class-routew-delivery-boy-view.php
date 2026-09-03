@@ -34,6 +34,7 @@ public function __construct()
         add_action('admin_post_routew_mark_picked_up', array($this, 'mark_picked_up'));
         add_action('admin_post_routew_mark_delivered', array($this, 'mark_delivered'));
         add_action('wp_ajax_routew_update_delivery_status', array($this, 'ajax_update_delivery_status'));
+        add_action('wp_ajax_routew_confirm_cash_collected', array($this, 'ajax_confirm_cash_collected'));
         add_action('wp_ajax_routew_agent_dashboard_state', array($this, 'ajax_dashboard_state'));
         add_action('admin_post_routew_settle_agent_cash', array($this, 'handle_cash_settlement'));
         add_action('admin_post_routew_review_settlement', array($this, 'handle_settlement_review'));
@@ -60,6 +61,7 @@ public function __construct()
         }
 
         if (isset($_GET['routew_agent_manifest'])) {
+            $brand = ROUTEW_Brand_Color::pwa_color();
             $manifest = array(
                 'name' => __('RouteMile Agent', 'routemile-for-woocommerce'),
                 'short_name' => __('FX Agent', 'routemile-for-woocommerce'),
@@ -69,7 +71,7 @@ public function __construct()
                 'display' => 'standalone',
                 'orientation' => 'portrait',
                 'background_color' => '#F5F5F5',
-                'theme_color' => '#E85D04',
+                'theme_color' => $brand,
                 'icons' => array(
                     array(
                         'src' => ROUTEW_PLUGIN_URL . 'assets/img/agent-icon.svg',
@@ -156,8 +158,16 @@ public function __construct()
 
         foreach (array_merge($new_orders, $active_orders) as $order) {
             $modified = $order->get_date_modified();
-            $sig_parts[] = $order->get_id() . ':' . $order->get_status() . ':' . ($modified ? $modified->format('U') : '0');
-            if ('cod' === $order->get_payment_method()) {
+            $sig_parts[] = $order->get_id() . ':' . $order->get_status() . ':' . ($modified ? $modified->format('U') : '0') . ':' . ((int) $order->get_meta('_routew_cash_collected', true) > 0 ? '1' : '0');
+            // The agent has already physically collected the cash for an
+            // order with `_routew_cash_collected > 0` — that money is on
+            // THEIR hands, but it's no longer "to collect". Exclude it from
+            // the live summary so the banner stops saying "Cash to collect"
+            // once the agent has tapped Cash Collected. The "you are
+            // holding ৳X" banner is computed separately by
+            // ROUTEW_Agent_Cash (from completed orders after the last
+            // settlement) and updates when the order is delivered.
+            if ('cod' === $order->get_payment_method() && (int) $order->get_meta('_routew_cash_collected', true) <= 0) {
                 $cod_count++;
                 $cod_total += (float) $order->get_total();
             }
@@ -241,6 +251,13 @@ if ('completed' === $status && 'routew-picked-up' !== $order->get_status()) {
     wp_send_json_error(array('message' => __('You must mark the order as picked up before marking it delivered.', 'routemile-for-woocommerce')), 400);
 }
 
+// COD gate: the agent must confirm the cash was physically collected
+// before the order can be marked delivered — otherwise the settlement
+// ledger counts money the agent does not have yet.
+if ('completed' === $status && 'cod' === $order->get_payment_method() && !self::is_cash_collected($order)) {
+    wp_send_json_error(array('message' => __('This is a cash-on-delivery order. Please confirm you collected the cash before marking it delivered.', 'routemile-for-woocommerce')), 400);
+}
+
 		$assigned_id = $order->get_meta('_routew_delivery_boy_id', true);
 
 		if (empty($assigned_id) || (int) $assigned_id !== (int) get_current_user_id()) {
@@ -251,13 +268,72 @@ if ('completed' === $status && 'routew-picked-up' !== $order->get_status()) {
 		if (is_callable(array($order, 'update_status'))) {
 			$note = ('routew-picked-up' === $status) ? __('Order picked up by delivery agent (AJAX).', 'routemile-for-woocommerce') : __('Order delivered by delivery agent (AJAX).', 'routemile-for-woocommerce');
 			if ($order->update_status($status, $note)) {
-				wp_send_json_success(array('message' => __('Status updated successfully.', 'routemile-for-woocommerce')));
+				wp_send_json_success($this->build_action_response($order));
 			} else {
 				wp_send_json_error(array('message' => __('Failed to update order status.', 'routemile-for-woocommerce')));
 			}
 		} else {
 			wp_send_json_error(array('message' => __('Order update not callable.', 'routemile-for-woocommerce')));
 		}
+	}
+
+	/**
+	 * Build the rich success payload for an agent action.
+	 *
+	 * The agent PWA updates in place — no page reload — so every action
+	 * response carries everything the client needs to move the card to
+	 * its destination tab, refresh the tabbar counters and the header
+	 * stats, and toast the result:
+	 *   - `card`:   fresh order-card HTML rendered for the order's NEW
+	 *               status (see includes/agent-template-helpers.php)
+	 *   - `tab`:    which tab the order now lives in (new-orders |
+	 *               in-progress | delivered)
+	 *   - `counts`: tab counts + today's performance + COD summary
+	 *   - `cash`:   the agent's unsettled/pending hand-over state (the
+	 *               "cash collected" action changes it)
+	 *
+	 * @param WC_Order $order The order AFTER the status change.
+	 * @return array Success payload for wp_send_json_success().
+	 * @since 1.6.0
+	 */
+	private function build_action_response($order)
+	{
+		require_once ROUTEW_PLUGIN_DIR . 'includes/agent-template-helpers.php';
+
+		$status = $order->get_status();
+		$tab = 'new-orders';
+		if ('routew-picked-up' === $status) {
+			$tab = 'in-progress';
+		} elseif (in_array($status, array('completed', 'cancelled', 'refunded', 'failed'), true)) {
+			$tab = 'delivered';
+		}
+
+		$state = self::build_dashboard_state(get_current_user_id());
+
+		// Cash hand-over summary (drives the "you are holding ৳X"
+		// banner + the "settled/pending" state). Computing this every
+		// action means the agent sees the unsettled total climb in
+		// place the instant they tap Mark Delivered, without a reload.
+		if (!class_exists('ROUTEW_Agent_Cash', false)) {
+			require_once ROUTEW_PLUGIN_DIR . 'includes/class-routew-agent-cash.php';
+		}
+		$cash = ROUTEW_Agent_Cash::get_agent_cash_summary(get_current_user_id());
+
+		return array(
+			'message' => __('Status updated successfully.', 'routemile-for-woocommerce'),
+			'tab' => $tab,
+			'card' => routew_render_order_card($order, array('history' => ('delivered' === $tab))),
+			'counts' => $state['counts'],
+			'today' => $state['today'],
+			'cod' => $state['cod'],
+			'cash' => array(
+				'unsettled' => (float) $cash['unsettled'],
+				'unsettled_formatted' => wp_strip_all_tags(wc_price((float) $cash['unsettled'], array('currency' => get_woocommerce_currency()))),
+				'has_pending' => !empty($cash['pending']),
+				'has_last_accepted' => !empty($cash['last_accepted']),
+			),
+			'signature' => $state['signature'],
+		);
 	}
 
 /**
@@ -299,6 +375,90 @@ public function login_redirect_woocommerce($redirect, $user)
 
 
 	/**
+	 * Was the cash for a COD order confirmed as collected?
+	 *
+	 * The meta value is the GMT unix timestamp of the confirmation (a
+	 * positive int), set by confirm_cash_collected(); it doubles as the
+	 * flag and the audit time.
+	 *
+	 * @param WC_Order $order Order object.
+	 * @return bool
+	 * @since 1.6.0
+	 */
+	public static function is_cash_collected($order)
+	{
+		return ((int) $order->get_meta('_routew_cash_collected', true)) > 0;
+	}
+
+	/**
+	 * AJAX: the delivery agent confirms the COD cash was collected.
+	 *
+	 * Records `_routew_cash_collected` (timestamp), sets the order's
+	 * paid date (the money physically changed hands — this is the
+	 * accounting-truth moment for COD) and leaves an order-note audit
+	 * trail. Only then does the UI (and the server-side gate in
+	 * ajax_update_delivery_status / mark_delivered) allow marking the
+	 * order delivered.
+	 *
+	 * @since 1.6.0
+	 */
+	public function ajax_confirm_cash_collected()
+	{
+		check_ajax_referer('routew_delivery_action', 'nonce');
+
+		if (!is_user_logged_in() || !current_user_can('routew_delivery_access')) {
+			wp_send_json_error(array('message' => __('Unauthorized access.', 'routemile-for-woocommerce')), 403);
+		}
+
+		$order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
+		$order = $order_id ? wc_get_order($order_id) : false;
+
+		if (!$order) {
+			wp_send_json_error(array('message' => __('Invalid order.', 'routemile-for-woocommerce')));
+		}
+
+		$assigned_id = $order->get_meta('_routew_delivery_boy_id', true);
+		if (empty($assigned_id) || (int) $assigned_id !== (int) get_current_user_id()) {
+			wp_send_json_error(array('message' => __('You are not assigned to this order.', 'routemile-for-woocommerce')), 403);
+		}
+
+		if ('cod' !== $order->get_payment_method()) {
+			wp_send_json_error(array('message' => __('This order is not cash on delivery.', 'routemile-for-woocommerce')), 400);
+		}
+
+		if ('routew-picked-up' !== $order->get_status()) {
+			wp_send_json_error(array('message' => __('Cash can only be confirmed once the order is picked up.', 'routemile-for-woocommerce')), 400);
+		}
+
+		if (self::is_cash_collected($order)) {
+			// Idempotent: already confirmed — treat as success so a
+			// double-tap never blocks the agent. Still return the fresh
+			// card so the client unlocks the deliver button.
+			wp_send_json_success($this->build_action_response($order));
+		}
+
+		$order->update_meta_data('_routew_cash_collected', time());
+
+		// Accounting truth: for COD the payment is received the moment
+		// the agent collects the cash. Only set when not already set —
+		// never rewrite payment history.
+		if (!$order->get_date_paid()) {
+			$order->set_date_paid(time());
+		}
+
+		$order->save();
+
+		$order->add_order_note(sprintf(
+			/* translators: 1: formatted amount, 2: agent name. */
+			__('Cash of %1$s collected by delivery agent %2$s.', 'routemile-for-woocommerce'),
+			wp_strip_all_tags($order->get_formatted_order_total()),
+			wp_get_current_user()->display_name
+		));
+
+		wp_send_json_success($this->build_action_response($order));
+	}
+
+	/**
 	 * Handle "Picked Up" action from Delivery Dashboard.
 	 *
 	 * @since 1.0.0
@@ -332,6 +492,10 @@ public function mark_picked_up()
         // Must already be picked up (1.2.16).
         if ('routew-picked-up' !== $order->get_status()) {
             wp_die(esc_html__('You must mark the order as picked up before marking it delivered.', 'routemile-for-woocommerce'));
+        }
+        // COD gate — same rule the AJAX path enforces.
+        if ('cod' === $order->get_payment_method() && !self::is_cash_collected($order)) {
+            wp_die(esc_html__('This is a cash-on-delivery order. Please confirm you collected the cash before marking it delivered.', 'routemile-for-woocommerce'));
         }
         $order->update_status('completed', __('Order delivered by delivery agent.', 'routemile-for-woocommerce'));
 

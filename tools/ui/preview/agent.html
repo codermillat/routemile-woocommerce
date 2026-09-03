@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RouteMile — Agent PWA (preview)</title>
+<link rel="stylesheet" href="../../../assets/css/routew-ui.css">
+<link rel="stylesheet" href="../../../assets/css/delivery-dashboard.css">
+</head>
+<body class="routew-delivery-dashboard-page">
+<div class="routew-ui routew-app-dashboard">
+	<header class="routew-app-header">
+		<div class="routew-app-header__row">
+			<div class="routew-app-header__brand">
+				<span class="routew-app-header__logo" aria-hidden="true">
+					<svg viewBox="0 0 24 24"><path d="M12 2 3 6.5v11L12 22l9-4.5v-11L12 2Zm0 2.3 6.3 3.2L12 10.7 5.7 7.5 12 4.3Zm-7 4.9 6 3v7.2l-6-3V9.2Zm8 10.2v-7.2l6-3v7.2l-6 3Z"/></svg>
+				</span>
+				<div class="routew-app-header__titles">
+					<h1>RouteMile Agent</h1>
+					<p class="routew-app-header__agent">
+						Rahim Uddin
+						<span class="routew-app-header__dot" aria-hidden="true"></span>
+						<span class="routew-app-header__date">September 2</span>
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="routew-agent-stats" role="status">
+			<div class="routew-agent-stat">
+				<span class="routew-agent-stat__icon"><svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span>
+				<span class="routew-agent-stat__value">6</span>
+				<span class="routew-agent-stat__label">Delivered today</span>
+			</div>
+			<div class="routew-agent-stat">
+				<span class="routew-agent-stat__icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 10.6 4 2.3-1 1.7-5-2.9V6h2v6.6Z"/></svg></span>
+				<span class="routew-agent-stat__value">2</span>
+				<span class="routew-agent-stat__label">Active now</span>
+			</div>
+			<div class="routew-agent-stat">
+				<span class="routew-agent-stat__icon"><svg viewBox="0 0 24 24"><path d="M3 6h18v12H3V6Zm9 2.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5ZM5 8v2h2V8H5Zm12 6v2h2v-2h-2Z"/></svg></span>
+				<span class="routew-agent-stat__value"><span class="woocommerce-Price-amount"><bdi>৳2,340<span class="woocommerce-Price-currencySymbol">.00</span></bdi></span></span>
+				<span class="routew-agent-stat__label">Collected today</span>
+			</div>
+			<div class="routew-agent-stat routew-agent-stat--due">
+				<span class="routew-agent-stat__icon"><svg viewBox="0 0 24 24"><path d="M5 3v18h2v-7h10.6l-2.2-4 2.2-4H7V3H5Z"/></svg></span>
+				<span class="routew-agent-stat__value"><span class="woocommerce-Price-amount"><bdi>৳860<span class="woocommerce-Price-currencySymbol">.00</span></bdi></span></span>
+				<span class="routew-agent-stat__label">To hand over</span>
+			</div>
+		</div>
+		<div class="routew-settle-bar routew-settle-bar--active">
+			<span class="routew-settle-bar__text">You are holding ৳860.00 of the store's cash.</span>
+			<form method="post">
+				<button type="button" class="btn routew-settle-btn">
+					<svg viewBox="0 0 24 24"><path d="M3 6h18v12H3V6Zm9 2.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5ZM5 8v2h2V8H5Zm12 6v2h2v-2h-2Z"/></svg>
+					Request hand-over
+				</button>
+			</form>
+		</div>
+	</header>
+
+	<main class="routew-app-main">
+		<div id="new-orders" class="routew-tab-content active" role="tabpanel">
+			<div class="card routew-order-card routew-order-card--cod">
+				<div class="card-header routew-card-header">
+					<h3 class="h6 mb-0">Order #1258</h3>
+					<span class="routew-pill routew-pill--assigned">Assigned</span>
+				</div>
+				<div class="routew-cod-strip" role="status">
+					<svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M3 6h18v12H3V6Zm9 2.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5ZM5 8v2h2V8H5Zm12 6v2h2v-2h-2Z"/></svg>
+					<span class="routew-cod-strip__label">Collect on delivery</span>
+					<span class="routew-cod-strip__amount"><span class="woocommerce-Price-amount"><bdi>৳1,250.00</bdi></span></span>
+					<span class="routew-cod-strip__method">Cash</span>
+				</div>
+				<div class="card-body routew-card-body">
+					<div class="routew-card-section">
+						<p class="mb-2"><svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-8 1.7-8 5v2h16v-2c0-3.3-4.7-5-8-5Z"/></svg>
+							<strong>Customer:</strong> Karim Ahmed</p>
+						<p class="mb-2"><svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M6.6 10.8a15.6 15.6 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.6.6 3.9.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.7.6 3.9.1.4 0 .8-.2 1.1l-2.2 2.8Z"/></svg>
+							<strong>Phone:</strong> <a class="routew-call-link" href="tel:+8801700000000">+880 1700-000000</a></p>
+						<p class="mb-2"><svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M12 3.2 3 11h2.4v9h5.1v-5.4h3v5.4h5.1v-9H21L12 3.2Z"/></svg>
+							<strong>Delivery Address:</strong> Flat 4B, House 25, Tower A, Block 2, Dhanmondi</p>
+						<p class="mb-2"><svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M3.8 15.2 15.2 3.8a1 1 0 0 1 1.4 0l3.6 3.6a1 1 0 0 1 0 1.4L8.8 20.2a1 1 0 0 1-1.4 0l-3.6-3.6a1 1 0 0 1 0-1.4Zm3.6 1.4 1.4-1.4-1.1-1.1 1.4-1.4 1.1 1.1 1.4-1.4-1.1-1.1 1.4-1.4 3.3 3.3L7.4 19.7l-1.1-1.1Z"/></svg>
+							<strong>Distance:</strong> 3.2 km</p>
+					</div>
+					<div class="routew-customer-note">
+						<div class="routew-customer-note__title">
+							<svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm8 1.5V8h4.5L14 3.5ZM7 12h10v1.6H7V12Zm0 3.4h10V17H7v-1.6Z"/></svg>
+							Delivery instructions
+						</div>
+						<p class="routew-customer-note__line">Ring the bell twice, 3rd floor.</p>
+					</div>
+				</div>
+				<div class="card-footer routew-card-footer">
+					<a href="#" class="btn routew-button routew-button-map">
+						<svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7Zm0 9.6A2.6 2.6 0 1 0 12 6.4a2.6 2.6 0 0 0 0 5.2Z"/></svg>
+						Open Exact Location
+					</a>
+					<a href="tel:+8801700000000" class="btn routew-button routew-button-call">
+						<svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M6.6 10.8a15.6 15.6 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.6.6 3.9.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.7.6 3.9.1.4 0 .8-.2 1.1l-2.2 2.8Z"/></svg>
+						<span class="routew-button-call__label">Call</span>
+					</a>
+					<button type="button" class="btn routew-button routew-button-pickup routew-action-btn">
+						<svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M12 2 3 6.5v11L12 22l9-4.5v-11L12 2Zm0 2.3 6.3 3.2L12 10.7 5.7 7.5 12 4.3Zm-7 4.9 6 3v7.2l-6-3V9.2Zm8 10.2v-7.2l6-3v7.2l-6 3Z"/></svg>
+						Mark Picked Up
+					</button>
+				</div>
+			</div>
+
+			<div class="card routew-order-card">
+				<div class="card-header routew-card-header">
+					<h3 class="h6 mb-0">Order #1257</h3>
+					<span class="routew-pill routew-pill--transit">Picked up</span>
+				</div>
+				<div class="routew-prepaid-strip" role="status">
+					<svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v3H3V6a1 1 0 0 1 1-1Zm-1 6h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7Z"/></svg>
+					<span class="routew-prepaid-strip__label">Prepaid — Card. Nothing to collect.</span>
+				</div>
+				<div class="card-body routew-card-body">
+					<div class="routew-card-section">
+						<p class="mb-2"><svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-8 1.7-8 5v2h16v-2c0-3.3-4.7-5-8-5Z"/></svg>
+							<strong>Customer:</strong> Nusrat Jahan</p>
+						<p class="mb-2"><svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M12 3.2 3 11h2.4v9h5.1v-5.4h3v5.4h5.1v-9H21L12 3.2Z"/></svg>
+							<strong>Delivery Address:</strong> House 12, Road 9, Mohammadpur</p>
+					</div>
+				</div>
+				<div class="card-footer routew-card-footer">
+					<a href="#" class="btn routew-button routew-button-map">
+						<svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7Zm0 9.6A2.6 2.6 0 1 0 12 6.4a2.6 2.6 0 0 0 0 5.2Z"/></svg>
+						Open Exact Location
+					</a>
+					<a href="tel:+8801800000000" class="btn routew-button routew-button-call">
+						<svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M6.6 10.8a15.6 15.6 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.6.6 3.9.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.7.6 3.9.1.4 0 .8-.2 1.1l-2.2 2.8Z"/></svg>
+						<span class="routew-button-call__label">Call</span>
+					</a>
+					<button type="button" class="btn routew-button routew-button-deliver routew-action-btn">
+						<svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M5 3v18h2v-7h10.6l-2.2-4 2.2-4H7V3H5Z"/></svg>
+						Mark Delivered
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="delivered" class="routew-tab-content" role="tabpanel">
+			<div class="card routew-order-card routew-order-card--history routew-order-card--cod">
+				<div class="card-header routew-card-header">
+					<h3 class="h6 mb-0">Order #1245</h3>
+					<span class="routew-pill routew-pill--delivered">Completed</span>
+				</div>
+				<div class="routew-cod-strip routew-cod-strip--settled" role="status">
+					<svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M3 6h18v12H3V6Zm9 2.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5ZM5 8v2h2V8H5Zm12 6v2h2v-2h-2Z"/></svg>
+					<span class="routew-cod-strip__label">Collected on delivery</span>
+					<span class="routew-cod-strip__amount"><span class="woocommerce-Price-amount"><bdi>৳720.00</bdi></span></span>
+					<span class="routew-cod-strip__method">Cash</span>
+				</div>
+				<div class="card-body routew-card-body">
+					<div class="routew-card-section">
+						<p><svg class="routew-svg-icon" viewBox="0 0 24 24"><path d="M12 3.2 3 11h2.4v9h5.1v-5.4h3v5.4h5.1v-9H21L12 3.2Z"/></svg>
+							<strong>Delivery Address:</strong> Road 27, Dhanmondi</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<nav class="routew-tabbar" role="tablist">
+		<button type="button" class="routew-tab-link active" data-routew-tab="new-orders">
+			<svg viewBox="0 0 24 24"><path d="M12 2 3 6.5v11L12 22l9-4.5v-11L12 2Zm0 2.3 6.3 3.2L12 10.7 5.7 7.5 12 4.3Zm-7 4.9 6 3v7.2l-6-3V9.2Zm8 10.2v-7.2l6-3v7.2l-6 3Z"/></svg>
+			<span class="routew-tabbar__label">New</span>
+			<span class="routew-tabbar__count">2</span>
+		</button>
+		<button type="button" class="routew-tab-link" data-routew-tab="in-progress">
+			<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 10.6 4 2.3-1 1.7-5-2.9V6h2v6.6Z"/></svg>
+			<span class="routew-tabbar__label">In Progress</span>
+			<span class="routew-tabbar__count">0</span>
+		</button>
+		<button type="button" class="routew-tab-link" data-routew-tab="delivered">
+			<svg viewBox="0 0 24 24"><path d="M5 3v18h2v-7h10.6l-2.2-4 2.2-4H7V3H5Z"/></svg>
+			<span class="routew-tabbar__label">Delivered</span>
+			<span class="routew-tabbar__count">1</span>
+		</button>
+	</nav>
+</div>
+
+<script>
+	// Minimal tab behavior mirroring delivery-dashboard.js
+	document.querySelectorAll('[data-routew-tab]').forEach(btn => {
+		btn.addEventListener('click', () => {
+			document.querySelectorAll('.routew-tab-link').forEach(b => b.classList.remove('active'));
+			btn.classList.add('active');
+			document.querySelectorAll('.routew-tab-content').forEach(c => c.classList.remove('active'));
+			document.getElementById(btn.dataset.routewTab).classList.add('active');
+		});
+	});
+</script>
+</body>
+</html>

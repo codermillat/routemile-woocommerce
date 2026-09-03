@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RouteMile — Checkout (preview)</title>
+<link rel="stylesheet" href="../../../assets/css/routew-ui.css">
+<link rel="stylesheet" href="../../../assets/css/checkout.css">
+<style>
+	body { margin: 0; background: #FDFDFC; font-family: Georgia, serif; }
+	.site { max-width: 720px; margin: 0 auto; padding: 24px 20px 64px; }
+	.site-header { border-bottom: 1px solid #e5e5e5; padding: 14px 0 18px; margin-bottom: 26px; font-size: 21px; }
+	/* fake WC checkout around the plugin cards */
+	.wc-checkout-note { background: #f6f6f6; border: 1px solid #e5e5e5; padding: 14px 16px; margin-bottom: 20px; font-size: 14px; color: #444; font-family: Georgia, serif; }
+	#routew-map { height: 280px; }
+	.map-fake { width: 100%; height: 100%; background:
+		repeating-linear-gradient(45deg, #E8F0E4 0 18px, #DDEBd7 18px 36px); display: grid; place-items: center; color: #6b7d64; font-family: Georgia, serif; }
+</style>
+</head>
+<body>
+<div class="site">
+	<div class="site-header"><b>Bella Cucina</b> — fake theme</div>
+	<div class="wc-checkout-note">WooCommerce checkout summary + billing details would render here (theme markup, untouched).</div>
+
+	<div>
+		<div id="routew-location-picker-container" class="routew-ui routew-checkout-card routew-checkout-card--location">
+			<div class="card-body routew-checkout-card__body">
+				<div class="routew-checkout-step">
+					<span class="routew-checkout-step__num" aria-hidden="true">1</span>
+					<div class="routew-checkout-step__text">
+						<h3 class="routew-checkout-step__title">Where should we deliver?</h3>
+						<p class="routew-checkout-step__sub">Search your area, use your location, or drag the pin to set the exact drop point.</p>
+					</div>
+				</div>
+
+				<div class="routew-location-search-wrapper">
+					<svg class="routew-location-search-wrapper__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19Zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14Z"/></svg>
+					<input id="routew-location-search-input" type="text" placeholder="Search area or landmark…" class="form-control" value="">
+					<button type="button" id="routew-get-location" class="btn routew-locate-btn">
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm8.94 3A9 9 0 0 0 13 3.06V1h-2v2.06A9 9 0 0 0 3.06 11H1v2h2.06A9 9 0 0 0 11 20.94V23h2v-2.06A9 9 0 0 0 20.94 13H23v-2ZM12 19a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z"/></svg>
+						<span class="routew-locate-btn__label">Locate me</span>
+					</button>
+				</div>
+
+				<div class="routew-map-shell">
+					<div id="routew-map" class="routew-map" role="application" aria-label="Delivery location map">
+						<div class="map-fake">map canvas</div>
+					</div>
+				</div>
+
+				<div id="routew-selected-location" class="routew-location-confirm" style="display:none;">
+					<span class="routew-location-confirm__icon" aria-hidden="true">
+						<svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+					</span>
+					<div class="routew-location-confirm__body">
+						<span class="routew-location-confirm__label">Delivering to</span>
+						<span id="routew-selected-address" class="routew-location-confirm__address">Road 12, Dhanmondi, Dhaka 1209, Bangladesh</span>
+					</div>
+				</div>
+
+				<input type="hidden" name="routew_lat" id="routew_lat" value="">
+				<input type="hidden" name="routew_lng" id="routew_lng" value="">
+			</div>
+		</div>
+
+		<div id="routew-delivery-details-container" class="routew-ui routew-checkout-card routew-checkout-card--details">
+			<div class="card-body routew-checkout-card__body">
+				<div class="routew-checkout-step">
+					<span class="routew-checkout-step__num" aria-hidden="true">2</span>
+					<div class="routew-checkout-step__text">
+						<h3 class="routew-checkout-step__title">Address details</h3>
+						<p class="routew-checkout-step__sub">Help your rider find the exact door.</p>
+					</div>
+				</div>
+
+				<p class="form-row form-row-wide validate-required" id="routew_address_details_field">
+					<label class="form-label" for="routew_address_details">House / Flat / Building No. <span class="required">*</span></label>
+					<input type="text" class="input-text form-control" name="routew_address_details" id="routew_address_details" placeholder="e.g., Flat 4B, House 25, Tower A, Block 2" value="">
+				</p>
+				<p class="form-row form-row-wide" id="routew_landmark_field">
+					<label class="form-label" for="routew_landmark">Nearby Landmark (optional)</label>
+					<input type="text" class="input-text form-control" name="routew_landmark" id="routew_landmark" placeholder="e.g., Near City Mall, Opposite Park" value="">
+				</p>
+				<p class="form-row form-row-wide" id="routew_delivery_instructions_field">
+					<label class="form-label" for="routew_delivery_instructions">Delivery Instructions</label>
+					<textarea class="input-text form-control" name="routew_delivery_instructions" id="routew_delivery_instructions" placeholder="e.g., Ring the bell twice, Leave at the door, Call before arriving…" rows="2"></textarea>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Simulate checkout.js revealing the confirmation banner
+	document.getElementById('routew-map').addEventListener('click', function () {
+		document.getElementById('routew-selected-location').style.display = 'flex';
+	});
+</script>
+</body>
+</html>
