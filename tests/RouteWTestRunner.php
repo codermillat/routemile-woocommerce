@@ -1879,7 +1879,167 @@ class ROUTEWTestRunner
             $this->fail('DS16 brand-color file missing ABSPATH guard or hex validation');
         }
 
+        // =====================================================================
+        // PG1 — Payment-completion lifecycle gate (2026-09 security audit).
+        //
+        // WooCommerce auto-flags any order moved to `completed` as PAID
+        // (WC_Order::maybe_set_date_paid). RouteMile's four manual
+        // transition paths (manager admin-post + AJAX, rider admin-post +
+        // AJAX) must all refuse `completed` while the order still needs
+        // payment — ROUTEW_Order_Lifecycle::can_complete_order() is that
+        // gate. These tests pin:
+        //   - the gate helper + its allow-branches (paid / COD-collected /
+        //     zero-total orders must KEEP passing, so legit flow works),
+        //   - each of the four gated call sites,
+        //   - the COD cash-confirmation sequence that satisfies the gate,
+        //   - a generic scan: ANY function that can set `completed` and
+        //     forgets the gate fails the suite — this is what stops a
+        //     future UI action from silently reintroducing the bypass.
+        // =====================================================================
+
+        $lifecycle_php_pg1 = file_get_contents($this->plugin_dir . '/includes/services/class-routew-order-lifecycle.php');
+
+        // A. The gate helper exists and blocks with a routew_unpaid error.
+        if (false !== strpos($lifecycle_php_pg1, 'function can_complete_order')
+            && false !== strpos($lifecycle_php_pg1, 'routew_unpaid')) {
+            $this->pass('PG1 gate helper defined (can_complete_order + routew_unpaid block)');
+        } else {
+            $this->fail('PG1 gate helper missing: can_complete_order()');
+        }
+
+        // B. The gate's allow-branches: gateway-paid orders, COD with
+        // collected cash, and zero-total orders keep passing — the gate
+        // must block only genuinely unpaid transitions.
+        if (false !== strpos($lifecycle_php_pg1, 'is_paid()')
+            && false !== strpos($lifecycle_php_pg1, "get_date_paid('edit')")
+            && false !== strpos($lifecycle_php_pg1, "'_routew_cash_collected'")
+            && false !== strpos($lifecycle_php_pg1, 'get_total() <= 0')) {
+            $this->pass('PG1 gate allow-branches: paid + COD-collected + zero-total still pass');
+        } else {
+            $this->fail('PG1 gate allow-branches incomplete — legitimate orders could be blocked');
+        }
+
+        $actions_chunks_pg1 = $this->pg1_function_chunks($this->plugin_dir . '/includes/class-routew-dashboard-actions.php');
+        $agent_chunks_pg1 = $this->pg1_function_chunks($this->plugin_dir . '/includes/class-routew-delivery-boy-view.php');
+
+        // C. Manager admin-post path: update_order_status gates `completed`.
+        $body_pg1 = isset($actions_chunks_pg1['update_order_status']) ? $actions_chunks_pg1['update_order_status'] : '';
+        if (false !== strpos($body_pg1, "'completed'")
+            && false !== strpos($body_pg1, 'update_status(')
+            && false !== strpos($body_pg1, 'can_complete_order')) {
+            $this->pass('PG1 manager admin-post path gated (update_order_status refuses unpaid completed)');
+        } else {
+            $this->fail('PG1 manager admin-post path UNGATED: update_order_status can forge a paid order');
+        }
+
+        // D. Manager AJAX path: ajax_update_status gates `completed`.
+        $body_pg1 = isset($actions_chunks_pg1['ajax_update_status']) ? $actions_chunks_pg1['ajax_update_status'] : '';
+        if (false !== strpos($body_pg1, "'completed'")
+            && false !== strpos($body_pg1, 'update_status(')
+            && false !== strpos($body_pg1, 'can_complete_order')) {
+            $this->pass('PG1 manager AJAX path gated (ajax_update_status refuses unpaid completed)');
+        } else {
+            $this->fail('PG1 manager AJAX path UNGATED: ajax_update_status can forge a paid order');
+        }
+
+        // E. Rider admin-post path: mark_delivered gates `completed` and
+        // keeps its pre-existing COD-cash precondition.
+        $body_pg1 = isset($agent_chunks_pg1['mark_delivered']) ? $agent_chunks_pg1['mark_delivered'] : '';
+        if (false !== strpos($body_pg1, "'completed'")
+            && false !== strpos($body_pg1, 'update_status(')
+            && false !== strpos($body_pg1, 'can_complete_order')
+            && false !== strpos($body_pg1, 'is_cash_collected')) {
+            $this->pass('PG1 rider admin-post path gated (mark_delivered refuses unpaid completed)');
+        } else {
+            $this->fail('PG1 rider admin-post path UNGATED: mark_delivered can forge a paid order');
+        }
+
+        // F. Rider AJAX path: ajax_update_delivery_status gates `completed`.
+        $body_pg1 = isset($agent_chunks_pg1['ajax_update_delivery_status']) ? $agent_chunks_pg1['ajax_update_delivery_status'] : '';
+        if (false !== strpos($body_pg1, "'completed'")
+            && false !== strpos($body_pg1, 'update_status(')
+            && false !== strpos($body_pg1, 'can_complete_order')) {
+            $this->pass('PG1 rider AJAX path gated (ajax_update_delivery_status refuses unpaid completed)');
+        } else {
+            $this->fail('PG1 rider AJAX path UNGATED: ajax_update_delivery_status can forge a paid order');
+        }
+
+        // G. Legitimate COD sequence: cash confirmation still writes BOTH
+        // the collected meta AND date_paid — pick_up → cash → deliver
+        // keeps passing the gate (verified live in the audit).
+        $body_pg1 = isset($agent_chunks_pg1['ajax_confirm_cash_collected']) ? $agent_chunks_pg1['ajax_confirm_cash_collected'] : '';
+        if (false !== strpos($body_pg1, "update_meta_data('_routew_cash_collected'")
+            && false !== strpos($body_pg1, 'set_date_paid(')
+            && false !== strpos($body_pg1, 'is_cash_collected')) {
+            $this->pass('PG1 COD cash confirmation intact (meta + date_paid satisfy the gate)');
+        } else {
+            $this->fail('PG1 COD cash confirmation broken — legit deliveries would be blocked');
+        }
+
+        // H. Future-proof scan: EVERY completed-capable transition function
+        // in the transition files must call the gate. A new manager or
+        // rider action that can set `completed` without can_complete_order
+        // fails here — this is the regression tripwire.
+        $gated_pg1 = 0;
+        $ungated_pg1 = array();
+        foreach (array(
+            $this->plugin_dir . '/includes/class-routew-dashboard-actions.php',
+            $this->plugin_dir . '/includes/class-routew-delivery-boy-view.php',
+            $this->plugin_dir . '/includes/class-routew-order-admin.php',
+        ) as $file_pg1) {
+            foreach ($this->pg1_function_chunks($file_pg1) as $fn_pg1 => $body_pg1) {
+                if (false === strpos($body_pg1, 'update_status(')) {
+                    continue; // not a transition function
+                }
+                if (false === strpos($body_pg1, "'completed'")) {
+                    continue; // cannot reach `completed`
+                }
+                if (false !== strpos($body_pg1, 'can_complete_order')) {
+                    $gated_pg1++;
+                } else {
+                    $ungated_pg1[] = $fn_pg1 . '() in ' . basename($file_pg1);
+                }
+            }
+        }
+        if (empty($ungated_pg1) && $gated_pg1 >= 4) {
+            $this->pass("PG1 future-proof scan: all {$gated_pg1} completed-capable transition functions call the gate");
+        } else {
+            $this->fail('PG1 UNGATED completed-capable transition function(s): ' . implode(', ', $ungated_pg1));
+        }
+
         echo "\n";
+    }
+
+    /**
+     * PG1 helper: split a PHP file into per-function source chunks.
+     *
+     * Each chunk runs from a named function/method declaration to the
+     * next one (or EOF), so it always contains that function's full
+     * body. The PG1 payment-gate tests use this to assert needles
+     * INSIDE specific functions (e.g. that update_order_status() calls
+     * can_complete_order() before update_status()).
+     *
+     * @param string $file Absolute file path.
+     * @return array<string, string> Map of function name => source chunk.
+     */
+    private function pg1_function_chunks($file)
+    {
+        $src = @file_get_contents($file);
+        if (false === $src || '' === $src) {
+            return array();
+        }
+        if (!preg_match_all('/function\s+([A-Za-z0-9_]+)\s*\(/', $src, $m, PREG_OFFSET_CAPTURE)) {
+            return array();
+        }
+        $chunks = array();
+        $total = count($m[1]);
+        for ($i = 0; $i < $total; $i++) {
+            $name = $m[1][$i][0];
+            $start = $m[1][$i][1];
+            $end = ($i + 1 < $total) ? $m[1][$i + 1][1] : strlen($src);
+            $chunks[$name] = substr($src, $start, $end - $start);
+        }
+        return $chunks;
     }
 
     private function findPhpFiles($dir)

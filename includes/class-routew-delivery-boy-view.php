@@ -258,6 +258,18 @@ if ('completed' === $status && 'cod' === $order->get_payment_method() && !self::
     wp_send_json_error(array('message' => __('This is a cash-on-delivery order. Please confirm you collected the cash before marking it delivered.', 'routemile-for-woocommerce')), 400);
 }
 
+// AUDIT-FIX 1.6.1: refuse to push any order into `completed` via the
+// agent path when payment has not been recorded. The rider can still
+// confirm cash collection on COD orders (which itself sets date_paid),
+// and gateway payments set date_paid themselves — this gate only
+// blocks unpaid orders.
+if ('completed' === $status) {
+    $gate = ROUTEW_Order_Lifecycle::can_complete_order($order);
+    if (is_wp_error($gate)) {
+        wp_send_json_error(array('message' => $gate->get_error_message()), 403);
+    }
+}
+
 		$assigned_id = $order->get_meta('_routew_delivery_boy_id', true);
 
 		if (empty($assigned_id) || (int) $assigned_id !== (int) get_current_user_id()) {
@@ -496,6 +508,13 @@ public function mark_picked_up()
         // COD gate — same rule the AJAX path enforces.
         if ('cod' === $order->get_payment_method() && !self::is_cash_collected($order)) {
             wp_die(esc_html__('This is a cash-on-delivery order. Please confirm you collected the cash before marking it delivered.', 'routemile-for-woocommerce'));
+        }
+        // AUDIT-FIX 1.6.1: never let a rider force `completed` on an
+        // unpaid order — the order's payment_method decides whether the
+        // customer already paid (gateway) or the agent collected cash.
+        $gate = ROUTEW_Order_Lifecycle::can_complete_order($order);
+        if (is_wp_error($gate)) {
+            wp_die(esc_html($gate->get_error_message()));
         }
         $order->update_status('completed', __('Order delivered by delivery agent.', 'routemile-for-woocommerce'));
 

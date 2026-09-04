@@ -134,6 +134,16 @@ class ROUTEW_Dashboard_Actions
 
 		$valid_statuses = array('routew-in-kitchen', 'routew-assigned', 'routew-picked-up', 'completed', 'cancelled');
 		if (in_array($new_status, $valid_statuses, true)) {
+			if ('completed' === $new_status) {
+				// AUDIT-FIX 1.6.1: never transition an unpaid order to
+				// 'completed' (which WC auto-flags as paid). Refuse and
+				// require either a real gateway webhook or a confirmed
+				// COD cash-collected state.
+				$gate = ROUTEW_Order_Lifecycle::can_complete_order($order);
+				if (is_wp_error($gate)) {
+					wp_die(esc_html($gate->get_error_message()));
+				}
+			}
 			$order->update_status($new_status, __('Status updated from dashboard.', 'routemile-for-woocommerce'));
 		}
 
@@ -243,6 +253,17 @@ class ROUTEW_Dashboard_Actions
 		$valid_statuses = array('routew-in-kitchen', 'routew-assigned', 'routew-picked-up', 'completed', 'cancelled');
 		if (!in_array($new_status, $valid_statuses, true)) {
 			wp_send_json_error(array('message' => __('Invalid status.', 'routemile-for-woocommerce')), 400);
+		}
+
+		if ('completed' === $new_status) {
+			// AUDIT-FIX 1.6.1: never transition an unpaid order to
+			// 'completed' (which WC auto-flags as paid). Refuse and
+			// require either a real gateway webhook or a confirmed
+			// COD cash-collected state.
+			$gate = ROUTEW_Order_Lifecycle::can_complete_order($order);
+			if (is_wp_error($gate)) {
+				wp_send_json_error(array('message' => $gate->get_error_message()), 403);
+			}
 		}
 
 		$order->update_status($new_status, __('Status updated from dashboard.', 'routemile-for-woocommerce'));
