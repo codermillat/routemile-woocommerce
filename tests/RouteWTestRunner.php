@@ -359,25 +359,45 @@ class ROUTEWTestRunner
         echo GREEN . "▶ Testing Plugin Headers..." . RESET . "\n";
 
         $main_file = $this->plugin_dir . '/routemile-woocommerce.php';
+        $readme_file = $this->plugin_dir . '/readme.txt';
         $content = file_get_contents($main_file);
+        $readme = file_get_contents($readme_file);
 
-        $required_headers = [
+        // Per the Plugin Directory guidelines (and the wp.org reviewer's
+        // directive in the 4-Sep-26 review), "Tested up to" belongs ONLY
+        // in readme.txt — declaring it in the plugin PHP header creates
+        // ambiguity about which value users see. So we check it in readme
+        // and explicitly verify the main file does NOT have it.
+        $main_required_headers = [
             'Plugin Name' => '/Plugin Name:\s*.+/',
             'Version' => '/Version:\s*[\d.]+/',
             'Requires at least' => '/Requires at least:\s*[\d.]+/',
-            'Tested up to' => '/Tested up to:\s*[\d.]+/',
             'Requires PHP' => '/Requires PHP:\s*[\d.]+/',
             'WC requires at least' => '/WC requires at least:\s*[\d.]+/',
             'WC tested up to' => '/WC tested up to:\s*[\d.]+/',
             'Requires Plugins' => '/Requires Plugins:\s*woocommerce/',
         ];
 
-        foreach ($required_headers as $name => $pattern) {
+        foreach ($main_required_headers as $name => $pattern) {
             if (preg_match($pattern, $content)) {
                 $this->pass("Header present: $name");
             } else {
                 $this->fail("Missing header: $name");
             }
+        }
+
+        // Tested up to must NOT be in the main PHP file (reviewer explicit ask).
+        if (preg_match('/^\s*\*\s*Tested up to:\s*.+$/m', $content)) {
+            $this->fail('"Tested up to" must be in readme.txt only — remove from the main plugin file');
+        } else {
+            $this->pass('"Tested up to" correctly absent from the main plugin file');
+        }
+
+        // And MUST be present in readme.txt.
+        if (preg_match('/^Tested up to:\s*[\d.]+/m', $readme)) {
+            $this->pass('readme.txt declares "Tested up to" (the only supported place)');
+        } else {
+            $this->fail('readme.txt missing "Tested up to" header');
         }
 
         // Check HPOS compatibility declaration

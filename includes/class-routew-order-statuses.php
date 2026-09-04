@@ -140,8 +140,12 @@ class ROUTEW_Order_Statuses
 				'exclude_from_search' => false,
 				'show_in_admin_all_list' => true,
 				'show_in_admin_status_list' => true,
-				/* translators: %s: order count for this status. */
-				'label_count' => _n_noop($label . ' <span class="count">(%s)</span>', $label . ' <span class="count">(%s)</span>', 'routemile-for-woocommerce')
+				// No 'label_count' here: the standard WP pattern (literal gettext
+				// string) can't accommodate our admin-configurable status labels
+				// (they're stored in the DB, not the .pot file, so the gettext
+				// parser can't translate them). The stock post-list table will
+				// show the label without a count badge; our own deliveries
+				// dashboard renders per-status counts separately.
 			));
 		}
 		// phpcs:enable

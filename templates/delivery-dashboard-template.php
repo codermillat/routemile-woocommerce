@@ -85,7 +85,7 @@ $delivered_orders = wc_get_orders(array(
             <div class="routew-app-header__row">
                 <div class="routew-app-header__brand">
                     <span class="routew-app-header__logo" aria-hidden="true">
-                        <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        <?php routew_agent_icon_e('box'); // kses_post escaped SVG ?>
                     </span>
                     <div class="routew-app-header__titles">
                         <h1><?php esc_html_e('RouteMile Agent', 'routemile-for-woocommerce'); ?></h1>
@@ -160,7 +160,7 @@ $delivered_orders = wc_get_orders(array(
                         <input type="hidden" name="action" value="routew_settle_agent_cash" />
                         <input type="hidden" name="agent_id" value="<?php echo esc_attr(get_current_user_id()); ?>" />
                         <button type="submit" class="btn btn-primary routew-settle-btn" data-routew-settle-amount="<?php echo esc_attr(wp_strip_all_tags(wc_price($routew_cash['unsettled']))); ?>">
-                            <?php echo routew_agent_icon('cash'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                            <?php routew_agent_icon_e('cash'); // kses_post escaped SVG ?>
                             <?php esc_html_e('Request hand-over', 'routemile-for-woocommerce'); ?>
                         </button>
                     </form>
@@ -180,7 +180,7 @@ $delivered_orders = wc_get_orders(array(
             <?php endif; ?>
             <?php if ($routew_state['cod']['count'] > 0): ?>
                 <div class="routew-cod-summary" role="status">
-                    <?php echo routew_agent_icon('cash'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                    <?php routew_agent_icon_e('cash'); // kses_post escaped SVG ?>
                     <span class="routew-cod-summary__text">
                         <?php
                         // translators: 1 = formatted amount, 2 = number of orders.
@@ -202,7 +202,7 @@ $delivered_orders = wc_get_orders(array(
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="routew-no-orders">
-                        <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        <?php routew_agent_icon_e('box'); // kses_post escaped SVG ?>
                         <p><?php esc_html_e('No new deliveries assigned.', 'routemile-for-woocommerce'); ?></p>
                         <p class="routew-no-orders__hint"><?php esc_html_e('New orders appear here automatically — leave the app open.', 'routemile-for-woocommerce'); ?></p>
                     </div>
@@ -216,7 +216,7 @@ $delivered_orders = wc_get_orders(array(
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="routew-no-orders">
-                        <?php echo routew_agent_icon('clock'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        <?php routew_agent_icon_e('clock'); // kses_post escaped SVG ?>
                         <p><?php esc_html_e('No deliveries in progress.', 'routemile-for-woocommerce'); ?></p>
                     </div>
                 <?php endif; ?>
@@ -229,7 +229,7 @@ $delivered_orders = wc_get_orders(array(
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="routew-no-orders">
-                        <?php echo routew_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                        <?php routew_agent_icon_e('flag'); // kses_post escaped SVG ?>
                         <p><?php esc_html_e('No delivered orders yet.', 'routemile-for-woocommerce'); ?></p>
                     </div>
                 <?php endif; ?>
@@ -239,19 +239,19 @@ $delivered_orders = wc_get_orders(array(
         <nav class="routew-tabbar" role="tablist" aria-label="<?php esc_attr_e('Delivery status filters', 'routemile-for-woocommerce'); ?>">
             <button type="button" id="tab-new-orders" class="routew-tab-link active" role="tab" aria-selected="true"
                 aria-controls="new-orders" data-routew-tab="new-orders">
-                <?php echo routew_agent_icon('box'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                <?php routew_agent_icon_e('box'); // kses_post escaped SVG ?>
                 <span class="routew-tabbar__label"><?php esc_html_e('New', 'routemile-for-woocommerce'); ?></span>
                 <span class="routew-tabbar__count"><?php echo count($new_orders); ?></span>
             </button>
             <button type="button" id="tab-in-progress" class="routew-tab-link" role="tab" aria-selected="false"
                 aria-controls="in-progress" data-routew-tab="in-progress">
-                <?php echo routew_agent_icon('clock'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                <?php routew_agent_icon_e('clock'); // kses_post escaped SVG ?>
                 <span class="routew-tabbar__label"><?php esc_html_e('In Progress', 'routemile-for-woocommerce'); ?></span>
                 <span class="routew-tabbar__count"><?php echo count($picked_up_orders); ?></span>
             </button>
             <button type="button" id="tab-delivered" class="routew-tab-link" role="tab" aria-selected="false"
                 aria-controls="delivered" data-routew-tab="delivered">
-                <?php echo routew_agent_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static inline SVG ?>
+                <?php routew_agent_icon_e('flag'); // kses_post escaped SVG ?>
                 <span class="routew-tabbar__label"><?php esc_html_e('Delivered', 'routemile-for-woocommerce'); ?></span>
                 <span class="routew-tabbar__count"><?php echo count($delivered_orders); ?></span>
             </button>

@@ -4,7 +4,7 @@ Tags: woocommerce, delivery, food delivery, restaurant, local delivery
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -54,10 +54,10 @@ This plugin contacts third-party services only when the map provider you choose 
 
 * **Google Maps** — JavaScript is loaded from `maps.googleapis.com` on the checkout page; geocoding and routing requests are sent server-side to `maps.googleapis.com`. Service: [Google Maps Platform](https://cloud.google.com/maps-platform). Terms: [Google Maps Platform Terms of Service](https://cloud.google.com/maps-platform/terms). Privacy: [Google Privacy Policy](https://policies.google.com/privacy).
 * **OpenStreetMap tiles** — map tiles are loaded from `tile.openstreetmap.org`. Service: [OpenStreetMap](https://www.openstreetmap.org/). Terms / licence: [OpenStreetMap Copyright and License](https://www.openstreetmap.org/copyright). Privacy: [OpenStreetMap Foundation Privacy Policy](https://osmfoundation.org/wiki/Privacy_Policy).
-* **Nominatim geocoding (OpenStreetMap mode only)** — coordinate and address lookups are sent to `nominatim.openstreetmap.org`. Subject to the OpenStreetMap Foundation's [Nominatim Usage Policy](https://operations.osmfoundation.org/policies/nominatim/) (1 request/second application-wide). Privacy: [Nominatim privacy notice](https://nominatim.org/release-notes/latest#privacy).
+* **Nominatim geocoding (OpenStreetMap mode only)** — coordinate and address lookups are sent to `nominatim.openstreetmap.org`. Subject to the OpenStreetMap Foundation's [Nominatim Usage Policy](https://operations.osmfoundation.org/policies/nominatim/) (1 request/second application-wide). Privacy: [OSM Foundation Privacy Policy](https://osmfoundation.org/wiki/Privacy_Policy).
 * **Project OSRM routing (OpenStreetMap mode only)** — driving-distance and travel-time queries are sent to `router.project-osrm.org`. Service: [Project OSRM](https://project-osrm.org/). Terms: [Project OSRM Terms of Service](https://project-osrm.org/about/). Privacy: the OSRM public router is operated by the OSRM community on a best-effort basis; please review the operator notice linked on the OSRM project page.
-* **MapTiler** — map tiles and geocoding calls go to `api.maptiler.com`. Service: [MapTiler](https://www.maptiler.com/). Terms: [MapTiler Terms of Service](https://www.maptiler.com/terms/). Privacy: [MapTiler Privacy Policy](https://www.maptiler.com/privacy/).
-* **Geoapify** — tiles, geocoding and routing calls go to `api.geoapify.com` and `maps.geoapify.com`. Service: [Geoapify](https://www.geoapify.com/). Terms: [Geoapify Terms of Use](https://www.geoapify.com/terms-of-use/). Privacy: [Geoapify Privacy Policy](https://www.geoapify.com/privacy-policy/).
+* **MapTiler** — map tiles and geocoding calls go to `api.maptiler.com`. Service: [MapTiler](https://www.maptiler.com/). Terms: [MapTiler Terms of Service](https://www.maptiler.com/terms/). Privacy: [MapTiler Privacy Policy](https://www.maptiler.com/privacy-policy/).
+* **Geoapify** — tiles, geocoding and routing calls go to `api.geoapify.com` and `maps.geoapify.com`. Service: [Geoapify](https://www.geoapify.com/). Terms: [Geoapify Terms and Conditions](https://www.geoapify.com/terms-and-conditions/). Privacy: [Geoapify Privacy Policy](https://www.geoapify.com/privacy-policy/).
 
 Each provider's "Powered by ..." attribution string is shown on the customer-facing map only when you tick "Show provider credit" under WooCommerce → Settings → RouteMile → Map Provider. The default is OFF per the WordPress.org Plugin Directory Guideline 10; you should turn it ON whenever your selected provider's licence requires visible credit.
 
@@ -156,6 +156,9 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 
 == Changelog ==
 
+= 1.6.2 =
+* Plugin Directory review fixes: corrected 3 invalid external-service URLs in the readme (Nominatim, MapTiler, Geoapify); removed the duplicate "Tested up to" header from the main plugin PHP file (kept only in readme.txt); replaced the dynamic-label `_n_noop()` call in the order status registration (admin-configurable labels can't be in the .pot file, so the standard WP pattern is to drop `label_count` for custom statuses — our own deliveries dashboard renders per-status counts separately); and wrapped the 25 inline-SVG icon echoes with `wp_kses_post()` via a new `routew_agent_icon_e()` helper so Plugin Check's escaping audit passes.
+
 = 1.6.1 =
 * Security: manual "completed" transitions are now gated on payment state. Previously a shop manager could mark an unpaid order completed from the deliveries dashboard, and an assigned delivery rider could do the same through the rider app on prepaid (bank-transfer/cheque) orders — WooCommerce records any completed order as paid, so two button taps created a "paid" order with no payment and no transaction record. Gateway-paid orders, cash-on-delivery with confirmed cash collection, and zero-total orders are unaffected.
 * Internal: new regression suite (PG1) guards the payment gate on all four transition paths and fails the build if any future action can set completed on an unpaid order.
@@ -185,6 +188,9 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 Earlier releases: see CHANGELOG.md in the repository.
 
 == Upgrade Notice ==
+
+= 1.6.2 =
+Plugin Directory review fixes only. No functional changes from 1.6.1.
 
 = 1.6.1 =
 Security release: unpaid orders can no longer be marked completed (which WooCommerce records as paid) from the dashboard or the rider app. Recommended for all stores.
