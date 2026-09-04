@@ -4,7 +4,7 @@ Tags: woocommerce, delivery, food delivery, restaurant, local delivery
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -156,6 +156,10 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 
 == Changelog ==
 
+= 1.6.1 =
+* Security: manual "completed" transitions are now gated on payment state. Previously a shop manager could mark an unpaid order completed from the deliveries dashboard, and an assigned delivery rider could do the same through the rider app on prepaid (bank-transfer/cheque) orders — WooCommerce records any completed order as paid, so two button taps created a "paid" order with no payment and no transaction record. Gateway-paid orders, cash-on-delivery with confirmed cash collection, and zero-total orders are unaffected.
+* Internal: new regression suite (PG1) guards the payment gate on all four transition paths and fails the build if any future action can set completed on an unpaid order.
+
 = 1.6.0 =
 * Mile Zero design system: every customer and rider surface (checkout, order tracking, order-received, My Account, delivery-rider app) rebuilt on a fast, self-contained design system with bundled fonts — no more theme conflicts from generic Bootstrap styling.
 * Order stage labels: rename the five delivery stages (label, colour, icon) from the settings screen; renames apply everywhere instantly and never touch stored order data.
@@ -181,6 +185,9 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 Earlier releases: see CHANGELOG.md in the repository.
 
 == Upgrade Notice ==
+
+= 1.6.1 =
+Security release: unpaid orders can no longer be marked completed (which WooCommerce records as paid) from the dashboard or the rider app. Recommended for all stores.
 
 = 1.6.0 =
 New design system across all customer and rider pages, renameable order stages, and a custom brand colour. No settings migration needed — existing settings, riders and orders are untouched.
