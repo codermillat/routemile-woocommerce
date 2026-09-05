@@ -4,7 +4,7 @@ Tags: woocommerce, delivery, food delivery, restaurant, local delivery
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -156,6 +156,10 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 
 == Changelog ==
 
+= 1.6.3 =
+* Plugin Directory review fix (round 3): the two remaining "escape late" outputs are now wrapped in `wp_kses_post()` — the `woocommerce_my_account_my_address_description` filter result in the My Account address template and the `wc_get_email_order_items()` result in the order-status email. Both keep their WooCommerce semantics (legitimate filtered HTML passes, dangerous markup is stripped).
+* Fixed: an undefined `$i` variable in the order-status email's totals rows (a PHP 8 warning under WP_DEBUG); the first totals row's thicker top border now renders as intended.
+
 = 1.6.2 =
 * Plugin Directory review fixes: corrected 3 invalid external-service URLs in the readme (Nominatim, MapTiler, Geoapify); removed the duplicate "Tested up to" header from the main plugin PHP file (kept only in readme.txt); replaced the dynamic-label `_n_noop()` call in the order status registration (admin-configurable labels can't be in the .pot file, so the standard WP pattern is to drop `label_count` for custom statuses — our own deliveries dashboard renders per-status counts separately); and wrapped the 25 inline-SVG icon echoes with `wp_kses_post()` via a new `routew_agent_icon_e()` helper so Plugin Check's escaping audit passes.
 
@@ -188,6 +192,9 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 Earlier releases: see CHANGELOG.md in the repository.
 
 == Upgrade Notice ==
+
+= 1.6.3 =
+Plugin Directory review fix: two remaining template outputs now pass through `wp_kses_post()`. No functional changes from 1.6.2.
 
 = 1.6.2 =
 Plugin Directory review fixes only. No functional changes from 1.6.1.

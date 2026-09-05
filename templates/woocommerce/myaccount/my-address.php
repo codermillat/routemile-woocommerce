@@ -56,7 +56,7 @@ if ( ! wc_ship_to_billing_address_only() && wc_shipping_enabled() ) {
 ?>
 
 <p class="routew-lead">
-	<?php echo apply_filters( 'woocommerce_my_account_my_address_description', esc_html__( 'The following addresses will be used on the checkout page by default.', 'woocommerce' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch -- filtered value may contain HTML; WC core string keeps the WC domain for its language packs. ?>
+	<?php echo wp_kses_post( apply_filters( 'woocommerce_my_account_my_address_description', esc_html__( 'The following addresses will be used on the checkout page by default.', 'woocommerce' ) ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch -- WC core string keeps the WC domain for its language packs; filter output is allow-listed via wp_kses_post. ?>
 </p>
 
 <div class="routew-address-grid">

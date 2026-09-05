@@ -46,15 +46,17 @@ do_action('woocommerce_email_header', $email_heading, $email);
         </thead>
         <tbody>
             <?php
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce's own builder, returns order rows markup
-            echo wc_get_email_order_items(
-                $order,
-                array(
-                    'show_sku' => false,
-                    'show_image' => false,
-                    'image_size' => array(32, 32),
-                    'plain_text' => $plain_text,
-                    'sent_to_admin' => $sent_to_admin,
+            // WooCommerce's own order-rows builder — filtered HTML is allow-listed on output.
+            echo wp_kses_post(
+                wc_get_email_order_items(
+                    $order,
+                    array(
+                        'show_sku' => false,
+                        'show_image' => false,
+                        'image_size' => array(32, 32),
+                        'plain_text' => $plain_text,
+                        'sent_to_admin' => $sent_to_admin,
+                    )
                 )
             );
             ?>
@@ -69,9 +71,9 @@ do_action('woocommerce_email_header', $email_heading, $email);
                     ?>
                     <tr>
                         <th class="td" scope="row" colspan="2"
-                            style="text-align:left; <?php echo (1 === $i) ? 'border-top-width: 4px;' : ''; ?>">
+                            style="text-align:left; <?php echo (1 === $key) ? esc_attr('border-top-width: 4px;') : ''; ?>">
                             <?php echo wp_kses_post($total['label']); ?></th>
-                        <td class="td" style="text-align:left; <?php echo (1 === $i) ? 'border-top-width: 4px;' : ''; ?>">
+                        <td class="td" style="text-align:left; <?php echo (1 === $key) ? esc_attr('border-top-width: 4px;') : ''; ?>">
                             <?php echo wp_kses_post($total['value']); ?></td>
                     </tr>
                     <?php
