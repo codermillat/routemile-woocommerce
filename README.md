@@ -2,14 +2,17 @@
 
 A complete delivery management system for single-restaurant WooCommerce stores.
 
-![Version](https://img.shields.io/badge/Version-1.4.0-blue)
+**[Install from WordPress.org](https://wordpress.org/plugins/routemile-for-woocommerce/)** — the plugin is now in the official [WordPress Plugin Directory](https://wordpress.org/plugins/routemile-for-woocommerce/), so you can install it directly from **Plugins → Add New** in your admin.
+
+![Version](https://img.shields.io/badge/Version-1.6.3-blue)
 ![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue)
 ![WooCommerce](https://img.shields.io/badge/WooCommerce-7.0%2B-purple)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-blue)
 ![HPOS](https://img.shields.io/badge/HPOS-Compatible-green)
 ![License](https://img.shields.io/badge/License-GPL--3.0--or--later-green)
+[![WordPress.org](https://img.shields.io/badge/WordPress.org-Plugin%20Directory-21759b?logo=wordpress)](https://wordpress.org/plugins/routemile-for-woocommerce/)
 
-> **Latest release:** v1.4.0 — customer My Account overhaul, delivery-rider PWA (installable app, live order list, COD collection + settlement workflow), settings redesigned for non-technical admins, kitchen-note privacy. See [`CHANGELOG.md`](./CHANGELOG.md) for full details.
+> **Latest release:** v1.6.3 — Mile Zero design system across every customer and rider surface, admin-renameable order stages, one-click brand colour, cash settlement workflow, and WordPress.org Plugin Directory compliance. See [`CHANGELOG.md`](./CHANGELOG.md) for full details.
 
 ## Features
 
@@ -66,7 +69,7 @@ The plugin is self-contained except for the map provider you choose:
 Run the built-in test suite:
 
 ```bash
-php tests/FXWTestRunner.php
+php tests/RouteWTestRunner.php
 ```
 
 The runner validates PHP syntax, security patterns (ABSPATH checks, nonce verification), file structure, plugin headers, HPOS declaration, bundled-vendor integrity (SHA-256), and custom order statuses.
@@ -77,7 +80,7 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Run `php tests/FXWTestRunner.php` before opening a pull request.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Run `php tests/RouteWTestRunner.php` before opening a pull request.
 
 ## License
 
@@ -99,8 +102,12 @@ GitHub: [@codermillat](https://github.com/codermillat)
 
 ## Installation
 
+**From WordPress.org (recommended):** search "RouteMile" under **Plugins → Add New**, or get it directly at [wordpress.org/plugins/routemile-for-woocommerce](https://wordpress.org/plugins/routemile-for-woocommerce/).
+
+**Manual upload:**
+
 1. Install and activate WooCommerce first.
-2. Upload the plugin ZIP via **Plugins → Add New → Upload Plugin**, or install through the WordPress plugins screen.
+2. Upload the plugin ZIP via **Plugins → Add New → Upload Plugin**.
 3. Go to **WooCommerce → Settings → RouteMile**, pick a map provider, and set your restaurant location, delivery radius, and delivery fees.
 4. Enable the RouteMile Delivery method in your shipping zone(s), or let the plugin add it automatically.
 5. Create users with the "Delivery Boy" role — their app lives at their Delivery Dashboard page.
@@ -152,5 +159,3 @@ The plugin handles real orders and real money (including COD). Beyond the code:
 - **Role hygiene** — managers/admins need `edit_shop_orders` or `manage_woocommerce`; riders only get the "Delivery Boy" role and see only their own assigned orders.
 - **Cash settlement is trust-based by design** — the plugin records exactly who collected, handed over, and approved what and when, but physical cash still needs human reconciliation.
 - **Back up regularly** — all RouteMile data lives in WordPress/WooCommerce's own tables, so standard backups cover it.
-
-## Privacy & external services
