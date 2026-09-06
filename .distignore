@@ -70,6 +70,11 @@ build/
 ._*
 Thumbs.db
 
+# Design source files (originals for the wp.org banner/icon/screenshots).
+# The processed, shipped versions live in .wordpress-org/ — these never
+# belong in the production zip.
+design-assets/
+
 # QA / debug screenshot artifacts committed for local review but never
 # shipped to end users (per repo's own .gitignore).
 audit-*.png

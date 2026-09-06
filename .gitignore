@@ -1,6 +1,5 @@
 # =====================================================================
-# FoodXpress for WooCommerce — .gitignore
-# Last updated: 1.2.1
+# RouteMile for WooCommerce — .gitignore
 # =====================================================================
 
 # Release archives (built locally; wp.org carries the shipped zip)
@@ -127,3 +126,4 @@ config-local.php
 .mimosa/
 # ZCode agent session artifacts
 .zcode/
+
