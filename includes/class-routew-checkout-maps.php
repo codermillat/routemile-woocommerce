@@ -226,13 +226,46 @@ class ROUTEW_Checkout_Maps
         $restaurant_center = (new ROUTEW_Mapping_Service())->get_restaurant_location($options);
         $restaurant_center = is_wp_error($restaurant_center) ? null : $restaurant_center;
 
+        // Honest coverage circle: the zone rule compares ROAD distance
+        // against the radius, but a map circle can only show crow-flies
+        // distance — and road routes (rivers, dead-ends) run longer. So the
+        // circle is drawn at radius ÷ road-factor: for estimate providers
+        // (no routing capability) that boundary is EXACT (computed distance
+        // IS straight × factor); for true-road providers it is a
+        // conservative guide and the toast/server message carries the real
+        // by-road figure. Drawing the full radius overstated coverage and
+        // produced "inside the circle but rejected" reports (2026-09-10).
+        $radius = isset($options['routew_delivery_zone_radius']) ? (float) $options['routew_delivery_zone_radius'] : (float) ROUTEW_Config::DEFAULT_DELIVERY_RADIUS;
+        $factor = 1.0;
+        if (class_exists('ROUTEW_Map_Providers')) {
+            $factor = (float) ROUTEW_Map_Providers::road_factor($options);
+        }
+        if ($factor < 1.0) {
+            $factor = 1.0;
+        }
+        $has_routing = class_exists('ROUTEW_Map_Providers') && ROUTEW_Map_Providers::supports('routing', $options);
+
+        // Store name for the fixed restaurant marker tooltip: the receipt
+        // name when set, else the site title. Stripped of tags — Leaflet
+        // renders tooltip strings as HTML.
+        $restaurant_name = isset($options['routew_receipt_restaurant_name']) ? wp_strip_all_tags((string) $options['routew_receipt_restaurant_name']) : '';
+        if ('' === $restaurant_name) {
+            $restaurant_name = wp_strip_all_tags((string) get_bloginfo('name'));
+        }
+
         return array(
             'rest_url' => esc_url_raw(rest_url('routemile/v1/checkout')),
             'rest_nonce' => wp_create_nonce('wp_rest'),
             'currency_symbol' => function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '',
             'saved_address' => $saved_address,
             'restaurant_center' => $restaurant_center,
-            'radius_km' => isset($options['routew_delivery_zone_radius']) ? (float) $options['routew_delivery_zone_radius'] : (float) ROUTEW_Config::DEFAULT_DELIVERY_RADIUS,
+            'radius_km' => $radius,
+            'circle_km' => round($radius / $factor, 2),
+            // True when the circle boundary is mathematically exact
+            // (estimate provider); false means "approximate — road
+            // distance decides", and the pickers style it accordingly.
+            'circle_exact' => !$has_routing,
+            'restaurant_name' => $restaurant_name,
             'translations' => array(
                 'calculating' => __('Calculating delivery fee...', 'routemile-for-woocommerce'),
                 // Success-toast labels (1.2.15): previously the toast reused

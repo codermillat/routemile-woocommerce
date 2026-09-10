@@ -259,7 +259,7 @@ class ROUTEW_Checkout
                     <span class="routew-checkout-step__num" aria-hidden="true">1</span>
                     <div class="routew-checkout-step__text">
                         <h3 class="routew-checkout-step__title"><?php esc_html_e('Where should we deliver?', 'routemile-for-woocommerce'); ?></h3>
-                        <p class="routew-checkout-step__sub"><?php esc_html_e('Search your area, use your location, or drag the pin to set the exact drop point.', 'routemile-for-woocommerce'); ?></p>
+                        <p class="routew-checkout-step__sub"><?php esc_html_e('Search your area, use your location, or drag the delivery pin to set the exact drop point. The store marker never moves.', 'routemile-for-woocommerce'); ?></p>
                     </div>
                 </div>
 

@@ -3,7 +3,7 @@
 # =====================================================================
 
 # Release archives (built locally; wp.org carries the shipped zip)
-routemile-woocommerce.*.zip
+routemile-*.zip
 
 # OS
 .DS_Store
@@ -46,7 +46,10 @@ CLAUDE.md
 .github/copilot-instructions.md
 
 # PHP / Composer / WordPress plugin dev
-vendor/
+# NOTE: anchored to repo root — the bundled Leaflet in
+# assets/vendor/leaflet/ ships with the plugin and MUST stay tracked.
+/vendor/
+!assets/vendor/
 composer.lock
 .phpunit.result.cache
 .phpunit-watcher.yml

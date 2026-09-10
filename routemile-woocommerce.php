@@ -3,7 +3,7 @@
  * Plugin Name:       RouteMile for WooCommerce
  * Plugin URI:        https://github.com/codermillat/routemile-woocommerce
  * Description:       Map-based delivery management for single-restaurant WooCommerce stores.
- * Version:           1.6.3
+ * Version:           1.6.4
  * Author:            MD MILLAT HOSEN
  * Author URI:        https://millat.is-a.dev/
  * License:           GPL-3.0-or-later
@@ -14,7 +14,7 @@
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
  * WC requires at least: 7.0
- * WC tested up to:   11.0
+ * WC tested up to:   11.1
  */
 
 // If this file is called directly, abort.
@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('ROUTEW_VERSION')) {
-    define('ROUTEW_VERSION', '1.6.3');
+    define('ROUTEW_VERSION', '1.6.4');
 }
 if (!defined('ROUTEW_PLUGIN_DIR')) {
     define('ROUTEW_PLUGIN_DIR', plugin_dir_path(__FILE__));

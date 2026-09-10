@@ -18,6 +18,9 @@ tests/
 playwright.config.js
 playwright-report/
 test-results/
+# Browser-session evidence dumps (never ship in the repo or the zip).
+audit-e2e/
+e2e-audit/
 
 # Local-only session / AI artifact folders — Claude, Codex, Mimosa,
 # ZCode, plus any tool that drops config into a dotfile folder.

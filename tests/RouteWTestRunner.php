@@ -656,14 +656,16 @@ class ROUTEWTestRunner
         }
 
         // R2 (SW) — the rider PWA service worker hardcodes the plugin folder
-        // path. It must match the slug WP exposes (lowercased). Catching
-        // drift here means a future rename of the slug surfaces in the
-        // test runner, not as "PWA icons 404" in the rider dashboard.
+        // path. Since v4 it is composed as BASE_PATH + 'wp-content/...' so
+        // subdirectory installs work; the slug fragment is still asserted.
+        // Catching drift here means a future rename of the slug surfaces in
+        // the test runner, not as "PWA icons 404" in the rider dashboard.
         $sw_path = $this->plugin_dir . '/assets/js/routew-agent-sw.js';
         if (file_exists($sw_path)) {
             $sw_body = file_get_contents($sw_path);
             $expected_sw_path = '/wp-content/plugins/' . $php_ns . '/assets/';
-            if (false !== strpos($sw_body, $expected_sw_path)) {
+            $sw_suffix = 'wp-content/plugins/' . $php_ns . '/assets/';
+            if (false !== strpos($sw_body, $expected_sw_path) || (false !== strpos($sw_body, 'BASE_PATH') && false !== strpos($sw_body, $sw_suffix))) {
                 $this->pass('R2 SW PLUGIN_ASSETS path matches PHP namespace (' . $expected_sw_path . ')');
             } else {
                 // Surface the actual value for debugging.
@@ -968,12 +970,13 @@ class ROUTEWTestRunner
             $this->fail('DS5 PWA manifest/SW endpoints missing from class-routew-delivery-boy-view.php');
         }
 
-        // SW cache bumped for the design-system CSS swap.
+        // SW cache bumped with each worker-strategy change (v4: dashboard-only
+        // scope + design-system CSS set).
         $sw_js = file_get_contents($this->plugin_dir . '/assets/js/routew-agent-sw.js');
-        if (preg_match("/CACHE_VERSION\s*=\s*['\"]routew-agent-v(\\d+)['\"]/", $sw_js, $swm) && (int) $swm[1] >= 3) {
+        if (preg_match("/CACHE_VERSION\s*=\s*['\"]routew-agent-v(\\d+)['\"]/", $sw_js, $swm) && (int) $swm[1] >= 4) {
             $this->pass('DS5 SW cache version bumped to v' . $swm[1] . ' (CSS filename set changed)');
         } else {
-            $this->fail('DS5 SW CACHE_VERSION not bumped to v3 — installed PWAs will serve stale CSS');
+            $this->fail('DS5 SW CACHE_VERSION not bumped (expected >= v4) — installed PWAs will serve stale CSS/scope');
         }
 
         // DS6 — My-account dashboard markup: greeting hero, quick actions,
@@ -2025,6 +2028,140 @@ class ROUTEWTestRunner
             $this->pass("PG1 future-proof scan: all {$gated_pg1} completed-capable transition functions call the gate");
         } else {
             $this->fail('PG1 UNGATED completed-capable transition function(s): ' . implode(', ', $ungated_pg1));
+        }
+
+        // =====================================================================
+        // CB1 — Block-checkout hardening (2026-09-10 live session).
+        // Four defects found while reproducing "No shipping options are
+        // available for this address" on a local WC 11.1 + Astra store:
+        // a fresh-distance refactor that dropped the km assignment, WC 11
+        // doing_it_wrong notices on field registration, and a silent
+        // fire-and-forget extension update.
+        $blocks_cb1 = file_get_contents($this->plugin_dir . '/includes/class-routew-blocks-checkout.php');
+
+        // 1. Fields must register on woocommerce_init, not
+        // woocommerce_blocks_loaded (WC 11 fires blocks_loaded before
+        // after_setup_theme, tripping the "register on woocommerce_init or
+        // later" + early-translation notices; the wrapper's own deferral
+        // keeps this exactly-once on every WC version).
+        if (false !== strpos($blocks_cb1, "add_action('woocommerce_init', array(\$this, 'register_fields'))")
+            && false === strpos($blocks_cb1, "add_action('woocommerce_blocks_loaded', array(\$this, 'register_fields'))")) {
+            $this->pass('CB1 additional fields register on woocommerce_init (WC 11 timing)');
+        } else {
+            $this->fail('CB1 field registration still on woocommerce_blocks_loaded — WC 11 logs doing_it_wrong');
+        }
+
+        // 2. No placeholder in additional-field attributes (WC 8.6+
+        // allowlist drops it with a notice; the text never rendered).
+        if (false === strpos($blocks_cb1, "'placeholder'")) {
+            $this->pass('CB1 additional fields carry no disallowed placeholder attribute');
+        } else {
+            $this->fail('CB1 placeholder attribute present — WC strips it and logs doing_it_wrong');
+        }
+
+        // 3. Fresh-distance path must assign km (regression tripwire: the
+        // quote refactor dropped the assignment, silently skipping the
+        // radius check and misquoting the fee whenever the pin moved).
+        $ship_cb1 = file_get_contents($this->plugin_dir . '/includes/class-routew-shipping-method.php');
+        if (false !== strpos($ship_cb1, "\$distance_in_km = round( \$distance_data['distance']->value / 1000, 2 );")) {
+            $this->pass('CB1 shipping method assigns distance km on the fresh-quote path');
+        } else {
+            $this->fail('CB1 UNASSIGNED distance km on fresh path — radius check bypassed, fee misquoted');
+        }
+
+        // 4. Both pickers must handle an extensionCartUpdate rejection
+        // (fire-and-forget left the totals panel stale with no error and
+        // no retry on transient failures).
+        $retry_cb1 = 0;
+        foreach (array('checkout.js', 'checkout-leaflet.js') as $js_cb1) {
+            $src_cb1 = @file_get_contents($this->plugin_dir . '/assets/js/' . $js_cb1);
+            if (false !== $src_cb1 && false !== strpos($src_cb1, 'extensionCartUpdate retry failed')) {
+                $retry_cb1++;
+            }
+        }
+        if (2 === $retry_cb1) {
+            $this->pass('CB1 both pickers retry a rejected extensionCartUpdate once');
+        } else {
+            $this->fail('CB1 extensionCartUpdate rejection unhandled — stale totals on transient failure');
+        }
+
+        // 5. Classic thank-you carries the .routew-ui scope (without it
+        // no scoped CSS applies: tracking icons render hundreds of px
+        // tall, overview/table/addresses fall back to theme markup).
+        $scope_cb1 = file_get_contents($this->plugin_dir . '/includes/class-routew-shortcodes.php');
+        if (false !== strpos($scope_cb1, "add_action('woocommerce_before_thankyou', array(\$this, 'open_thankyou_ui_scope'), 1)")
+            && false !== strpos($scope_cb1, "add_action('woocommerce_thankyou', array(\$this, 'close_thankyou_ui_scope'), 9999)")
+            && false !== strpos($scope_cb1, 'routew-ui routew-account routew-account--thankyou')) {
+            $this->pass('CB1 classic thank-you opens/closes the design-system scope wrapper');
+        } else {
+            $this->fail('CB1 classic thank-you scope wrapper missing — unstyled page, giant stepper icons');
+        }
+
+        // 6. The classic wrapper stays off the blockified template (the
+        // thank-you hooks fire inside sibling order-confirmation blocks
+        // there — an unconditional wrapper would split across blocks).
+        if (false !== strpos($scope_cb1, 'function is_blockified_checkout')
+            && false !== strpos($scope_cb1, "has_block('woocommerce/checkout'")) {
+            $this->pass('CB1 thank-you wrapper gated off the blockified checkout template');
+        } else {
+            $this->fail('CB1 blockified gate missing — wrapper would split across order-confirmation blocks');
+        }
+
+        // 7. The pin rides on the shipping package so WooCommerce's
+        // package-hash rate cache busts on every pin move. Without it a
+        // pre-pin recalc caches EMPTY rates and classic checkout sits on
+        // "No shipping options" forever (toast quoted, totals empty).
+        $handler_cb1 = file_get_contents($this->plugin_dir . '/includes/class-routew-checkout-handler.php');
+        if (false !== strpos($handler_cb1, "add_filter('woocommerce_cart_shipping_packages', array(\$this, 'stamp_pin_on_packages'))")
+            && false !== strpos($handler_cb1, "['routew_pin']")) {
+            $this->pass('CB1 pin stamped on shipping packages (cache busts on pin move)');
+        } else {
+            $this->fail('CB1 pin missing from packages — stale empty rates stick on classic checkout');
+        }
+
+        // 8. Two pins on the map: the fixed restaurant marker exists in
+        // both pickers (non-draggable, distinct from the customer pin).
+        $pins_cb1 = 0;
+        foreach (array('checkout.js', 'checkout-leaflet.js') as $js_cb1b) {
+            $src_cb1b = @file_get_contents($this->plugin_dir . '/assets/js/' . $js_cb1b);
+            if (false !== $src_cb1b && false !== strpos($src_cb1b, 'restaurantMarker') && false !== strpos($src_cb1b, 'draggable: false')) {
+                $pins_cb1++;
+            }
+        }
+        if (2 === $pins_cb1) {
+            $this->pass('CB1 fixed non-draggable restaurant marker in both pickers');
+        } else {
+            $this->fail('CB1 restaurant marker missing — customer cannot tell store from drop point');
+        }
+
+        // 9. Honest coverage: the circle uses radius ÷ road-factor (not
+        // the raw radius, which overstated road coverage) and the
+        // rejection names the by-road distance.
+        $maps_cb1 = file_get_contents($this->plugin_dir . '/includes/class-routew-checkout-maps.php');
+        if (false !== strpos($maps_cb1, "'circle_km'") && false !== strpos($maps_cb1, "'restaurant_name'")) {
+            $this->pass('CB1 picker params carry honest circle_km + restaurant name');
+        } else {
+            $this->fail('CB1 circle_km/restaurant_name params missing — circle overstates, marker unnamed');
+        }
+        if (false !== strpos($handler_cb1, 'function out_of_zone_message')
+            && false !== strpos($handler_cb1, 'km by road')) {
+            $this->pass('CB1 out-of-zone message names the by-road distance + range');
+        } else {
+            $this->fail('CB1 zone message still bare — inside-circle rejections read as contradictions');
+        }
+
+        // 10. Block checkout under a CLASSIC theme (Astra, Storefront):
+        // no core/post-content wrapper exists there, so the map picker
+        // needs the the_content fallback — with an exactly-once flag
+        // shared with the block-theme filter so block themes never render
+        // the picker twice.
+        $blocks_cb1b = file_get_contents($this->plugin_dir . '/includes/class-routew-blocks-checkout.php');
+        if (false !== strpos($blocks_cb1b, "add_filter('the_content', array(\$this, 'prepend_map_to_content_fallback'), 8)")
+            && false !== strpos($blocks_cb1b, 'function prepend_map_to_content_fallback')
+            && false !== strpos($blocks_cb1b, 'map_prepended')) {
+            $this->pass('CB1 classic-theme block checkout gets the map via the_content fallback (exactly-once)');
+        } else {
+            $this->fail('CB1 no classic-theme fallback — block checkout under Astra has no map picker');
         }
 
         echo "\n";

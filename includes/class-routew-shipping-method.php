@@ -146,10 +146,31 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 				return;
 			}
 
-			$distance_data = $mapping_service->get_distance(
-				$restaurant,
-				array( 'lat' => $customer_lat, 'lng' => $customer_lng )
-			);
+			// Prefer the toast's quoted fee when it covers THESE exact coords:
+			// validate_location() stored distance_km + cost for the pin the
+			// customer just dropped. Reusing the quote (instead of recomputing
+			// a possibly different distance) keeps the order summary identical
+			// to the toast (2026-09-10: toast said $17.65, totals charged
+			// $15.73 for the same pin). Falls through to a fresh quote when
+			// the pin moved or no quote exists.
+			$distance_in_km = null;
+			$quoted_cost = null;
+			$quoted_is_free = false;
+			$last_quote = WC()->session->get( 'routew_last_quote' );
+			if ( is_array( $last_quote )
+				&& isset( $last_quote['lat'], $last_quote['lng'], $last_quote['distance_km'], $last_quote['cost'] )
+				&& abs( (float) $last_quote['lat'] - (float) $customer_lat ) < 0.00005
+				&& abs( (float) $last_quote['lng'] - (float) $customer_lng ) < 0.00005 ) {
+				$distance_in_km = (float) $last_quote['distance_km'];
+				$quoted_cost = (float) $last_quote['cost'];
+				$quoted_is_free = ! empty( $last_quote['is_free'] );
+			}
+
+			if ( null === $distance_in_km ) {
+				$distance_data = $mapping_service->get_distance(
+					$restaurant,
+					array( 'lat' => $customer_lat, 'lng' => $customer_lng )
+				);
 
 			if ( is_wp_error( $distance_data ) ) {
 				// Log and surface a user-friendly error at checkout
@@ -162,12 +183,14 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 				return;
 			}
 
-			if ( ! isset( $distance_data['distance'] ) || ! is_object( $distance_data['distance'] ) || ! isset( $distance_data['distance']->value ) ) {
-				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->error( 'calculate_shipping: distance response missing distance value', array( 'source' => 'routemile-for-woocommerce' ) );
-				}
-				return;
+		if ( ! isset( $distance_data['distance'] ) || ! is_object( $distance_data['distance'] ) || ! isset( $distance_data['distance']->value ) ) {
+			if ( function_exists( 'wc_get_logger' ) ) {
+				wc_get_logger()->error( 'calculate_shipping: distance response missing distance value', array( 'source' => 'routemile-for-woocommerce' ) );
 			}
+			return;
+		}
+
+		$distance_in_km = round( $distance_data['distance']->value / 1000, 2 );
 
 			// Store distance data in session for UI/ETA reuse
 			if ( WC()->session ) {
@@ -179,75 +202,90 @@ if ( ! class_exists( 'ROUTEW_Shipping_Method' ) ) {
 					'estimated' => ! empty( $distance_data['estimated'] ),
 				) );
 			}
+		} // end fresh-distance fetch (quoted path skips the API call)
 
-			$radius = isset( $options['routew_delivery_zone_radius'] ) ? (float) $options['routew_delivery_zone_radius'] : 10;
-			$distance_in_km = $distance_data['distance']->value / 1000;
+		$radius = isset( $options['routew_delivery_zone_radius'] ) ? (float) $options['routew_delivery_zone_radius'] : 10;
 
-			if ( $distance_in_km > $radius ) {
+		if ( $distance_in_km > $radius ) {
+			if ( function_exists( 'wc_get_logger' ) ) {
+				wc_get_logger()->info( sprintf( 'calculate_shipping: out of zone (distance=%.3f km, radius=%.3f)', $distance_in_km, $radius ), array( 'source' => 'routemile-for-woocommerce' ) );
+			}
+			return; // Outside delivery zone
+		}
+
+		// Admin-configurable pricing rules (ROUTEW_Pricing): minimum order,
+		// distance tiers, free-delivery threshold.
+		if ( class_exists( 'ROUTEW_Pricing' ) ) {
+			$min_error = ROUTEW_Pricing::minimum_order_error();
+			if ( null !== $min_error ) {
 				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->info( sprintf( 'calculate_shipping: out of zone (distance=%.3f km, radius=%.3f)', $distance_in_km, $radius ), array( 'source' => 'routemile-for-woocommerce' ) );
+					wc_get_logger()->info( 'calculate_shipping: below minimum order — no rate', array( 'source' => 'routemile-for-woocommerce' ) );
 				}
-				return; // Outside delivery zone
+				return;
 			}
+		}
 
-			// Admin-configurable pricing rules (ROUTEW_Pricing): minimum order,
-			// distance tiers, free-delivery threshold.
+		// Fee via the shared quote helper (same function the REST toast
+		// calls) so the rate matches the toast exactly. When the toast
+		// quoted these exact coords, reuse its cost; otherwise quote fresh.
+		if ( null !== $quoted_cost ) {
+			$cost = $quoted_cost;
+			$is_free = $quoted_is_free;
 			if ( class_exists( 'ROUTEW_Pricing' ) ) {
-				$min_error = ROUTEW_Pricing::minimum_order_error();
-				if ( null !== $min_error ) {
-					if ( function_exists( 'wc_get_logger' ) ) {
-						wc_get_logger()->info( 'calculate_shipping: below minimum order — no rate', array( 'source' => 'routemile-for-woocommerce' ) );
-					}
-					return;
-				}
-			}
-
-			$base_fee = isset( $options['routew_delivery_fee_base'] ) ? (float) $options['routew_delivery_fee_base'] : 5;
-			$fee_per_km = isset( $options['routew_delivery_fee_per_km'] ) ? (float) $options['routew_delivery_fee_per_km'] : 1.5;
-			$cost = $base_fee + ( $distance_in_km * $fee_per_km );
-			$is_free = false;
-
-			if ( class_exists( 'ROUTEW_Pricing' ) ) {
-				$tier_fee = ROUTEW_Pricing::fee_for_distance( $distance_in_km, $options );
-				if ( false === $tier_fee ) {
+				$live_quote = ROUTEW_Pricing::quote_for_distance( $distance_in_km, $options );
+				if ( ! empty( $live_quote['beyond_tiers'] ) ) {
 					if ( function_exists( 'wc_get_logger' ) ) {
 						wc_get_logger()->info( sprintf( 'calculate_shipping: distance %.2f km beyond all tiers — no rate', $distance_in_km ), array( 'source' => 'routemile-for-woocommerce' ) );
 					}
 					return;
 				}
-				if ( null !== $tier_fee ) {
-					$cost = $tier_fee;
+				if ( $live_quote['is_free'] !== $is_free ) {
+					$cost = (float) $live_quote['cost'];
+					$is_free = (bool) $live_quote['is_free'];
 				}
-				if ( ROUTEW_Pricing::is_free_delivery() ) {
-					$cost = 0;
-					$is_free = true;
+				$base_fee = isset( $options['routew_delivery_fee_base'] ) ? (float) $options['routew_delivery_fee_base'] : 5;
+				$fee_per_km = isset( $options['routew_delivery_fee_per_km'] ) ? (float) $options['routew_delivery_fee_per_km'] : 1.5;
+			}
+		} else {
+			$quote = class_exists( 'ROUTEW_Pricing' )
+				? ROUTEW_Pricing::quote_for_distance( $distance_in_km, $options )
+				: array( 'cost' => 0, 'is_free' => false, 'beyond_tiers' => false );
+			if ( ! empty( $quote['beyond_tiers'] ) ) {
+				if ( function_exists( 'wc_get_logger' ) ) {
+					wc_get_logger()->info( sprintf( 'calculate_shipping: distance %.2f km beyond all tiers — no rate', $distance_in_km ), array( 'source' => 'routemile-for-woocommerce' ) );
 				}
+				return;
 			}
+			$cost = (float) $quote['cost'];
+			$is_free = ! empty( $quote['is_free'] );
+			$base_fee = isset( $options['routew_delivery_fee_base'] ) ? (float) $options['routew_delivery_fee_base'] : 5;
+			$fee_per_km = isset( $options['routew_delivery_fee_per_km'] ) ? (float) $options['routew_delivery_fee_per_km'] : 1.5;
+		}
 
-			if ( function_exists( 'wc_get_logger' ) ) {
-				wc_get_logger()->debug( sprintf( 'calculate_shipping: adding rate cost=%.2f (distance=%.3f km, base=%.2f, per_km=%.2f)', $cost, $distance_in_km, $base_fee, $fee_per_km ), array( 'source' => 'routemile-for-woocommerce' ) );
-			}
+		if ( function_exists( 'wc_get_logger' ) ) {
+			wc_get_logger()->debug( sprintf( 'calculate_shipping: adding rate cost=%.2f (distance=%.3f km, base=%.2f, per_km=%.2f)', $cost, $distance_in_km, $base_fee, $fee_per_km ), array( 'source' => 'routemile-for-woocommerce' ) );
+		}
 
-			$rate_id = $this->id . ( $this->instance_id ? ':' . $this->instance_id : '' );
+		$rate_id = $this->id . ( $this->instance_id ? ':' . $this->instance_id : '' );
 
-			// When the free-delivery threshold zeroed the cost, say so in the
-			// label itself — the confirmation screen otherwise renders the
-			// shipping row with a blank/zero amount and customers read that
-			// as a broken order rather than a discount (1.3.9).
-			$label = $is_free
-				? sprintf(
-					/* translators: %s: shipping method title shown to the customer. */
-					__( '%s (Free delivery)', 'routemile-for-woocommerce' ),
-					$this->title
-				)
-				: $this->title;
+		// When the free-delivery threshold zeroed the cost, say so in the
+		// label itself — the confirmation screen otherwise renders the
+		// shipping row with a blank/zero amount and customers read that
+		// as a broken order rather than a discount (1.3.9).
+		$label = $is_free
+			? sprintf(
+				/* translators: %s: shipping method title shown to the customer. */
+				__( '%s (Free delivery)', 'routemile-for-woocommerce' ),
+				$this->title
+			)
+			: $this->title;
 
-			$this->add_rate( array(
-				'id'      => $rate_id,
-				'label'   => $label,
-				'cost'    => $cost,
-				'package' => $package,
-			) );
+		$this->add_rate( array(
+			'id'      => $rate_id,
+			'label'   => $label,
+			'cost'    => $cost,
+			'package' => $package,
+		) );
 		}
 	}
 }

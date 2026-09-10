@@ -4,7 +4,7 @@ Tags: woocommerce, delivery, food delivery, restaurant, local delivery
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.6.3
+Stable tag: 1.6.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -55,7 +55,7 @@ This plugin contacts third-party services only when the map provider you choose 
 * **Google Maps** — JavaScript is loaded from `maps.googleapis.com` on the checkout page; geocoding and routing requests are sent server-side to `maps.googleapis.com`. Service: [Google Maps Platform](https://cloud.google.com/maps-platform). Terms: [Google Maps Platform Terms of Service](https://cloud.google.com/maps-platform/terms). Privacy: [Google Privacy Policy](https://policies.google.com/privacy).
 * **OpenStreetMap tiles** — map tiles are loaded from `tile.openstreetmap.org`. Service: [OpenStreetMap](https://www.openstreetmap.org/). Terms / licence: [OpenStreetMap Copyright and License](https://www.openstreetmap.org/copyright). Privacy: [OpenStreetMap Foundation Privacy Policy](https://osmfoundation.org/wiki/Privacy_Policy).
 * **Nominatim geocoding (OpenStreetMap mode only)** — coordinate and address lookups are sent to `nominatim.openstreetmap.org`. Subject to the OpenStreetMap Foundation's [Nominatim Usage Policy](https://operations.osmfoundation.org/policies/nominatim/) (1 request/second application-wide). Privacy: [OSM Foundation Privacy Policy](https://osmfoundation.org/wiki/Privacy_Policy).
-* **Project OSRM routing (OpenStreetMap mode only)** — driving-distance and travel-time queries are sent to `router.project-osrm.org`. Service: [Project OSRM](https://project-osrm.org/). Terms: [Project OSRM Terms of Service](https://project-osrm.org/about/). Privacy: the OSRM public router is operated by the OSRM community on a best-effort basis; please review the operator notice linked on the OSRM project page.
+* **Project OSRM routing (OpenStreetMap mode only)** — driving-distance and travel-time queries are sent to `router.project-osrm.org`. Service: [Project OSRM](https://project-osrm.org/). Terms / project home: [Project OSRM on GitHub](https://github.com/Project-OSRM/osrm-backend). Privacy: the OSRM public router is operated by the OSRM community on a best-effort basis; please review the operator notice linked on the OSRM project page.
 * **MapTiler** — map tiles and geocoding calls go to `api.maptiler.com`. Service: [MapTiler](https://www.maptiler.com/). Terms: [MapTiler Terms of Service](https://www.maptiler.com/terms/). Privacy: [MapTiler Privacy Policy](https://www.maptiler.com/privacy-policy/).
 * **Geoapify** — tiles, geocoding and routing calls go to `api.geoapify.com` and `maps.geoapify.com`. Service: [Geoapify](https://www.geoapify.com/). Terms: [Geoapify Terms and Conditions](https://www.geoapify.com/terms-and-conditions/). Privacy: [Geoapify Privacy Policy](https://www.geoapify.com/privacy-policy/).
 
@@ -155,6 +155,13 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 4. RouteMile settings inside WooCommerce.
 
 == Changelog ==
+
+= 1.6.4 =
+* Fixed classic checkout stuck on "No shipping options available" after the pin: the pin is now stamped onto the shipping package so WooCommerce's package-hash rate cache busts on every pin move (toast and totals always agree).
+* Map honesty: fixed non-draggable restaurant marker on both pickers; coverage circle drawn at radius ÷ road-factor (exact for estimate providers, conservative guide for true-road ones); out-of-zone rejections name the by-road distance and range.
+* Classic thank-you page restyled (was unstyled with giant tracking icons); block checkout works under classic themes (Astra, Storefront) via a the_content fallback.
+* Checkout field registration moved to woocommerce_init (WC 11 timing), disallowed placeholder attributes removed; extension totals refresh retries once on transient failure.
+* Docs: fixed dead Project OSRM Terms URL; WC tested up to 11.1.
 
 = 1.6.3 =
 * Plugin Directory review fix (round 3): the two remaining "escape late" outputs are now wrapped in `wp_kses_post()` — the `woocommerce_my_account_my_address_description` filter result in the My Account address template and the `wc_get_email_order_items()` result in the order-status email. Both keep their WooCommerce semantics (legitimate filtered HTML passes, dangerous markup is stripped).

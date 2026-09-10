@@ -433,16 +433,22 @@ jQuery(function ($) {
     });
 
     // --- Service worker (offline shell + static asset cache) ---------------
+    // Narrow scope: the worker controls ONLY the dashboard path so it can
+    // never intercept checkout/cart/account traffic (Chrome's "Event
+    // handler ... must be added on the initial evaluation" flood on the
+    // checkout page came from the old '/' scope registration). The scope
+    // path is localized (subdirectory-safe) — see `scopePath` below.
     (function registerServiceWorker() {
         var config = agentConfig();
         if (!config || !config.swUrl || !('serviceWorker' in navigator)) {
             return;
         }
-        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-            return; // SW requires a secure context.
+        if (!window.isSecureContext) {
+            return; // SW requires a secure context (https or localhost).
         }
+        var scope = config.scopePath || '/delivery-dashboard/';
         window.addEventListener('load', function () {
-            navigator.serviceWorker.register(config.swUrl, { scope: '/' }).catch(function (error) {
+            navigator.serviceWorker.register(config.swUrl, { scope: scope }).catch(function (error) {
                 console.warn('FXW agent service worker registration failed:', error);
             });
         });

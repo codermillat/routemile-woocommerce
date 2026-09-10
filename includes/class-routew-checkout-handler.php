@@ -62,11 +62,56 @@ class ROUTEW_Checkout_Handler
         add_action('woocommerce_checkout_update_user_meta', array($this, 'save_customer_address'), 10, 2);
         add_action('woocommerce_checkout_create_order', array($this, 'save_delivery_details_to_order'), 10, 2);
 
+        // Stamp the pinned coordinates onto every shipping package so the
+        // pin becomes part of WooCommerce's package-hash rate cache.
+        // Without this, a recalc that ran before the pin existed caches
+        // EMPTY rates under the (cart + address) hash, and every later
+        // recalc keeps serving that stale empty set without ever running
+        // our method again — the classic checkout sits on "No shipping
+        // options available" forever even though the toast quoted a fee
+        // (seen live 2026-09-10). With the pin in the package, moving the
+        // pin changes the hash and forces a fresh calculation on both the
+        // classic (update_checkout) and block (Store API) flows.
+        add_filter('woocommerce_cart_shipping_packages', array($this, 'stamp_pin_on_packages'));
+
         // One-shot data migration (1.3.9): pre-1.3.9 orders duplicated the
         // exact address into shipping address line 2, which the order
         // confirmation, receipt and admin screens rendered twice. Run once
         // on the next admin page load after the upgrade.
         add_action('admin_init', array($this, 'maybe_migrate_duplicated_address_2'), 20);
+    }
+
+    /**
+     * Append the session pin to each shipping package.
+     *
+     * Read-only: the key only feeds `WC_Shipping::get_package_hash()`
+     * (zone matching and every shipping method read their own documented
+     * keys). Empty string when no pin is set, so the pre-pin hash — and
+     * its correctly-empty cached rates — are unchanged.
+     *
+     * @param array[] $packages Shipping packages.
+     * @return array[] Packages with `routew_pin` stamped on each.
+     * @since 1.6.4
+     */
+    public function stamp_pin_on_packages($packages)
+    {
+        if (!is_array($packages)) {
+            return $packages;
+        }
+        $pin = '';
+        if (function_exists('WC') && WC() && WC()->session) {
+            $lat = WC()->session->get('customer_lat');
+            $lng = WC()->session->get('customer_lng');
+            if (is_numeric($lat) && is_numeric($lng)) {
+                $pin = (string) $lat . ',' . (string) $lng;
+            }
+        }
+        foreach ($packages as $i => $package) {
+            if (is_array($package)) {
+                $packages[$i]['routew_pin'] = $pin;
+            }
+        }
+        return $packages;
     }
 
     /**
@@ -336,6 +381,28 @@ class ROUTEW_Checkout_Handler
     }
 
     /**
+     * Single shared "outside the delivery range" message.
+     *
+     * Names the actual by-road distance and the range so a pin that LOOKS
+     * inside the map circle but routes farther by road gets an
+     * explanation instead of a contradiction (2026-09-10).
+     *
+     * @param float $distance_km Road distance in km.
+     * @param float $radius_km   Configured delivery radius in km.
+     * @return string
+     * @since 1.6.4
+     */
+    public static function out_of_zone_message($distance_km, $radius_km)
+    {
+        return sprintf(
+            /* translators: 1: road distance in km, 2: delivery range in km. */
+            __('Sorry, we do not deliver to your location — it is %1$s km by road and we deliver within %2$s km of the restaurant.', 'routemile-for-woocommerce'),
+            number_format_i18n((float) $distance_km, 2),
+            number_format_i18n((float) $radius_km, 2)
+        );
+    }
+
+    /**
      * Compact zone check shared with the blocks-checkout field validation:
      * returns an error message when the store is closed, the pinned
      * coordinates are missing, the service is misconfigured, or the pin
@@ -393,7 +460,7 @@ class ROUTEW_Checkout_Handler
 
         $radius = isset($options['routew_delivery_zone_radius']) ? (float) $options['routew_delivery_zone_radius'] : ROUTEW_Config::DEFAULT_DELIVERY_RADIUS;
         if (($distance_data['distance']->value / 1000) > $radius) {
-            return __('Sorry, we do not deliver to your location.', 'routemile-for-woocommerce');
+            return self::out_of_zone_message($distance_data['distance']->value / 1000, $radius);
         }
 
         return null;
@@ -520,7 +587,7 @@ class ROUTEW_Checkout_Handler
             if (function_exists('wc_get_logger')) {
                 wc_get_logger()->info('validate_delivery_zone: out of zone', array('source' => 'routemile-for-woocommerce'));
             }
-            $errors->add('delivery_zone', __('Sorry, we do not deliver to your location.', 'routemile-for-woocommerce'));
+            $errors->add('delivery_zone', self::out_of_zone_message($distance_in_km, $radius));
             return;
         }
 

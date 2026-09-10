@@ -224,11 +224,17 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
             // a normal business outcome, not a transport or request error —
             // returning 400 made the browser log a red console error for
             // expected behaviour. Malformed requests still 4xx (1.3.0).
+            // The message names the by-road distance: a pin can sit inside
+            // the map circle yet route farther by road (rivers, dead-ends),
+            // and a bare "we do not deliver" reads as a contradiction.
+            $out_of_zone = class_exists('ROUTEW_Checkout_Handler') && method_exists('ROUTEW_Checkout_Handler', 'out_of_zone_message')
+                ? ROUTEW_Checkout_Handler::out_of_zone_message($distance_in_km, $radius)
+                : __('Sorry, we do not deliver to your location.', 'routemile-for-woocommerce');
             return rest_ensure_response(array(
                 'status' => 'error',
                 'in_zone' => false,
                 'code' => 'out_of_zone',
-                'message' => __('Sorry, we do not deliver to your location.', 'routemile-for-woocommerce'),
+                'message' => $out_of_zone,
                 'distance_km' => round($distance_in_km, 2),
             ));
         }
@@ -256,29 +262,45 @@ class ROUTEW_REST_Checkout_Controller extends WP_REST_Controller
             }
         }
 
-        // Calculate Fee (estimate — honors configured tiers + threshold;
-        // with the session/cart loaded, the free-delivery threshold can see
-        // the real cart subtotal)
-        $base_fee = isset($options['routew_delivery_fee_base']) ? (float) $options['routew_delivery_fee_base'] : 5;
-        $fee_per_km = isset($options['routew_delivery_fee_per_km']) ? (float) $options['routew_delivery_fee_per_km'] : 1.5;
-        $cost = $base_fee + ($distance_in_km * $fee_per_km);
-        if (class_exists('ROUTEW_Pricing')) {
-            $tier_fee = ROUTEW_Pricing::fee_for_distance($distance_in_km, $options);
-            if (null !== $tier_fee && false !== $tier_fee) {
-                $cost = $tier_fee;
-            }
-            if (ROUTEW_Pricing::is_free_delivery()) {
-                $cost = 0;
-            }
+        // Calculate Fee via the shared quote helper (same function the
+        // WooCommerce shipping rate calls — toast and totals cannot drift).
+        // With the session/cart loaded, the free-delivery threshold can see
+        // the real cart subtotal.
+        $quote = class_exists('ROUTEW_Pricing')
+            ? ROUTEW_Pricing::quote_for_distance($distance_in_km, $options)
+            : array('cost' => (isset($options['routew_delivery_fee_base']) ? (float) $options['routew_delivery_fee_base'] : 5) + ($distance_in_km * (isset($options['routew_delivery_fee_per_km']) ? (float) $options['routew_delivery_fee_per_km'] : 1.5)), 'is_free' => false, 'beyond_tiers' => false);
+
+        // Tiers configured but no tier covers this pin: same outcome as the
+        // shipping method (no rate) — report out-of-zone with the radius
+        // message instead of quoting a base+per-km fee the totals won't show.
+        if (!empty($quote['beyond_tiers'])) {
+            $radius = isset($options['routew_delivery_zone_radius']) ? (float) $options['routew_delivery_zone_radius'] : 10;
+            return new WP_Error('beyond_tiers', sprintf(
+                /* translators: %s: delivery radius in km. */
+                __('Sorry, we only deliver within %s km of the restaurant.', 'routemile-for-woocommerce'),
+                number_format_i18n($radius, 2)
+            ), array('status' => 200));
         }
+
+        $cost = (float) $quote['cost'];
 
         // Store in session for checkout (critical for order processing):
         // the session is bootstrapped above, so these writes persist to the
         // customer's checkout request via the cookie + shutdown save.
+        // `routew_last_quote` carries the QUOTED km + fee for this exact pin
+        // so calculate_shipping() can reuse them instead of recomputing a
+        // (possibly different) distance — toast and totals stay identical.
         if (WC()->session) {
             WC()->session->set('customer_lat', $lat);
             WC()->session->set('customer_lng', $lng);
             WC()->session->set('routew_distance_data', $distance_data);
+            WC()->session->set('routew_last_quote', array(
+                'lat' => $lat,
+                'lng' => $lng,
+                'distance_km' => $distance_in_km,
+                'cost' => $cost,
+                'is_free' => !empty($quote['is_free']),
+            ));
         }
 
         // Store-formatted fee (auto currency, decimals, symbol position).

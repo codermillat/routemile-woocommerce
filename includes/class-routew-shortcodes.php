@@ -65,6 +65,18 @@ class ROUTEW_Shortcodes
 		// class directly to each block's own wrapper div, which is what
 		// the CSS selectors need.
 		add_filter('render_block', array($this, 'wrap_thankyou_block'), 10, 2);
+
+		// CLASSIC (shortcode) thank-you page: the block filter above never
+		// runs here, so without a scope wrapper NONE of the design-system
+		// CSS applies — the tracking stepper icons render at their raw
+		// intrinsic size (hundreds of px tall) and the overview strip,
+		// details table and address cards fall back to unstyled theme
+		// markup (seen live 2026-09-10). These two hooks span the whole
+		// classic thank-you, but MUST stay off the blockified template
+		// (where they fire inside sibling blocks — see above), hence the
+		// has_block() gate inside each method.
+		add_action('woocommerce_before_thankyou', array($this, 'open_thankyou_ui_scope'), 1);
+		add_action('woocommerce_thankyou', array($this, 'close_thankyou_ui_scope'), 9999);
 	}
 
 	/**
@@ -153,6 +165,66 @@ class ROUTEW_Shortcodes
 		);
 
 		return null === $out ? $block_content : $out;
+	}
+
+	/**
+	 * Open the .routew-ui scope wrapper around the CLASSIC thank-you.
+	 *
+	 * Hooked on `woocommerce_before_thankyou` at priority 1 so the div
+	 * spans the overview strip, details table, customer addresses AND
+	 * our tracking block. Skipped on the blockified template (where the
+	 * same hooks fire inside sibling blocks) and outside the
+	 * order-received context.
+	 *
+	 * @param int $order_id Order ID passed by the hook (unused).
+	 * @since 1.6.4
+	 */
+	public function open_thankyou_ui_scope($order_id = 0)
+	{
+		if (!function_exists('is_order_received_page') || !is_order_received_page()) {
+			return;
+		}
+		if ($this->is_blockified_checkout()) {
+			return;
+		}
+		echo '<div class="routew-ui routew-account routew-account--thankyou">';
+	}
+
+	/**
+	 * Close the .routew-ui scope wrapper around the CLASSIC thank-you.
+	 *
+	 * Hooked on `woocommerce_thankyou` at priority 9999 so it closes
+	 * after every other thank-you callback. Same gates as the opener —
+	 * an unbalanced div would break the whole page layout.
+	 *
+	 * @param int $order_id Order ID passed by the hook (unused).
+	 * @since 1.6.4
+	 */
+	public function close_thankyou_ui_scope($order_id = 0)
+	{
+		if (!function_exists('is_order_received_page') || !is_order_received_page()) {
+			return;
+		}
+		if ($this->is_blockified_checkout()) {
+			return;
+		}
+		echo '</div>';
+	}
+
+	/**
+	 * Is the current checkout page rendered by the Checkout BLOCK?
+	 *
+	 * Used to keep classic-only wrappers (thank-you scope div) off the
+	 * blockified template, where the classic thank-you hooks fire inside
+	 * individual order-confirmation blocks instead of spanning them.
+	 *
+	 * @return bool
+	 * @since 1.6.4
+	 */
+	private function is_blockified_checkout()
+	{
+		$post = get_post();
+		return ($post instanceof WP_Post) && has_block('woocommerce/checkout', $post);
 	}
 
 	/**

@@ -21,6 +21,7 @@
             isValid: false,
             map: null,
             marker: null,
+            restaurantMarker: null,
             geocoder: null,
             settings: {}
         },
@@ -138,6 +139,12 @@
 
                 // Delivery radius circle around the restaurant (visual zone limit)
                 this.drawDeliveryRadius();
+
+                // Fixed restaurant marker — the second pin. Non-draggable
+                // and visually distinct (ink badge, never the red customer
+                // pin). Classic Marker API so it works with and without a
+                // Cloud Console Map ID.
+                this.addRestaurantMarker();
 
                 // Setup PlaceAutocompleteElement
                 this.setupAutocomplete();
@@ -317,10 +324,37 @@
         triggerTotalRefresh: function (lat, lng) {
             if (this.isBlocksCheckout()) {
                 try {
-                    window.wc.blocksCheckout.extensionCartUpdate({
+                    const result = window.wc.blocksCheckout.extensionCartUpdate({
                         namespace: 'routemile-for-woocommerce',
                         data: { lat, lng }
                     });
+                    // The call is async and fire-and-forget here — a
+                    // rejected promise (flaky network, racing cart update)
+                    // would otherwise leave the totals panel showing stale
+                    // "No available delivery option" with no error and no
+                    // retry (seen 2026-09-10). Retry once after a short
+                    // delay so a transient failure self-heals on the next
+                    // pin the customer drops at the latest.
+                    if (result && typeof result.catch === 'function') {
+                        result.catch((err) => {
+                            console.warn('FXW: extensionCartUpdate rejected, retrying once', err);
+                            setTimeout(() => {
+                                try {
+                                    const retry = window.wc.blocksCheckout.extensionCartUpdate({
+                                        namespace: 'routemile-for-woocommerce',
+                                        data: { lat, lng }
+                                    });
+                                    if (retry && typeof retry.catch === 'function') {
+                                        retry.catch((retryErr) => {
+                                            console.warn('FXW: extensionCartUpdate retry failed', retryErr);
+                                        });
+                                    }
+                                } catch (retryErr) {
+                                    console.warn('FXW: extensionCartUpdate retry threw', retryErr);
+                                }
+                            }, 1500);
+                        });
+                    }
                     return;
                 } catch (err) {
                     console.warn('FXW: extensionCartUpdate failed, falling back to jQuery', err);
@@ -402,13 +436,18 @@
         },
 
         /**
-         * Draws the delivery-radius circle around the restaurant so the
-         * customer can see the selectable zone. Pins outside it are
-         * rejected by the zone validation toast (and server-side).
+         * Draws the honest coverage circle around the restaurant.
+         * circle_km comes from the server (radius ÷ road-factor: exact
+         * for estimate providers, conservative guide for true-road
+         * ones) — never the raw radius, which overstated coverage.
+         * Google Circle has no dashed-stroke support, so unlike the
+         * Leaflet twin this stays solid; the rejection toast carries
+         * the real by-road figure.
          */
         drawDeliveryRadius: function () {
             const restaurant = this.state.settings.restaurant_center;
-            const radiusKm = parseFloat(this.state.settings.radius_km);
+            const radiusKm = parseFloat(this.state.settings.circle_km)
+                || parseFloat(this.state.settings.radius_km);
 
             if (!restaurant || !restaurant.lat || !restaurant.lng || !radiusKm) {
                 return;
@@ -428,6 +467,43 @@
                 });
             } catch (err) {
                 console.warn('FXW: Radius circle failed', err);
+            }
+        },
+
+        /**
+         * Fixed restaurant marker (see addRestaurantMarker in the
+         * Leaflet twin for rationale). Asset-free: the badge is an
+         * inline-SVG data URL so no image file ships.
+         */
+        addRestaurantMarker: function () {
+            if (this.state.restaurantMarker || !this.state.map) {
+                return;
+            }
+            const restaurant = this.state.settings.restaurant_center;
+            if (!restaurant || !restaurant.lat || !restaurant.lng) {
+                return;
+            }
+            try {
+                const glyph = '<path d="M4 9l1.2-4.5h13.6L20 9M4 9v11h16V9M4 9h16M9.5 20v-5.5h5V20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+                const badge = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34" width="34" height="34">'
+                    + '<circle cx="17" cy="17" r="15" fill="#1C1917" stroke="#fff" stroke-width="2"/>'
+                    + '<g transform="translate(9,9) scale(0.6667)">' + glyph + '</g>'
+                    + '</svg>';
+                this.state.restaurantMarker = new google.maps.Marker({
+                    map: this.state.map,
+                    position: { lat: parseFloat(restaurant.lat), lng: parseFloat(restaurant.lng) },
+                    draggable: false,
+                    clickable: true,
+                    title: this.state.settings.restaurant_name || '',
+                    zIndex: -500,
+                    icon: {
+                        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(badge),
+                        scaledSize: new google.maps.Size(30, 30),
+                        anchor: new google.maps.Point(15, 15)
+                    }
+                });
+            } catch (err) {
+                console.warn('FXW: Restaurant marker failed', err);
             }
         },
 

@@ -47,9 +47,12 @@ public function __construct()
      * Two public, static-content endpoints on `init` (before any output):
      * `?routew_agent_manifest=1` returns the web-app manifest and
      * `?routew_agent_sw=1` streams the bundled service worker with a
-     * `Service-Worker-Allowed: /` header so it can control
-     * `/delivery-dashboard/` even though the script is served from the
-     * home URL. No user input is reflected; nothing here is order data.
+     * matching `Service-Worker-Allowed` dashboard-path header plus a
+     * same-path `{ scope }` registration (both derived from
+     * `home_url('/delivery-dashboard/')`, so subdirectory installs work),
+     * so the worker controls ONLY the agent dashboard —
+     * checkout/cart/account pages are outside its scope by construction.
+     * No user input is reflected; nothing here is order data.
      *
      * @since 1.4.0
      */
@@ -67,7 +70,7 @@ public function __construct()
                 'short_name' => __('FX Agent', 'routemile-for-woocommerce'),
                 'description' => __('Delivery agent dashboard for RouteMile orders.', 'routemile-for-woocommerce'),
                 'start_url' => home_url('/delivery-dashboard/'),
-                'scope' => home_url('/'),
+                'scope' => home_url('/delivery-dashboard/'),
                 'display' => 'standalone',
                 'orientation' => 'portrait',
                 'background_color' => '#F5F5F5',
@@ -101,7 +104,7 @@ public function __construct()
 
         header('Content-Type: application/javascript; charset=utf-8');
         header('Cache-Control: no-cache');
-        header('Service-Worker-Allowed: /');
+        header('Service-Worker-Allowed: ' . wp_parse_url(home_url('/delivery-dashboard/'), PHP_URL_PATH));
         readfile($sw_path); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- streaming a static bundled asset.
         exit;
     }

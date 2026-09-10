@@ -294,6 +294,60 @@ class ROUTEW_Pricing
 	}
 
 	/**
+	 * Single source of truth for the delivery fee at a given distance.
+	 *
+	 * Both fee surfaces MUST call this — the REST toast estimate
+	 * (`ROUTEW_REST_Checkout_Controller::validate_location`) and the
+	 * WooCommerce shipping rate (`ROUTEW_Shipping_Method::calculate_shipping`).
+	 * Previously each file duplicated the base + per-km + tiers + free-delivery
+	 * arithmetic inline, and the two copies drifted (toast said $17.65 while
+	 * the order summary charged $15.73 for the same pin — 2026-09-10).
+	 *
+	 * Return shape: array('cost' => float, 'is_free' => bool,
+	 * 'beyond_tiers' => bool). `beyond_tiers` means tiers are configured but
+	 * no tier covers this distance — callers must offer NO rate.
+	 *
+	 * Free-delivery threshold is NOT resolved here when $subtotal is null and
+	 * no cart context exists (early REST): is_free_delivery() safely returns
+	 * false there, and the shipping method re-resolves with the live cart.
+	 *
+	 * @param float      $distance_km Distance in kilometers.
+	 * @param array|null $options     Plugin settings (defaults to option).
+	 * @param float|null $subtotal    Cart subtotal for the free-delivery check; null reads WC()->cart.
+	 * @return array
+	 * @since 1.6.4
+	 */
+	public static function quote_for_distance($distance_km, $options = null, $subtotal = null)
+	{
+		if (null === $options) {
+			$options = get_option('routew_settings');
+		}
+		if (!is_array($options)) {
+			$options = array();
+		}
+
+		$distance_km = (float) $distance_km;
+		$base_fee = isset($options['routew_delivery_fee_base']) ? (float) $options['routew_delivery_fee_base'] : 5;
+		$fee_per_km = isset($options['routew_delivery_fee_per_km']) ? (float) $options['routew_delivery_fee_per_km'] : 1.5;
+		$cost = $base_fee + ($distance_km * $fee_per_km);
+		$is_free = false;
+
+		$tier_fee = self::fee_for_distance($distance_km, $options);
+		if (false === $tier_fee) {
+			return array('cost' => 0, 'is_free' => false, 'beyond_tiers' => true);
+		}
+		if (null !== $tier_fee) {
+			$cost = $tier_fee;
+		}
+		if (self::is_free_delivery($subtotal)) {
+			$cost = 0;
+			$is_free = true;
+		}
+
+		return array('cost' => (float) $cost, 'is_free' => $is_free, 'beyond_tiers' => false);
+	}
+
+	/**
 	 * Is this order subtotal eligible for free delivery?
 	 *
 	 * @param float|null $subtotal Cart subtotal; null reads WC()->cart.

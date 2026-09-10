@@ -224,6 +224,25 @@
 	}
 }
 
+// Fixed restaurant marker (divIcon injected by the pickers —
+// checkout.js + checkout-leaflet.js). Ink badge, never the customer
+// pin blue; pointer-events stay on so the name tooltip works.
+.routew-restaurant-badge {
+	background: none;
+	border: none;
+}
+
+.routew-restaurant-badge__dot {
+	display: grid;
+	place-items: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	background: $rm-ink;
+	border: 2px solid #fff;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, .35);
+}
+
 // Skeleton shimmer while the map boots (JS toggles the class)
 .routew-skeleton-loading {
 	position: relative;

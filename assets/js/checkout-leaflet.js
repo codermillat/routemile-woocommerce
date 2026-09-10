@@ -22,6 +22,7 @@
             isValid: false,
             map: null,
             marker: null,
+            restaurantMarker: null,
             circle: null,
             searchTimer: null,
             settings: {}
@@ -132,6 +133,7 @@
                 this.onLocationChange(e.latlng.lat, e.latlng.lng);
             });
 
+            this.addRestaurantMarker();
             this.drawDeliveryRadius();
 
             const saved = this.state.settings.saved_address;
@@ -266,10 +268,36 @@
         triggerTotalRefresh: function (lat, lng) {
             if (this.isBlocksCheckout()) {
                 try {
-                    window.wc.blocksCheckout.extensionCartUpdate({
+                    const result = window.wc.blocksCheckout.extensionCartUpdate({
                         namespace: 'routemile-for-woocommerce',
                         data: { lat, lng }
                     });
+                    // Mirror of the retry in checkout.js: a rejected
+                    // promise would otherwise leave the totals panel
+                    // showing stale "No available delivery option" with no
+                    // error and no retry (seen 2026-09-10). Retry once
+                    // after a short delay so a transient failure
+                    // self-heals on the next dropped pin at the latest.
+                    if (result && typeof result.catch === 'function') {
+                        result.catch((err) => {
+                            console.warn('FXW: extensionCartUpdate rejected, retrying once', err);
+                            setTimeout(() => {
+                                try {
+                                    const retry = window.wc.blocksCheckout.extensionCartUpdate({
+                                        namespace: 'routemile-for-woocommerce',
+                                        data: { lat, lng }
+                                    });
+                                    if (retry && typeof retry.catch === 'function') {
+                                        retry.catch((retryErr) => {
+                                            console.warn('FXW: extensionCartUpdate retry failed', retryErr);
+                                        });
+                                    }
+                                } catch (retryErr) {
+                                    console.warn('FXW: extensionCartUpdate retry threw', retryErr);
+                                }
+                            }, 1500);
+                        });
+                    }
                     return;
                 } catch (err) {
                     console.warn('FXW: extensionCartUpdate failed, falling back to jQuery', err);
@@ -336,24 +364,70 @@
 
         drawDeliveryRadius: function () {
             const restaurant = this.state.settings.restaurant_center;
-            const radiusKm = parseFloat(this.state.settings.radius_km);
+            // Honest coverage: circle_km is radius ÷ road-factor from the
+            // server (exact for estimate providers, conservative guide for
+            // true-road ones) — never the raw radius, which overstated
+            // coverage for road routes.
+            const circleKm = parseFloat(this.state.settings.circle_km)
+                || parseFloat(this.state.settings.radius_km);
 
-            if (!restaurant || !restaurant.lat || !restaurant.lng || !radiusKm) {
+            if (!restaurant || !restaurant.lat || !restaurant.lng || !circleKm) {
                 return;
             }
 
             this.state.circle = L.circle(
                 [parseFloat(restaurant.lat), parseFloat(restaurant.lng)],
                 {
-                    radius: radiusKm * 1000,
+                    radius: circleKm * 1000,
                     interactive: false,
                     fillColor: '#28a745',
                     fillOpacity: 0.06,
                     color: '#28a745',
                     opacity: 0.5,
-                    weight: 1.5
+                    weight: 1.5,
+                    // Dashed = approximate: the zone rule compares road
+                    // distance, which no crow-flies circle can match.
+                    dashArray: '7 7'
                 }
             ).addTo(this.state.map);
+        },
+
+        /**
+         * Fixed restaurant marker — the second pin. Non-draggable and
+         * visually distinct (ink badge, never the blue customer pin), so
+         * customers see where the kitchen is relative to their drop
+         * point. Asset-free divIcon: no new image files to ship.
+         */
+        addRestaurantMarker: function () {
+            if (this.state.restaurantMarker || !this.state.map) {
+                return;
+            }
+            const restaurant = this.state.settings.restaurant_center;
+            if (!restaurant || !restaurant.lat || !restaurant.lng) {
+                return;
+            }
+            const name = this.state.settings.restaurant_name || '';
+            const badge = L.divIcon({
+                className: 'routew-restaurant-badge',
+                html: '<span class="routew-restaurant-badge__dot" aria-hidden="true">'
+                    + '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 9l1.2-4.5h13.6L20 9M4 9v11h16V9M4 9h16M9.5 20v-5.5h5V20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                    + '</span>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+            this.state.restaurantMarker = L.marker(
+                [parseFloat(restaurant.lat), parseFloat(restaurant.lng)],
+                {
+                    draggable: false,
+                    keyboard: false,
+                    icon: badge,
+                    zIndexOffset: -500,
+                    title: name
+                }
+            ).addTo(this.state.map);
+            if (name) {
+                this.state.restaurantMarker.bindTooltip(name);
+            }
         },
 
         showSelectedAddress: function (address) {

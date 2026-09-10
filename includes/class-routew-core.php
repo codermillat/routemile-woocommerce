@@ -204,6 +204,10 @@ class ROUTEW_Core
 			'ajaxUrl' => admin_url('admin-ajax.php'),
 			'stateNonce' => wp_create_nonce('routew_agent_state'),
 			'swUrl' => add_query_arg('routew_agent_sw', '1', home_url('/')),
+			// Path-only dashboard scope for the SW registration
+			// (subdirectory-safe: '/shop/delivery-dashboard/' when WP lives
+			// under /shop/; the worker derives the same value at runtime).
+			'scopePath' => wp_parse_url(home_url('/delivery-dashboard/'), PHP_URL_PATH),
 			'pollIntervalMs' => 30000,
 			'i18n' => array(
 				'offline' => __('You are offline — orders will refresh when the connection returns', 'routemile-for-woocommerce'),

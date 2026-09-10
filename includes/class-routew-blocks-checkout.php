@@ -44,13 +44,16 @@ class ROUTEW_Blocks_Checkout
 	 */
 	public function __construct()
 	{
-		// Hook on woocommerce_blocks_loaded (or later) — WC 11+ requires
-		// the blocks runtime to be available before
-		// woocommerce_register_additional_checkout_field() will accept a
-		// call; woocommerce_init fires too early and the function defers
-		// the registration to woocommerce_blocks_loaded, which can miss
-		// the page render. v1.2.18.
-		add_action('woocommerce_blocks_loaded', array($this, 'register_fields'));
+		// Hook on woocommerce_init (NOT woocommerce_blocks_loaded): WC 11
+		// fires blocks_loaded before after_setup_theme, so registering
+		// there trips "should be registered on the woocommerce_init action
+		// or later" + early-translation notices (debug.log, 2026-09-10).
+		// woocommerce_init runs after both, and the
+		// woocommerce_register_additional_checkout_field() wrapper itself
+		// defers to blocks_loaded when the runtime isn't ready yet — so
+		// this single hook is exactly-once on every WC version and every
+		// request type (frontend render, Store API, admin).
+		add_action('woocommerce_init', array($this, 'register_fields'));
 		add_action('woocommerce_validate_additional_field', array($this, 'validate_address_details'), 10, 3);
 		// Render the picker into the WRAPPER around the checkout block, never
 		// into the block's own output. WooCommerce's Checkout block hydrates
@@ -64,6 +67,17 @@ class ROUTEW_Blocks_Checkout
 		// itself. Classic themes never reach here (the classic checkout
 		// renders the picker through its own billing-form hook).
 		add_filter('render_block_core/post-content', array($this, 'prepend_map_to_post_content'), 10, 2);
+		// Classic themes (Astra, Storefront, GeneratePress, …) render page
+		// content through the_content with NO core/post-content wrapper
+		// block, so the filter above never fires there and a block
+		// checkout under a classic theme gets no map picker at all
+		// (proven live 2026-09-10 on Astra). This fallback covers them.
+		// Runs at priority 8, before do_blocks (9), on the raw content so
+		// has_block() still matches. A static flag shared with
+		// prepend_map_to_post_content() keeps block themes at exactly one
+		// picker (there the_content runs inside the post-content render,
+		// so the fallback wins and the wrapper filter stands down).
+		add_filter('the_content', array($this, 'prepend_map_to_content_fallback'), 8);
 		add_action('woocommerce_store_api_checkout_update_order_from_request', array($this, 'apply_delivery_data'), 10, 2);
 
 		// Register the `routemile` extension namespace with the Cart/Checkout
@@ -177,6 +191,12 @@ class ROUTEW_Blocks_Checkout
 		// ROUTEW_Checkout_Address instead. Registering a second field here put
 		// two address inputs on the block checkout, and the value would not
 		// have landed in the order's real address (1.3.0).
+		//
+		// NOTE: no `attributes` placeholder — WC 8.6+ only allows
+		// maxLength/readOnly/pattern/autocomplete/autocapitalize/title
+		// (+ aria-*/data-*) and silently drops anything else with a
+		// doing_it_wrong notice, so example text lives in the label docs,
+		// not in a placeholder that never renders.
 		woocommerce_register_additional_checkout_field(array(
 			'id' => 'routemile/landmark',
 			// The block checkout appends its own "(optional)" suffix to
@@ -185,9 +205,6 @@ class ROUTEW_Blocks_Checkout
 			'location' => 'address',
 			'type' => 'text',
 			'required' => false,
-			'attributes' => array(
-				'placeholder' => __('e.g., Near City Mall, Opposite Park', 'routemile-for-woocommerce'),
-			),
 		));
 
 		woocommerce_register_additional_checkout_field(array(
@@ -196,9 +213,6 @@ class ROUTEW_Blocks_Checkout
 			'location' => 'order',
 			'type' => 'text',
 			'required' => false,
-			'attributes' => array(
-				'placeholder' => __('e.g., Ring the bell twice, call before arriving...', 'routemile-for-woocommerce'),
-			),
 		));
 	}
 
@@ -230,6 +244,17 @@ class ROUTEW_Blocks_Checkout
 	}
 
 	/**
+	 * Whether the map picker was already prepended on this request.
+	 *
+	 * Exactly-once guard shared by prepend_map_to_post_content() (block
+	 * themes) and prepend_map_to_content_fallback() (classic themes).
+	 *
+	 * @var bool
+	 * @since 1.6.4
+	 */
+	private static $map_prepended = false;
+
+	/**
 	 * Render the Step-1 map picker above the Checkout block on block themes.
 	 *
 	 * Hooked on `render_block_core/post-content` — the wrapper block through
@@ -247,6 +272,9 @@ class ROUTEW_Blocks_Checkout
 	 */
 	public function prepend_map_to_post_content($block_content, $block)
 	{
+		if (self::$map_prepended) {
+			return $block_content;
+		}
 		if (is_admin() || !function_exists('is_checkout') || !is_checkout()) {
 			return $block_content;
 		}
@@ -258,6 +286,62 @@ class ROUTEW_Blocks_Checkout
 			return $block_content;
 		}
 
+		$prefix = $this->map_picker_prefix();
+		if ('' === $prefix) {
+			return $block_content;
+		}
+
+		self::$map_prepended = true;
+		return $prefix . $block_content;
+	}
+
+	/**
+	 * Render the Step-1 map picker above the Checkout block on CLASSIC
+	 * themes (Astra, Storefront, …), where no core/post-content wrapper
+	 * exists. Same output as prepend_map_to_post_content(); the shared
+	 * flag keeps block themes at exactly one picker.
+	 *
+	 * @param string $content Raw post content (pre-do_blocks).
+	 * @return string
+	 * @since 1.6.4
+	 */
+	public function prepend_map_to_content_fallback($content)
+	{
+		if (self::$map_prepended) {
+			return $content;
+		}
+		if (is_admin() || (function_exists('wp_doing_ajax') && wp_doing_ajax()) || is_feed() || !in_the_loop() || !is_main_query()) {
+			return $content;
+		}
+		if (!function_exists('is_checkout') || !is_checkout()) {
+			return $content;
+		}
+
+		$post = get_post();
+		if (!$post || !has_block('woocommerce/checkout', $post)) {
+			return $content;
+		}
+
+		$prefix = $this->map_picker_prefix();
+		if ('' === $prefix) {
+			return $content;
+		}
+
+		self::$map_prepended = true;
+		return $prefix . $content;
+	}
+
+	/**
+	 * Closed-store notice + Step-1 map picker HTML for the block checkout.
+	 *
+	 * Shared by the block-theme wrapper filter and the classic-theme
+	 * content fallback so both surfaces stay identical.
+	 *
+	 * @return string Notice and/or picker markup, '' when neither applies.
+	 * @since 1.6.4
+	 */
+	private function map_picker_prefix()
+	{
 		$prefix = '';
 
 		// The Open/Closed switch controls order placement — when closed,
@@ -282,11 +366,7 @@ class ROUTEW_Blocks_Checkout
 			$prefix .= ROUTEW_Checkout::render_location_picker(true);
 		}
 
-		if ('' === $prefix) {
-			return $block_content;
-		}
-
-		return $prefix . $block_content;
+		return $prefix;
 	}
 
 	/**
