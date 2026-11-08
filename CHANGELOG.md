@@ -4,6 +4,17 @@ All notable changes to RouteMile for WooCommerce will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.5] — 2026-11-08 — HPOS order-status + memory hotfix
+
+### Fixed
+- **Order statuses would not update on HPOS order screens.** The delivery meta box printed its Reject / Unassign / Assign forms nested inside WooCommerce's own order form. Nested forms are invalid HTML: the browser folds the inner fields into the outer `action=edit_order` submit, corrupting WooCommerce's action and nonce so the status update failed. The meta box now renders inputs only; every state-changing action is a standalone `<form>` printed once in `admin_footer` and linked to its submit button with the HTML `form` attribute. Reject/Unassign redirects also use an HPOS-safe order-URL redirect instead of the raw referer.
+- **Memory exhaustion / 503s on stores with large order histories.** The pre-1.3.9 address-line-2 migration hydrated *every* matching order on `admin_init`; if the request died before finishing, the next admin page load repeated the entire job. New `ROUTEW_Address_Migration` service (`includes/services/class-routew-address-migration.php`) processes at most 100 orders per admin request, persists its offset only after a batch fully succeeds, resumes from the failed batch after a fatal, and sets the original `routew_migrated_address2_v139` completion flag when done. Settings and order data are untouched apart from the intended normalization.
+- **Agent cash summaries and My Account order counts no longer load unbounded histories.** Both now page through 100 IDs at a time and hydrate one order at a time. Exact cash totals and customer counts are preserved — pagination changes memory use only, never the ledger arithmetic, and no history cap is applied. (The cash summary is not part of the rider's 30-second heartbeat.)
+- **Redundant full order saves removed.** Per-status timestamp writes (`ROUTEW_Order_Statuses`) and rider assignment metadata now persist via `$order->save_meta_data()` instead of a second full `$order->save()`, avoiding a repeated save + hook cascade on every status transition and assignment; supplied `WC_Order` objects are reused instead of re-fetching.
+
+### Tests
+- Regression coverage expanded, including function-scoped status-transition checks. **337/337 tests passing on PHP 8.5 and PHP 7.4.**
+
 ## [1.6.4] — 2026-09-10 — Mile Zero design system
 
 ### Security (2026-09 audit: unpaid orders can no longer be forged to "paid")

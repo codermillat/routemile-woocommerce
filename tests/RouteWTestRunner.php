@@ -196,6 +196,7 @@ class ROUTEWTestRunner
             'includes/class-routew-pricing.php' => 'Admin-configurable pricing rules',
             'includes/services/class-routew-delivery-fee.php' => 'Delivery fee service',
             'includes/services/class-routew-address-validator.php' => 'Address validator service',
+            'includes/services/class-routew-address-migration.php' => 'Resumable address migration service',
             'includes/class-routew-dashboard.php' => 'Dashboard class',
             'includes/class-routew-dashboard-render.php' => 'Deliveries dashboard renderer',
             'includes/class-routew-dashboard-actions.php' => 'Deliveries dashboard write handlers',
@@ -288,6 +289,10 @@ class ROUTEWTestRunner
             'includes/class-routew-dashboard.php',
             'includes/class-routew-reporting.php',
             'templates/delivery-dashboard-template.php',
+            'includes/class-routew-checkout-handler.php',
+            'includes/class-routew-agent-cash.php',
+            'includes/class-routew-my-account.php',
+            'includes/services/class-routew-address-migration.php',
         ];
 
         foreach ($files_to_check as $rel_path) {
@@ -510,6 +515,80 @@ class ROUTEWTestRunner
             $this->pass('M10 legacy admin_init GET handler removed');
         } else {
             $this->fail('M10 legacy admin_init GET handler still registered');
+        }
+
+        // HPOS1 — order-editor form isolation, redundant-save and bounded-work fixes.
+        $oa_chunks_hpos = $this->pg1_function_chunks($oa_file);
+        $render_chunk = isset($oa_chunks_hpos['render_delivery_meta_box']) ? $oa_chunks_hpos['render_delivery_meta_box'] : '';
+        if (isset($oa_chunks_hpos['render_delivery_meta_box'])
+            && false === strpos($oa_chunks_hpos['render_delivery_meta_box'], '<form')
+            && false !== strpos($render_chunk, 'form="routew-reject-order-')
+            && false !== strpos($render_chunk, 'form="routew-reassign-order-')) {
+            $this->pass('HPOS1 order meta box has no nested forms or competing action fields');
+        } else {
+            $this->fail('HPOS1 RouteMile controls still nest forms inside WooCommerce #order');
+        }
+        if (isset($oa_chunks_hpos['render_order_action_forms'])
+            && false !== strpos($oa_chunks_hpos['render_order_action_forms'], 'wp_nonce_field(\'routew_order_action\')')
+            && false !== strpos($oa_chunks_hpos['render_order_action_forms'], 'name="action"')
+            && false !== strpos($oa, "add_action('admin_footer', array(\$this, 'render_order_action_forms'))")) {
+            $this->pass('HPOS1 standalone action forms render after #order with their own nonce/action');
+        } else {
+            $this->fail('HPOS1 standalone action-form renderer missing');
+        }
+
+        $save_chunk_hpos = isset($oa_chunks_hpos['save_delivery_meta_box_data']) ? $oa_chunks_hpos['save_delivery_meta_box_data'] : '';
+        if (false !== strpos($oa, "woocommerce_process_shop_order_meta', array(\$this, 'save_delivery_meta_box_data'), 10, 2")
+            && false !== strpos($oa, 'function save_delivery_meta_box_data($post_id, $order = null)')
+            && false !== strpos($save_chunk_hpos, '$order instanceof WC_Order')
+            && false !== strpos($save_chunk_hpos, '$order->save_meta_data();')
+            && false === strpos($save_chunk_hpos, '$order->save();')) {
+            $this->pass('HPOS1 meta save reuses supplied WC_Order and avoids redundant full saves');
+        } else {
+            $this->fail('HPOS1 meta save does not reuse the supplied order / still full-saves');
+        }
+
+        if (isset($oa_chunks_hpos['redirect_to_order'])
+            && false !== strpos($oa_chunks_hpos['redirect_to_order'], 'get_edit_post_link')
+            && false !== strpos($oa_chunks_hpos['redirect_to_order'], 'page=wc-orders&action=edit&id=')
+            && false !== strpos($oa, 'redirect_to_order($order_id)')) {
+            $this->pass('HPOS1 reject/reassign redirects use HPOS-safe editor fallback');
+        } else {
+            $this->fail('HPOS1 standalone action redirect is not HPOS-safe');
+        }
+
+        $migration_file = $this->plugin_dir . '/includes/services/class-routew-address-migration.php';
+        $migration = file_exists($migration_file) ? file_get_contents($migration_file) : '';
+        if (false !== strpos($migration, 'const BATCH_SIZE = 100')
+            && false !== strpos($migration, "'return' => 'ids'")
+            && false !== strpos($migration, "'paged' => \$page")
+            && false !== strpos($migration, 'wc_get_order($order_id)')
+            && false !== strpos($migration, 'routew_address2_migration_offset')
+            && false !== strpos($migration, 'routew_migrated_address2_v139')
+            && false === strpos($migration, "'limit' => -1")) {
+            $this->pass('HPOS1 address migration uses bounded ID pages + resumable offset + final flag');
+        } else {
+            $this->fail('HPOS1 migration is not bounded/resumable or completion semantics regressed');
+        }
+
+        $cash_hpos1 = file_get_contents($this->plugin_dir . '/includes/class-routew-agent-cash.php');
+        $account_chunks_hpos = $this->pg1_function_chunks($this->plugin_dir . '/includes/class-routew-my-account.php');
+        $account_count_hpos1 = isset($account_chunks_hpos['count_orders_for_customer']) ? $account_chunks_hpos['count_orders_for_customer'] : '';
+        if (false !== strpos($cash_hpos1, "'return' => 'ids'")
+            && false !== strpos($cash_hpos1, "'paged' => \$page")
+            && false !== strpos($cash_hpos1, 'wc_get_order($order_id)')
+            && false === strpos($cash_hpos1, "'limit' => -1")) {
+            $this->pass('HPOS1 cash summary paginates IDs and hydrates one order at a time');
+        } else {
+            $this->fail('HPOS1 cash aggregation is not bounded');
+        }
+        if (false !== strpos($account_count_hpos1, "'limit'       => \$limit")
+            && false !== strpos($account_count_hpos1, "'paged'       => \$page")
+            && false !== strpos($account_count_hpos1, '$total += $batch;')
+            && false === strpos($account_count_hpos1, "'limit'       => -1")) {
+            $this->pass('HPOS1 customer statistics use bounded exact paginated counting');
+        } else {
+            $this->fail('HPOS1 customer order counts are not bounded');
         }
 
         // M7 (ledger cap): create_request must use the SETTLEMENT_LEDGER_CAP
@@ -1303,12 +1382,16 @@ class ROUTEWTestRunner
         // =====================================================================
 
         // --- A: status timestamp recording ---
-        $statuses_php = file_get_contents($this->plugin_dir . '/includes/class-routew-order-statuses.php');
+        $statuses_file = $this->plugin_dir . '/includes/class-routew-order-statuses.php';
+        $statuses_php = file_get_contents($statuses_file);
+        $statuses_chunks_hpos = $this->pg1_function_chunks($statuses_file);
+        $transition_chunk_hpos = isset($statuses_chunks_hpos['record_status_timestamp']) ? $statuses_chunks_hpos['record_status_timestamp'] : '';
         if (false !== strpos($statuses_php, "add_action('woocommerce_order_status_changed', array(\$this, 'record_status_timestamp'), 10, 4)")
             && false !== strpos($statuses_php, 'function record_status_timestamp')
             && false !== strpos($statuses_php, "_routew_status_at_' . \$status_to")
-            && false !== strpos($statuses_php, '$order->save()')) {
-            $this->pass('DS12 status transitions record _routew_status_at_* meta (official hook + save)');
+            && false !== strpos($transition_chunk_hpos, '$order->save_meta_data();')
+            && false === strpos($transition_chunk_hpos, '$order->save();')) {
+            $this->pass('DS12 status transitions record _routew_status_at_* meta (official hook + metadata-only save)');
         } else {
             $this->fail('DS12 status timestamp recording missing in class-routew-order-statuses.php');
         }

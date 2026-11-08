@@ -148,35 +148,56 @@ class ROUTEW_Agent_Cash
 			}
 		}
 
-		$delivered = wc_get_orders(array(
-			'limit' => -1,
-			'meta_key' => '_routew_delivery_boy_id',
-			'meta_value' => $agent_id,
-			'status' => array('completed'),
-			'orderby' => 'date',
-			'order' => 'DESC',
-		));
-
 		// Orders completed after the last ACCEPTED handover make up the
 		// current outstanding balance; with no accepted settlement yet,
-		// every delivered COD order does.
+		// every delivered COD order does. Keep this calculation explicit:
+		// the cutoff selects the displayed breakdown, while the exact balance
+		// remains the all-time collected total less accepted settlements.
 		$cutoff = $last_accepted ? (int) $last_accepted['reviewed_at'] : 0;
-		foreach ($delivered as $order) {
-			if ('cod' !== $order->get_payment_method()) {
-				continue;
+
+		// Fetch bounded ID pages, then hydrate one order at a time.
+		// limit=-1 query loaded an agent's entire delivery history into memory
+		// on every dashboard render and action. Totals and the unsettled-order
+		// breakdown still cover the complete history — pagination changes only
+		// memory use, never the ledger arithmetic.
+		$batch_size = 100;
+		$page = 1;
+		do {
+			$ids = wc_get_orders(array(
+				'limit' => $batch_size,
+				'paged' => $page,
+				'meta_key' => '_routew_delivery_boy_id',
+				'meta_value' => $agent_id,
+				'status' => array('completed'),
+				'orderby' => 'date',
+				'order' => 'DESC',
+				'return' => 'ids',
+			));
+			if (!is_array($ids)) {
+				break;
 			}
-			$collected_total += (float) $order->get_total();
-			$completed = $order->get_date_completed();
-			$ts = $completed ? $completed->getTimestamp() : 0;
-			if ($ts > $cutoff) {
-				$unsettled_orders[] = array(
-					'id' => $order->get_id(),
-					'number' => $order->get_order_number(),
-					'total' => (float) $order->get_total(),
-					'completed' => $ts,
-				);
+
+			foreach ($ids as $order_id) {
+				$order = wc_get_order($order_id);
+				if (!$order instanceof WC_Order || 'cod' !== $order->get_payment_method()) {
+					continue;
+				}
+				$collected_total += (float) $order->get_total();
+				$completed = $order->get_date_completed();
+				$ts = $completed ? $completed->getTimestamp() : 0;
+				if ($ts > $cutoff) {
+					$unsettled_orders[] = array(
+						'id' => $order->get_id(),
+						'number' => $order->get_order_number(),
+						'total' => (float) $order->get_total(),
+						'completed' => $ts,
+					);
+				}
 			}
-		}
+
+			$batch_count = count($ids);
+			$page++;
+		} while ($batch_count === $batch_size);
 
 		return array(
 			'collected_total' => $collected_total,

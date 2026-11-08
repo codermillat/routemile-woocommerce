@@ -11,6 +11,12 @@ if (!defined('ABSPATH')) {
  */
 class ROUTEW_Order_Admin
 {
+	/**
+	 * Order whose standalone action forms must be printed in the footer.
+	 *
+	 * @var int
+	 */
+	private $action_order_id = 0;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -20,7 +26,8 @@ class ROUTEW_Order_Admin
 	public function __construct()
 	{
 		add_action('add_meta_boxes', array($this, 'add_delivery_meta_box'));
-		add_action('woocommerce_process_shop_order_meta', array($this, 'save_delivery_meta_box_data'));
+		add_action('woocommerce_process_shop_order_meta', array($this, 'save_delivery_meta_box_data'), 10, 2);
+		add_action('admin_footer', array($this, 'render_order_action_forms'));
 		add_action('template_redirect', array($this, 'print_receipt_template'));
 		// State-changing order actions move from admin_init + GET to
 		// dedicated admin_post_* POST handlers (reject, reassign). This
@@ -51,8 +58,7 @@ class ROUTEW_Order_Admin
 			wp_die(esc_html__('Invalid order.', 'routemile-for-woocommerce'));
 		}
 		$order->update_status('cancelled', __('Order rejected by admin.', 'routemile-for-woocommerce'));
-		wp_safe_redirect(remove_query_arg(array('routew_action', '_wpnonce')));
-		exit;
+		$this->redirect_to_order($order_id);
 	}
 
 	/**
@@ -79,12 +85,11 @@ class ROUTEW_Order_Admin
 		$order->delete_meta_data('_routew_delivery_boy_id');
 		$revert_to = get_post_status_object('wc-routew-in-kitchen') ? 'routew-in-kitchen' : 'processing';
 		$order->update_status($revert_to, __('Delivery boy has been unassigned — order returned to kitchen.', 'routemile-for-woocommerce'));
-		$order->save();
+		// update_status() saves both the pending rider-meta deletion and status.
 		if (class_exists('ROUTEW_Order_Lifecycle')) {
 			ROUTEW_Order_Lifecycle::clear_delivery_location_meta($order_id);
 		}
-		wp_safe_redirect(remove_query_arg(array('routew_action', '_wpnonce')));
-		exit;
+		$this->redirect_to_order($order_id);
 	}
 
 	/**
@@ -207,6 +212,7 @@ class ROUTEW_Order_Admin
 		if (!$order) {
 			return;
 		}
+		$this->action_order_id = $order_id;
 		$delivery_boy_id = $order->get_meta('_routew_delivery_boy_id', true);
 		$delivery_boys = get_users(array('role__in' => array('delivery_boy')));
 		$payment_method = $order->get_payment_method_title();
@@ -278,35 +284,61 @@ class ROUTEW_Order_Admin
 				target="_blank" class="button"><?php esc_html_e('Print Receipt', 'routemile-for-woocommerce'); ?></a>
 		</p>
 		<p>
-			<?php
-			$edit_link = get_edit_post_link($order_id, 'raw');
-		if (!$edit_link) {
-			$edit_link = admin_url('admin.php?page=wc-orders&action=edit&id=' . absint($order_id));
-		}
-			?>
-			<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline-block;">
-				<?php wp_nonce_field('routew_order_action'); ?>
-				<input type="hidden" name="action" value="routew_reject" />
-				<input type="hidden" name="order_id" value="<?php echo esc_attr($order_id); ?>" />
-				<button type="submit" class="button button-danger"><?php esc_html_e('Reject Order', 'routemile-for-woocommerce'); ?></button>
-			</form>
-			<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline-block;">
-				<?php wp_nonce_field('routew_order_action'); ?>
-				<input type="hidden" name="action" value="routew_reassign" />
-				<input type="hidden" name="order_id" value="<?php echo esc_attr($order_id); ?>" />
-				<button type="submit" class="button"><?php esc_html_e('Re-assign', 'routemile-for-woocommerce'); ?></button>
-			</form>
+			<button type="submit" form="routew-reject-order-<?php echo esc_attr($order_id); ?>" class="button button-danger"><?php esc_html_e('Reject Order', 'routemile-for-woocommerce'); ?></button>
+			<button type="submit" form="routew-reassign-order-<?php echo esc_attr($order_id); ?>" class="button"><?php esc_html_e('Re-assign', 'routemile-for-woocommerce'); ?></button>
 		</p>
 		<?php
 	}
 
 	/**
+	 * Print standalone action forms after WooCommerce has closed #order.
+	 * Buttons in the meta box use the HTML form attribute to submit these
+	 * forms, so their action/nonce never contaminate WooCommerce's edit_order
+	 * request and no nested form is parsed or repaired by the browser.
+	 *
+	 * @return void
+	 */
+	public function render_order_action_forms()
+	{
+		$order_id = absint($this->action_order_id);
+		if (!$order_id) {
+			return;
+		}
+		foreach (array('reject', 'reassign') as $action) {
+			?>
+			<form id="routew-<?php echo esc_attr($action); ?>-order-<?php echo esc_attr($order_id); ?>" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+				<?php wp_nonce_field('routew_order_action'); ?>
+				<input type="hidden" name="action" value="routew_<?php echo esc_attr($action); ?>" />
+				<input type="hidden" name="order_id" value="<?php echo esc_attr($order_id); ?>" />
+			</form>
+			<?php
+		}
+	}
+
+	/**
+	 * Redirect to the current storage backend's order editor.
+	 *
+	 * @param int $order_id Order ID.
+	 * @return void
+	 */
+	private function redirect_to_order($order_id)
+	{
+		$edit_link = get_edit_post_link($order_id, 'raw');
+		if (!$edit_link) {
+			$edit_link = admin_url('admin.php?page=wc-orders&action=edit&id=' . absint($order_id));
+		}
+		wp_safe_redirect($edit_link ? $edit_link : admin_url());
+		exit;
+	}
+
+	/**
 	 * Saves the data from the meta box.
 	 *
-	 * @param   int   $post_id    The post ID.
-	 * @since   1.0.0
+	 * @param int           $post_id Order ID.
+	 * @param WC_Order|null $order Supplied order object on HPOS; WP_Post on legacy.
+	 * @since 1.0.0
 	 */
-	public function save_delivery_meta_box_data($post_id)
+	public function save_delivery_meta_box_data($post_id, $order = null)
 	{
 		if (!isset($_POST['routew_meta_box_nonce'])) {
 			return;
@@ -325,40 +357,46 @@ class ROUTEW_Order_Admin
 			return;
 		}
 
-		$order = wc_get_order($post_id);
+		$order = $order instanceof WC_Order ? $order : wc_get_order($post_id);
 		if (!$order) {
 			return;
 		}
 
 		// (routew_address_unit save branch removed in 1.2.16 — the input was never
-// rendered in the meta box; legacy meta is preserved in WC meta store.)
+		// rendered in the meta box; legacy meta is preserved in WC meta store.)
+		if (!isset($_POST['routew_delivery_boy_id'])) {
+			return;
+		}
 
-		if (isset($_POST['routew_delivery_boy_id'])) {
-			$new_id = absint($_POST['routew_delivery_boy_id']);
-			$prev_id = (int) $order->get_meta('_routew_delivery_boy_id', true);
+		$new_id = absint($_POST['routew_delivery_boy_id']);
+		$prev_id = (int) $order->get_meta('_routew_delivery_boy_id', true);
+		if ($new_id === $prev_id) {
+			return;
+		}
 
-			if ($new_id) {
-				$order->update_meta_data('_routew_delivery_boy_id', $new_id);
-			} else {
-				$order->delete_meta_data('_routew_delivery_boy_id');
-			}
-
-			$order->save();
-
-			if ($new_id && $new_id !== $prev_id) {
-				$options = get_option('routew_settings');
-				$auto_assign = true;
-				if (is_array($options) && isset($options['routew_auto_set_assigned_status'])) {
-					$auto_assign = in_array($options['routew_auto_set_assigned_status'], array('yes', 'true', 1, '1'), true);
-				}
-				if ($auto_assign) {
-					$order->update_status('routew-assigned', __('Order assigned to delivery boy.', 'routemile-for-woocommerce'));
-				} else {
-					$order->add_order_note(__('Delivery boy assigned (status unchanged).', 'routemile-for-woocommerce'));
-				}
-			}
+		if ($new_id) {
+			$order->update_meta_data('_routew_delivery_boy_id', $new_id);
 		} else {
-			$order->save();
+			$order->delete_meta_data('_routew_delivery_boy_id');
+		}
+
+		$auto_assign = false;
+		if ($new_id) {
+			$options = get_option('routew_settings');
+			$auto_assign = true;
+			if (is_array($options) && isset($options['routew_auto_set_assigned_status'])) {
+				$auto_assign = in_array($options['routew_auto_set_assigned_status'], array('yes', 'true', 1, '1'), true);
+			}
+			if ($auto_assign) {
+				// Saves both the pending rider meta and the assigned status.
+				$order->update_status('routew-assigned', __('Order assigned to delivery boy.', 'routemile-for-woocommerce'));
+				return;
+			}
+		}
+
+		$order->save_meta_data();
+		if ($new_id && !$auto_assign) {
+			$order->add_order_note(__('Delivery boy assigned (status unchanged).', 'routemile-for-woocommerce'));
 		}
 	}
 }

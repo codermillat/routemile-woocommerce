@@ -4,7 +4,7 @@ Tags: woocommerce, delivery, food delivery, restaurant, local delivery
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.6.4
+Stable tag: 1.6.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -156,6 +156,11 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 
 == Changelog ==
 
+= 1.6.5 =
+* Fixed order statuses failing to update on HPOS order screens: the delivery meta box no longer nests forms inside WooCommerce's order form (which corrupted the edit_order action and nonce). Reject, unassign and assignment actions now use standalone footer forms linked to their buttons via HTML form attributes.
+* Fixed memory exhaustion / 503 errors on stores with large order histories: the address-line-2 migration now runs in resumable 100-order batches instead of loading every order on admin_init, and agent cash summaries and My Account order counts use paginated queries. Totals and counts still cover complete history - no data is truncated.
+* Reduced redundant order saves: status timestamps and rider assignment metadata now use save_meta_data(), avoiding repeated full order saves and hook cascades.
+
 = 1.6.4 =
 * Fixed classic checkout stuck on "No shipping options available" after the pin: the pin is now stamped onto the shipping package so WooCommerce's package-hash rate cache busts on every pin move (toast and totals always agree).
 * Map honesty: fixed non-draggable restaurant marker on both pickers; coverage circle drawn at radius ÷ road-factor (exact for estimate providers, conservative guide for true-road ones); out-of-zone rejections name the by-road distance and range.
@@ -199,6 +204,9 @@ It is not a separate download. A rider logs into your site, opens the Delivery D
 Earlier releases: see CHANGELOG.md in the repository.
 
 == Upgrade Notice ==
+
+= 1.6.5 =
+Hotfix: order statuses now update reliably on HPOS order screens, and large order histories no longer cause memory exhaustion or 503 errors. Recommended for all stores.
 
 = 1.6.3 =
 Plugin Directory review fix: two remaining template outputs now pass through `wp_kses_post()`. No functional changes from 1.6.2.

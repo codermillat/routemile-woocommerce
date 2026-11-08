@@ -4,7 +4,7 @@ A complete delivery management system for single-restaurant WooCommerce stores.
 
 **[Install from WordPress.org](https://wordpress.org/plugins/routemile-for-woocommerce/)** — the plugin is now in the official [WordPress Plugin Directory](https://wordpress.org/plugins/routemile-for-woocommerce/), so you can install it directly from **Plugins → Add New** in your admin.
 
-![Version](https://img.shields.io/badge/Version-1.6.3-blue)
+![Version](https://img.shields.io/badge/Version-1.6.5-blue)
 ![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue)
 ![WooCommerce](https://img.shields.io/badge/WooCommerce-7.0%2B-purple)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-blue)
@@ -12,7 +12,7 @@ A complete delivery management system for single-restaurant WooCommerce stores.
 ![License](https://img.shields.io/badge/License-GPL--3.0--or--later-green)
 [![WordPress.org](https://img.shields.io/badge/WordPress.org-Plugin%20Directory-21759b?logo=wordpress)](https://wordpress.org/plugins/routemile-for-woocommerce/)
 
-> **Latest release:** v1.6.3 — Mile Zero design system across every customer and rider surface, admin-renameable order stages, one-click brand colour, cash settlement workflow, and WordPress.org Plugin Directory compliance. See [`CHANGELOG.md`](./CHANGELOG.md) for full details.
+> **Latest release:** v1.6.5 — hotfix for HPOS order-status updates failing to save and memory exhaustion on large order histories. Built on the Mile Zero design system across every customer and rider surface, with renameable order stages, brand colour, and the cash settlement workflow. See [`CHANGELOG.md`](./CHANGELOG.md) for full details.
 
 ## Features
 

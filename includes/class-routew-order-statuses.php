@@ -69,7 +69,7 @@ class ROUTEW_Order_Statuses
 		}
 
 		$order->update_meta_data($meta_key, time());
-		$order->save();
+		$order->save_meta_data();
 	}
 
 	/**
@@ -88,9 +88,10 @@ class ROUTEW_Order_Statuses
 	 * Re-entering a status overwrites the stamp with the latest time —
 	 * correct for reassignment flows (assigned → in-kitchen → assigned).
 	 *
-	 * save() is safe here: WC resets the transition queue before firing
-	 * this hook (class-wc-order.php status_transition()), so the nested
-	 * save cannot re-trigger it.
+	 * save_meta_data() persists only the timestamp and deliberately avoids a
+	 * second full order save (and its complete hook cascade). WooCommerce's
+	 * current save persists this pending meta later in the same request;
+	 * save_meta_data() also persists it when the hook runs without that save.
 	 *
 	 * @param int      $order_id    Order ID.
 	 * @param string   $status_from Previous status slug.
@@ -106,7 +107,7 @@ class ROUTEW_Order_Statuses
 		}
 
 		$order->update_meta_data('_routew_status_at_' . $status_to, time());
-		$order->save();
+		$order->save_meta_data();
 	}
 
 	/**

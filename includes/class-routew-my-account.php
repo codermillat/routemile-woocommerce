@@ -619,14 +619,24 @@ class ROUTEW_My_Account
 		if (!$customer_id || !function_exists('wc_get_orders')) {
 			return 0;
 		}
-		$query = new WC_Order_Query(array(
-			'customer_id' => $customer_id,
-			'status'      => $statuses,
-			'return'      => 'ids',
-			'limit'       => -1,
-		));
-		$ids = $query->get_orders();
-		return is_array($ids) ? count($ids) : 0;
+		$total = 0;
+		$page = 1;
+		$limit = 100;
+		do {
+			$query = new WC_Order_Query(array(
+				'customer_id' => $customer_id,
+				'status'      => $statuses,
+				'return'      => 'ids',
+				'limit'       => $limit,
+				'paged'       => $page,
+			));
+			$ids = $query->get_orders();
+			$batch = is_array($ids) ? count($ids) : 0;
+			$total += $batch;
+			$page++;
+		} while ($batch === $limit);
+
+		return $total;
 	}
 
 	/**

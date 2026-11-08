@@ -28,6 +28,7 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/services/class-routew-delivery-fee.php';
 require_once __DIR__ . '/services/class-routew-address-validator.php';
+require_once __DIR__ . '/services/class-routew-address-migration.php';
 
 /**
  * Class ROUTEW_Checkout_Handler
@@ -143,63 +144,16 @@ class ROUTEW_Checkout_Handler
     }
 
     /**
-     * Clear the duplicated shipping-address line 2 on orders placed
-     * before 1.3.9, normalising them to the new shape: line 2 is either
-     * "Landmark: <landmark>" (when a landmark was entered) or empty.
+     * Run one resumable batch of the duplicated-address migration.
      *
-     * Uses the HPOS-safe order CRUD (wc_get_orders + setters) — never a
-     * direct table write — and an option flag so it runs exactly once.
+     * The public method remains on the handler for backwards compatibility;
+     * ROUTEW_Address_Migration owns the bounded HPOS-safe implementation.
      *
      * @since 1.3.9
      */
     public function maybe_migrate_duplicated_address_2()
     {
-        if (get_option('routew_migrated_address2_v139')) {
-            return;
-        }
-        // Defensive guard: this is registered on admin_init but should not run
-        // for users who cannot manage orders. Plugin Check / WP.org wants the
-        // capability explicit, even though admin_init already runs only in
-        // admin context.
-        if (!current_user_can('manage_woocommerce') && !current_user_can('manage_options')) {
-            return;
-        }
-        if (!function_exists('wc_get_orders')) {
-            return; // WooCommerce unavailable; try on the next admin hit.
-        }
-
-        $orders = wc_get_orders(array(
-            'limit' => -1,
-            'status' => 'any',
-            'meta_key' => '_routew_delivery_address',
-            'return' => 'objects',
-        ));
-
-        foreach ($orders as $order) {
-            if (!is_a($order, 'WC_Order')) {
-                continue;
-            }
-            $details = trim((string) $order->get_meta('_routew_address_details', true));
-            $landmark = trim((string) $order->get_meta('_routew_landmark', true));
-            $current_line2 = (string) $order->get_shipping_address_2();
-
-            // Only touch the orders our old code shaped. Old line 2 was
-            // either the bare details (no landmark) or
-            // "details (Landmark: ...)" (with a landmark).
-            if ('' === $details || '' === $current_line2) {
-                continue;
-            }
-            $is_old_shape = ($details === $current_line2)
-                || (0 === strpos($current_line2, $details . ' ('));
-            if ($is_old_shape) {
-                $order->set_shipping_address_2(
-                    '' !== $landmark ? sprintf('%s: %s', __('Landmark', 'routemile-for-woocommerce'), $landmark) : ''
-                );
-                $order->save();
-            }
-        }
-
-        update_option('routew_migrated_address2_v139', 1);
+        ROUTEW_Address_Migration::run();
     }
 
 
